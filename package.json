@@ -1,0 +1,62 @@
+{
+  "name": "healthcare-platform-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NestJS modular monolith skeleton for a healthcare platform",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@11.17.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "nest build api",
+    "start": "nest start api",
+    "start:dev": "nest start api --watch",
+    "start:debug": "nest start api --debug --watch",
+    "start:prod": "node dist/apps/api/main.js",
+    "lint": "eslint \"{apps,libs,tools}/**/*.{ts,mts,mjs}\"",
+    "format": "prettier --write \"{apps,libs,docs,tools}/**/*.{ts,js,mjs,json,md,yml,yaml}\"",
+    "test": "jest",
+    "test:unit": "jest --testPathIgnorePatterns=/apps/api/test/e2e/",
+    "test:e2e": "jest --config apps/api/test/jest-e2e.json",
+    "architecture:check": "node tools/architecture/check-boundaries.mjs",
+    "check": "pnpm architecture:check && pnpm lint && pnpm test && pnpm build"
+  },
+  "dependencies": {
+    "@nestjs/common": "^12.0.1",
+    "@nestjs/config": "^12.0.0",
+    "@nestjs/core": "^12.0.1",
+    "@nestjs/cqrs": "^12.0.0",
+    "@nestjs/platform-fastify": "^12.0.1",
+    "@nestjs/swagger": "^12.0.1",
+    "@nestjs/typeorm": "^12.0.1",
+    "fastify": "^5.3.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "ioredis": "^5.6.1",
+    "mongodb": "^6.18.0",
+    "pg": "^8.16.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typeorm": "^1.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@nestjs/cli": "^12.0.0",
+    "@nestjs/schematics": "^12.0.0",
+    "@nestjs/testing": "^12.0.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+    "@types/supertest": "^6.0.3",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^30.0.5",
+    "prettier": "^3.6.2",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  }
+}

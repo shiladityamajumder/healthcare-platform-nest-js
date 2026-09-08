@@ -1,0 +1,95 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@platform/config": [
+        "libs/platform/config/src/index.ts"
+      ],
+      "@platform/database": [
+        "libs/platform/database/src/index.ts"
+      ],
+      "@platform/http": [
+        "libs/platform/http/src/index.ts"
+      ],
+      "@platform/logging": [
+        "libs/platform/logging/src/index.ts"
+      ],
+      "@platform/observability": [
+        "libs/platform/observability/src/index.ts"
+      ],
+      "@platform/security": [
+        "libs/platform/security/src/index.ts"
+      ],
+      "@platform/cache": [
+        "libs/platform/cache/src/index.ts"
+      ],
+      "@platform/messaging": [
+        "libs/platform/messaging/src/index.ts"
+      ],
+      "@shared/*": [
+        "libs/shared-kernel/src/*"
+      ],
+      "@modules/auth": [
+        "libs/modules/auth/src/public-api.ts"
+      ],
+      "@modules/user-management": [
+        "libs/modules/user-management/src/public-api.ts"
+      ],
+      "@modules/organizations": [
+        "libs/modules/organizations/src/public-api.ts"
+      ],
+      "@modules/patients": [
+        "libs/modules/patients/src/public-api.ts"
+      ],
+      "@modules/practitioners": [
+        "libs/modules/practitioners/src/public-api.ts"
+      ],
+      "@modules/file-management": [
+        "libs/modules/file-management/src/public-api.ts"
+      ],
+      "@modules/catalog": [
+        "libs/modules/catalog/src/public-api.ts"
+      ],
+      "@modules/pricing": [
+        "libs/modules/pricing/src/public-api.ts"
+      ],
+      "@modules/inventory": [
+        "libs/modules/inventory/src/public-api.ts"
+      ],
+      "@modules/orders": [
+        "libs/modules/orders/src/public-api.ts"
+      ],
+      "@modules/payments": [
+        "libs/modules/payments/src/public-api.ts"
+      ],
+      "@modules/notifications": [
+        "libs/modules/notifications/src/public-api.ts"
+      ],
+      "@modules/prescriptions": [
+        "libs/modules/prescriptions/src/public-api.ts"
+      ],
+      "@modules/appointments": [
+        "libs/modules/appointments/src/public-api.ts"
+      ],
+      "@modules/audit": [
+        "libs/modules/audit/src/public-api.ts"
+      ]
+    }
+  }
+}

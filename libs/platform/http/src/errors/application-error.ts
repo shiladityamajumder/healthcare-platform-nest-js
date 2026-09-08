@@ -1,0 +1,16 @@
+export {
+  AppError,
+  ApplicationError,
+  AuthenticationError,
+  AuthorizationError,
+  ConflictError,
+  DatabaseError,
+  DomainError,
+  ExternalServiceError,
+  ExternalServiceTimeoutError,
+  InfrastructureError,
+  InfrastructureUnavailableError,
+  NotFoundError,
+  OperationTimeoutError,
+  ValidationError,
+} from '@shared/errors';

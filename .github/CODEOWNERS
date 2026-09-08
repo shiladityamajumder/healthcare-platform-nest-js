@@ -1,0 +1,19 @@
+# Replace @team-* placeholders with real GitHub teams.
+/apps/api/ @team-platform
+/libs/platform/ @team-platform
+/libs/shared-kernel/ @team-architecture
+/libs/modules/auth/ @team-auth
+/libs/modules/user-management/ @team-user-management
+/libs/modules/organizations/ @team-organizations
+/libs/modules/patients/ @team-patients
+/libs/modules/practitioners/ @team-practitioners
+/libs/modules/file-management/ @team-file-management
+/libs/modules/catalog/ @team-catalog
+/libs/modules/pricing/ @team-pricing
+/libs/modules/inventory/ @team-inventory
+/libs/modules/orders/ @team-orders
+/libs/modules/payments/ @team-payments
+/libs/modules/notifications/ @team-notifications
+/libs/modules/prescriptions/ @team-prescriptions
+/libs/modules/appointments/ @team-appointments
+/libs/modules/audit/ @team-audit
