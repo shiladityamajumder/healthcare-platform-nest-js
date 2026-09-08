@@ -29,32 +29,38 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse<FastifyReply>();
 
     if (exception instanceof AppError) {
-      response
-        .status(statusFor(exception))
-        .send(
-          ApiResponseFactory.error(exception.code, exception.message, exception.details ?? null),
-        );
+      sendError(
+        response,
+        statusFor(exception),
+        ApiResponseFactory.error(exception.code, exception.message, exception.details ?? null),
+      );
       return;
     }
 
     if (exception instanceof HttpException) {
-      response
-        .status(exception.getStatus())
-        .send(
-          ApiResponseFactory.error(
-            'HTTP_ERROR',
-            messageForHttpException(exception),
-            exception.getResponse(),
-          ),
-        );
+      sendError(
+        response,
+        exception.getStatus(),
+        ApiResponseFactory.error(
+          'HTTP_ERROR',
+          messageForHttpException(exception),
+          exception.getResponse(),
+        ),
+      );
       return;
     }
 
     this.logger.error(exception instanceof Error ? exception.stack : 'Unknown exception');
-    response
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .send(ApiResponseFactory.error('INTERNAL_SERVER_ERROR', 'An unexpected error occurred.'));
+    sendError(
+      response,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      ApiResponseFactory.error('INTERNAL_SERVER_ERROR', 'An unexpected error occurred.'),
+    );
   }
+}
+
+function sendError(response: FastifyReply, status: HttpStatus, body: unknown): void {
+  response.code(status).send(body);
 }
 
 function statusFor(exception: AppError): HttpStatus {

@@ -9,14 +9,20 @@ import { MongoClient } from 'mongodb';
 import { MONGO_CLIENT } from './mongo/mongo.tokens';
 import { MongoDatabase } from './mongo/mongo.database';
 
+const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
+
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: postgresOptions,
-    }),
+    ...(databaseEnabled
+      ? [
+          TypeOrmModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: postgresOptions,
+          }),
+        ]
+      : []),
   ],
   providers: [
     {
@@ -40,13 +46,17 @@ import { MongoDatabase } from './mongo/mongo.database';
       },
     },
     MongoDatabase,
-    {
-      provide: TRANSACTION_MANAGER,
-      inject: [DataSource],
-      useFactory: (dataSource: DataSource) => new TypeOrmTransactionManager(dataSource),
-    },
+    ...(databaseEnabled
+      ? [
+          {
+            provide: TRANSACTION_MANAGER,
+            inject: [DataSource],
+            useFactory: (dataSource: DataSource) => new TypeOrmTransactionManager(dataSource),
+          },
+        ]
+      : []),
   ],
-  exports: [TRANSACTION_MANAGER, MongoDatabase, MONGO_CLIENT],
+  exports: [...(databaseEnabled ? [TRANSACTION_MANAGER] : []), MongoDatabase, MONGO_CLIENT],
 })
 export class DatabaseModule {}
 

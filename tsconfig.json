@@ -19,76 +19,76 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@platform/config": [
-        "libs/platform/config/src/index.ts"
+        "libs/platform/config/src/index"
       ],
       "@platform/database": [
-        "libs/platform/database/src/index.ts"
+        "libs/platform/database/src/index"
       ],
       "@platform/http": [
-        "libs/platform/http/src/index.ts"
+        "libs/platform/http/src/index"
       ],
       "@platform/logging": [
-        "libs/platform/logging/src/index.ts"
+        "libs/platform/logging/src/index"
       ],
       "@platform/observability": [
-        "libs/platform/observability/src/index.ts"
+        "libs/platform/observability/src/index"
       ],
       "@platform/security": [
-        "libs/platform/security/src/index.ts"
+        "libs/platform/security/src/index"
       ],
       "@platform/cache": [
-        "libs/platform/cache/src/index.ts"
+        "libs/platform/cache/src/index"
       ],
       "@platform/messaging": [
-        "libs/platform/messaging/src/index.ts"
+        "libs/platform/messaging/src/index"
       ],
       "@shared/*": [
         "libs/shared-kernel/src/*"
       ],
       "@modules/auth": [
-        "libs/modules/auth/src/public-api.ts"
+        "libs/modules/auth/src/public-api"
       ],
       "@modules/user-management": [
-        "libs/modules/user-management/src/public-api.ts"
+        "libs/modules/user-management/src/public-api"
       ],
       "@modules/organizations": [
-        "libs/modules/organizations/src/public-api.ts"
+        "libs/modules/organizations/src/public-api"
       ],
       "@modules/patients": [
-        "libs/modules/patients/src/public-api.ts"
+        "libs/modules/patients/src/public-api"
       ],
       "@modules/practitioners": [
-        "libs/modules/practitioners/src/public-api.ts"
+        "libs/modules/practitioners/src/public-api"
       ],
       "@modules/file-management": [
-        "libs/modules/file-management/src/public-api.ts"
+        "libs/modules/file-management/src/public-api"
       ],
       "@modules/catalog": [
-        "libs/modules/catalog/src/public-api.ts"
+        "libs/modules/catalog/src/public-api"
       ],
       "@modules/pricing": [
-        "libs/modules/pricing/src/public-api.ts"
+        "libs/modules/pricing/src/public-api"
       ],
       "@modules/inventory": [
-        "libs/modules/inventory/src/public-api.ts"
+        "libs/modules/inventory/src/public-api"
       ],
       "@modules/orders": [
-        "libs/modules/orders/src/public-api.ts"
+        "libs/modules/orders/src/public-api"
       ],
       "@modules/payments": [
-        "libs/modules/payments/src/public-api.ts"
+        "libs/modules/payments/src/public-api"
       ],
       "@modules/notifications": [
-        "libs/modules/notifications/src/public-api.ts"
+        "libs/modules/notifications/src/public-api"
       ],
       "@modules/prescriptions": [
-        "libs/modules/prescriptions/src/public-api.ts"
+        "libs/modules/prescriptions/src/public-api"
       ],
       "@modules/appointments": [
-        "libs/modules/appointments/src/public-api.ts"
+        "libs/modules/appointments/src/public-api"
       ],
       "@modules/audit": [
-        "libs/modules/audit/src/public-api.ts"
+        "libs/modules/audit/src/public-api"
       ]
     }
   }

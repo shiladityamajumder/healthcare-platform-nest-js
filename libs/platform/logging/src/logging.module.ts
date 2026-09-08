@@ -2,7 +2,11 @@ import { Global, Injectable, Logger, Module } from '@nestjs/common';
 
 /** Application logger boundary. Keep business rules out of this library. */
 @Injectable()
-export class AppLogger extends Logger {}
+export class AppLogger extends Logger {
+  public constructor() {
+    super('AppLogger');
+  }
+}
 
 @Global()
 @Module({

@@ -4,6 +4,6 @@ packages:
   - libs/platform/*
   - libs/modules/*
 allowBuilds:
-  '@parcel/watcher': set this to true or false
-  '@scarf/scarf': set this to true or false
-  unrs-resolver: set this to true or false
+  '@parcel/watcher': true
+  '@scarf/scarf': false
+  unrs-resolver: false

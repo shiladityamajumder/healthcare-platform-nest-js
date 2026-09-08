@@ -1,10 +1,12 @@
 import { Injectable, type NestMiddleware } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { AppLogger } from '@platform/logging';
 import { runWithRequestContext } from './request-context';
 
 type Next = (error?: Error) => void;
+type MiddlewareReply = FastifyReply | ServerResponse;
 
 function headerValue(value: string | string[] | undefined): string | undefined {
   const normalized = Array.isArray(value) ? value[0] : value;
@@ -15,22 +17,35 @@ function headerValue(value: string | string[] | undefined): string | undefined {
 export class RequestContextMiddleware implements NestMiddleware {
   public constructor(private readonly logger: AppLogger) {}
 
-  public use(request: FastifyRequest, reply: FastifyReply, next: Next): void {
+  public use(request: FastifyRequest, reply: MiddlewareReply, next: Next): void {
     const requestId = headerValue(request.headers['x-request-id']) ?? randomUUID();
     const correlationId = headerValue(request.headers['x-correlation-id']) ?? requestId;
     const apiVersion = `v${process.env.API_VERSION ?? '1'}`;
 
-    reply.header('X-Request-ID', requestId);
-    reply.header('X-Correlation-ID', correlationId);
-    reply.header('X-API-Version', apiVersion);
+    setHeader(reply, 'X-Request-ID', requestId);
+    setHeader(reply, 'X-Correlation-ID', correlationId);
+    setHeader(reply, 'X-API-Version', apiVersion);
 
-    reply.raw.once('finish', () => {
+    rawResponse(reply).once('finish', () => {
       this.logger.log(
-        `${request.method} ${request.url} ${reply.raw.statusCode} requestId=${requestId}`,
+        `${request.method} ${request.url} ${rawResponse(reply).statusCode} requestId=${requestId}`,
         RequestContextMiddleware.name,
       );
     });
 
     runWithRequestContext({ requestId, correlationId, apiVersion }, () => next());
   }
+}
+
+function setHeader(reply: MiddlewareReply, name: string, value: string): void {
+  if ('header' in reply && typeof reply.header === 'function') {
+    reply.header(name, value);
+    return;
+  }
+
+  (reply as ServerResponse).setHeader(name, value);
+}
+
+function rawResponse(reply: MiddlewareReply): ServerResponse {
+  return 'raw' in reply ? reply.raw : reply;
 }
