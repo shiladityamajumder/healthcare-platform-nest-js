@@ -1,14 +1,38 @@
 # Deployment model
 
-The repository produces **one backend deployable**. All business modules run in the same Nest process initially.
+## Current topology
 
-Recommended production shape:
+The repository produces one backend deployable. All business contexts run in the same NestJS process and scale as one stateless API unit.
 
-- multiple stateless API replicas behind a load balancer;
-- PostgreSQL as system of record;
-- Redis only for explicit cache/lock/rate-limit use cases;
-- object storage for files;
-- queue/broker only for workflows that genuinely need asynchronous durability;
-- centralized secrets, logs, metrics and traces.
+```mermaid
+flowchart LR
+  LB[Load balancer] --> API1[API replica]
+  LB --> API2[API replica]
+  API1 --> PG[(PostgreSQL)]
+  API2 --> PG
+  API1 -. optional .-> R[(Redis)]
+  API2 -. optional .-> R
+```
 
-Scale the monolith horizontally first. Extract a module only when independent scaling, release cadence, team autonomy or fault isolation justifies the operational cost.
+## Local topology
+
+`docker compose up -d postgres` starts the local PostgreSQL dependency. The API runs from the host with `pnpm start:dev`. MongoDB and Redis are optional and are not started by the current compose file.
+
+## Production baseline
+
+- Run multiple API replicas behind a load balancer.
+- Keep containers stateless; store files in object storage, not the container filesystem.
+- Use managed PostgreSQL with backups, point-in-time recovery, encryption, and restricted network access.
+- Supply secrets through a secret manager or workload identity, never through committed files.
+- Run migrations as a controlled release step before serving code that requires the new schema.
+- Centralize structured logs, metrics, traces, and audit events.
+- Define health semantics that distinguish process liveness from dependency readiness before production rollout.
+- Set resource limits, graceful shutdown, timeouts, retry policies, and rate limits explicitly.
+
+## Container
+
+The `Dockerfile` builds the Nest API and starts `dist/apps/api/main.js`. The image should be scanned, pinned to an approved base-image policy, and run as a non-root user before production use.
+
+## Release gate
+
+No release should rely on the scaffold's placeholder handlers. Verify API contracts, migrations, authorization, audit trails, data retention, and disaster-recovery procedures in the target environment.

@@ -1,18 +1,27 @@
 # Contributing
 
-## Ownership
+## Before coding
 
-Use CODEOWNERS per bounded context. Routine work in Auth, Files and Notifications should occur in different directory trees.
+Read [architecture](ARCHITECTURE.md), [module boundaries](MODULE-BOUNDARIES.md), and the README for the owning context. Confirm whether the change affects a public contract, schema, security control, or operational behavior.
 
-## Pull requests
+## Change ownership
 
-Prefer one bounded context/feature per PR. If a change requires edits across several modules, document why and whether the public contract should change instead.
+Keep a pull request focused on one bounded context or one cross-cutting concern. Cross-context edits are acceptable when the public contract or integration behavior genuinely changes; explain the dependency in the pull request.
 
-## Shared-code rule
+Do not move code into `libs/shared-kernel` or `libs/platform` only to remove local duplication. Promote code only when its ownership is stable and its abstraction is genuinely domain-neutral or technical.
 
-Do not move code into `shared-kernel` or `platform` merely to avoid duplication. Two small duplicated functions are often cheaper than coupling unrelated domains. Extract only stable technical or domain-neutral abstractions.
+## Pull request checklist
 
-## Before pushing
+- [ ] Scope and owning context are clear.
+- [ ] Public API or facade changes have been reviewed by consumers.
+- [ ] Database changes include a migration and rollback considerations.
+- [ ] Security, audit, privacy, and idempotency impact is addressed.
+- [ ] Unit tests cover the business rule.
+- [ ] Integration/e2e tests cover relevant boundaries.
+- [ ] Documentation and ADRs are updated when required.
+- [ ] `pnpm check` passes.
+
+## Local verification
 
 ```bash
 pnpm architecture:check
@@ -20,3 +29,5 @@ pnpm lint
 pnpm test
 pnpm build
 ```
+
+Keep commits reviewable and avoid committing generated output, local `.env` files, secrets, or patient data.

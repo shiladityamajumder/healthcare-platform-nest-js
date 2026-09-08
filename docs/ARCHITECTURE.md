@@ -1,110 +1,90 @@
 # Architecture
 
-## 1. Decision
+## Summary
 
-The platform is a **modular monolith**: one runtime/deployment unit, one Nest application composition root, and independently owned business bounded contexts.
+The backend is a **modular monolith**: one NestJS process, one deployment unit, and multiple business bounded contexts with enforced dependency boundaries. This gives the project simple local transactions and operations while keeping future extraction possible when a context genuinely needs independent scaling, release cadence, or fault isolation.
 
 ```mermaid
 flowchart LR
-  Client --> API[apps/api - Nest + Fastify]
-  API --> Auth[Auth]
-  API --> Users[User Management]
-  API --> Catalog[Catalog]
-  API --> Inventory[Inventory]
-  API --> Orders[Orders]
-  API --> Payments[Payments]
-  API --> Files[File Management]
-  API --> Notify[Notifications]
-  Auth --> DB[(PostgreSQL)]
-  Users --> DB
-  Catalog --> DB
-  Inventory --> DB
-  Orders --> DB
-  Payments --> DB
+  Client[API clients] --> API[apps/api\nNestJS + Fastify]
+  API --> Business[Business modules]
+  Business --> Platform[Platform libraries]
+  Platform --> Postgres[(PostgreSQL)]
+  Platform -. optional .-> Redis[(Redis)]
+  Platform -. optional .-> Mongo[(MongoDB)]
 ```
 
-The shared database **connection infrastructure** lives in `libs/platform/database`; table/entity/repository ownership lives inside each business module.
+## Repository layers
 
-## 2. Why this shape
+| Layer            | Location             | Responsibility                                                                    | May depend on                                    |
+| ---------------- | -------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Composition root | `apps/api`           | Bootstrap, module composition, health endpoints                                   | Platform and module public APIs                  |
+| Business         | `libs/modules/*`     | Bounded contexts and feature slices                                               | Own internals, platform contracts, shared kernel |
+| Platform         | `libs/platform/*`    | HTTP, configuration, persistence connections, cache, logging, messaging, security | External technical libraries                     |
+| Shared kernel    | `libs/shared-kernel` | Small stable domain-neutral primitives                                            | No business or platform libraries                |
 
-Your FastAPI reference already uses a healthy dependency flow: route -> service -> repository -> unit of work. This Nest structure preserves that discipline but strengthens team ownership by moving the HTTP boundary inside the bounded context and then splitting each context into feature slices.
+The composition root wires modules together; it does not own business workflows. A business module owns its transport boundary, application handlers, domain model, persistence adapters, and tests.
 
-For example, Auth does not have a 2,000-line `auth.controller.ts` or `auth.service.ts`. Registration, Login, Password Reset, MFA and token refresh each own their HTTP DTOs, handler and tests.
-
-## 3. Dependency direction
+## Dependency direction
 
 ```mermaid
 flowchart LR
-  API[Feature API / controller] --> APP[Feature application use case]
-  APP --> DOMAIN[Domain]
-  APP --> PORTS[Domain/application ports]
-  INFRA[Infrastructure adapters] --> PORTS
+  HTTP[HTTP controller / DTO] --> APP[Application handler]
+  APP --> DOMAIN[Domain rules]
+  APP --> PORT[Ports / contracts]
+  INFRA[Infrastructure adapter] --> PORT
   INFRA --> DOMAIN
-  DOMAIN --> NOTHING[No outer layer]
+  DOMAIN --> NOTHING[No outer-layer dependency]
 ```
 
-Rules:
+- Controllers translate transport input and output. They do not contain business decisions.
+- Application handlers coordinate a use case and depend on ports rather than concrete infrastructure.
+- Domain code expresses business rules and should remain framework-agnostic where practical.
+- Infrastructure implements ports and owns TypeORM, provider SDKs, storage, and other technical details.
+- ORM entities, repositories, and migrations are private to their owning bounded context.
 
-- Domain code is framework-agnostic where practical.
-- Application code orchestrates use cases and depends on abstractions/ports.
-- Infrastructure implements ports and owns TypeORM, external SDKs, queues, object storage, payment providers, etc.
-- Controllers translate HTTP to application input and application output to HTTP.
-- Cross-module access uses only another module's `public-api.ts` contract or an integration event.
-- Never import another module's TypeORM entity or repository.
+## Feature slices
 
-## 4. Vertical feature slices inside bounded contexts
+Features live under `libs/modules/<context>/src/features/<feature>`. A slice keeps its controller, DTOs, application command/handler, module wiring, and focused tests together. This limits merge contention and makes the unit of ownership visible in the filesystem.
 
-`libs/modules/auth/src/features/login` is independent from `.../registration` and `.../reset-password`. Two developers changing login and reset-password should normally edit no common implementation file.
+The current repository contains scaffolded slices across authentication, users, organizations, patients, practitioners, files, catalog, pricing, inventory, orders, payments, notifications, prescriptions, appointments, and audit. The feature directory is the source of truth for the current inventory.
 
-The bounded-context root module is primarily composition. It should change rarely after initial setup.
+## Cross-module communication
 
-## 5. Shared kernel vs platform
+Use the least coupled mechanism that satisfies the use case:
 
-`libs/shared-kernel` contains tiny stable domain-neutral types (e.g. domain event interfaces, pagination value objects). It must not contain business-specific DTOs, helpers or entities.
+1. Same-module application call.
+2. Narrow synchronous public facade when an immediate decision is required.
+3. Versioned integration event when a reaction can be asynchronous.
+4. Transactional outbox when delivery must survive a process or database failure.
 
-`libs/platform` contains technical infrastructure: config, database connection, logging, tracing, security primitives, cache and messaging. It must not contain business rules.
+Consumers may import only `@modules/<name>`, which resolves to that context's `src/public-api.ts`. They must not import another module's features, domain objects, ORM entities, repositories, or providers.
 
-If something is specific to Orders, put it in Orders even if another module might eventually need it. Promote to a shared contract only after there is a real cross-module need.
+## Data ownership
 
-## 6. Cross-module communication
-
-Prefer, in order:
-
-1. Same-module use-case call.
-2. Synchronous public facade for a business decision needed immediately.
-3. Domain/integration event for a reaction that can be decoupled.
-4. Transactional outbox when an event must survive process/database failure and later move to a broker.
-
-Do not create a web of direct service imports. A modular monolith with circular module dependencies is just a distributed monolith living in one process.
-
-## 7. Database ownership
-
-One PostgreSQL cluster/database is acceptable. Ownership is logical:
+One PostgreSQL database is acceptable for the monolith, but ownership is logical:
 
 - every table has one owning bounded context;
-- only that context writes through its repository;
-- another context asks the owner through a facade/query contract rather than joining directly to private tables in application code;
-- cross-context reporting should use dedicated read models/views, not business repositories reaching into foreign schemas.
+- only the owner writes through its repositories;
+- other contexts use a public contract or a dedicated read model;
+- cross-context reporting must not turn private business repositories into a shared query layer.
 
-For larger domains, PostgreSQL schemas per bounded context are recommended (`auth`, `users`, `catalog`, `inventory`, `orders`, etc.).
+The database connection is platform-owned. Schema artifacts are module-owned and should evolve through migrations with `synchronize: false`.
 
-## 8. Transactions
+## Transactions and consistency
 
-Transactions are owned by application use cases. Repositories do not commit independently. Multi-row invariants and stock/payment/order transitions must use explicit transactions and database constraints/locks where needed.
+Application use cases own transaction boundaries. Repositories do not commit independently. Use database constraints, explicit locks, idempotency keys, and deterministic lock ordering for workflows such as inventory, orders, and payments.
 
-Avoid a single transaction spanning external network calls. Use state transitions + idempotency + outbox/saga-style orchestration for payment, notification and third-party integrations.
+Do not keep a database transaction open across a network call. Represent external work as durable state transitions and use an outbox or saga-style workflow where necessary.
 
-## 9. CQRS
+## Extraction readiness
 
-The skeleton includes `@nestjs/cqrs`, but CQRS is not mandatory for every CRUD endpoint. Use command/query handlers where the workflow benefits from explicit use-case objects. Do not add ceremony just to say the project uses CQRS.
+A context is a candidate for extraction only when it has:
 
-## 10. Extraction readiness
+- no imports into another context's internals;
+- an explicit and versioned public contract;
+- clear data ownership;
+- durable event semantics where required; and
+- operational evidence that separate deployment is worth its cost.
 
-A module is ready to become a microservice later when:
-
-- other modules already call only its public API/contracts;
-- it owns its data;
-- events are explicit and versioned;
-- no foreign repository/entity imports exist.
-
-The architecture therefore preserves the option of later extraction without paying microservice operational cost today.
+The architecture protects that option without imposing distributed-system complexity on every feature today.

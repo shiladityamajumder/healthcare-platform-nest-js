@@ -1,7 +1,23 @@
-# Notifications bounded context
+# 🔔 Notifications bounded context
 
-Owns its HTTP endpoints, application use cases, domain model, persistence adapters, tests, and public cross-module contract.
+Notification delivery, preferences, templates, and delivery tracking.
 
-## Dependency rule
+## Ownership
 
-Code outside this module may import only `@modules/notifications`. It must never import this module's `src/features`, `src/domain`, or `src/infrastructure` paths directly.
+This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/notifications`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+
+## Feature inventory
+
+- `delivery-status`
+- `preferences`
+- `send-notification`
+- `templates`
+
+These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+
+## Boundary notes
+
+- Keep business rules inside this context.
+- Expose only narrow, real contracts through `src/public-api.ts`.
+- Keep ORM entities, repositories, migrations, and provider adapters private.
+- Use integration events or a documented facade for cross-context collaboration.

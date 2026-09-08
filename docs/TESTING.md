@@ -1,21 +1,32 @@
 # Testing strategy
 
-## Feature unit tests
+Tests should provide fast feedback at the lowest level that proves the behavior, with a small number of high-value end-to-end journeys.
 
-Located with the feature under `__tests__`. Mock ports, not framework internals.
+## Test layers
 
-## Module integration tests
+| Layer        | Purpose                                                     | Typical location                |
+| ------------ | ----------------------------------------------------------- | ------------------------------- |
+| Unit         | Business rules and handlers with ports mocked               | Feature `__tests__` directories |
+| Integration  | Repository, ORM, transaction, and provider adapter behavior | Context test suites             |
+| Contract     | Public facades, events, and external provider contracts     | Context or platform tests       |
+| E2E          | High-value HTTP journeys across the composed application    | `apps/api/test/e2e`             |
+| Architecture | Forbidden dependency detection                              | `pnpm architecture:check`       |
 
-Test repository adapters against a real disposable PostgreSQL database/container where SQL behavior matters.
+Mock ports and contracts, not NestJS internals. Use disposable real infrastructure when SQL behavior, transaction semantics, serialization, or provider integration is the behavior under test.
 
-## Contract tests
+## Commands
 
-Protect public module facades and external provider adapters.
+```bash
+pnpm test
+pnpm test:unit
+pnpm test:e2e
+pnpm architecture:check
+```
 
-## E2E tests
+## Expectations
 
-`apps/api/test/e2e` covers high-value user journeys across modules, not every validation branch.
-
-## Architecture tests
-
-`pnpm architecture:check` prevents forbidden dependencies and should run before unit tests in CI.
+- Test success, validation, authorization, conflict, retry, and failure paths.
+- Add regression coverage for every production bug.
+- Keep tests deterministic and independent; avoid shared mutable state.
+- Do not treat a generated handler that returns `not-implemented` as feature coverage.
+- E2E tests should exercise stable user journeys, not duplicate every unit-level validation case.

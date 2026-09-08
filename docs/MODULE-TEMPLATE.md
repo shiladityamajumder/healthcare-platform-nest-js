@@ -1,12 +1,14 @@
 # Bounded-context template
 
+Use this shape for a new business context. Do not create every directory up front; add a directory when the context has a real responsibility for it.
+
 ```text
 libs/modules/<context>/
 ├── README.md
 └── src/
-    ├── <context>.module.ts             # composition only
-    ├── public-api.ts                   # ONLY cross-context import target
-    ├── contracts/                      # narrow facade/events exposed externally
+    ├── <context>.module.ts
+    ├── public-api.ts
+    ├── contracts/
     ├── domain/
     │   ├── entities/
     │   ├── value-objects/
@@ -21,7 +23,7 @@ libs/modules/<context>/
     │       │   ├── <feature>.controller.ts
     │       │   └── dto/
     │       ├── application/
-    │       │   ├── <feature>.command|query.ts
+    │       │   ├── <feature>.command.ts
     │       │   └── <feature>.handler.ts
     │       └── __tests__/
     ├── infrastructure/
@@ -34,3 +36,13 @@ libs/modules/<context>/
         ├── factories/
         └── fakes/
 ```
+
+## Rules for the template
+
+- `public-api.ts` is the only cross-context import target.
+- `contracts/` contains narrow facades or versioned integration contracts, not an export-everything barrel.
+- `domain/` contains business rules, not NestJS controllers or TypeORM decorators where avoidable.
+- `application/` coordinates a use case through ports.
+- `infrastructure/` implements technical adapters and owns persistence details.
+- Feature tests should prove behavior without requiring a running HTTP server.
+- Add a context README with scope, owned data, public contracts, feature inventory, and known limitations.

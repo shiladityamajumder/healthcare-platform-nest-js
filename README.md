@@ -1,30 +1,122 @@
-# Healthcare Platform Backend — NestJS Modular Monolith
+# Healthcare Platform Backend
 
-A production-oriented **modular monolith** skeleton: one deployable NestJS application, many strongly isolated bounded contexts.
+NestJS modular monolith for a healthcare platform. The repository is organized around business capabilities, with one deployable API and explicit boundaries between bounded contexts.
 
-This repository intentionally separates business capabilities more aggressively than a conventional `controllers/services/entities` Nest project. The goal is to let teams work on Auth, Files, Notifications, Orders, Inventory, Payments, etc. with minimal shared-file contention and clear extraction boundaries if any module becomes a microservice later.
+<p align="center">
+  <a href="https://nestjs.com/" target="_blank" rel="noreferrer">
+    <img src="https://nestjs.com/img/logo-small.svg" width="96" alt="NestJS logo" />
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/NestJS-12-E0234E?logo=nestjs&logoColor=white" alt="NestJS 12" />
+  <img src="https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white" alt="Node.js 22 or newer" />
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white" alt="TypeScript 5.9" />
+  <img src="https://img.shields.io/badge/Fastify-5-000000?logo=fastify&logoColor=white" alt="Fastify 5" />
+  <img src="https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL 17" />
+  <img src="https://img.shields.io/badge/pnpm-11.17-F69220?logo=pnpm&logoColor=white" alt="pnpm 11.17" />
+</p>
+
+> **Repository status:** architecture and feature scaffolding are in place. Several handlers are intentionally placeholders and must be implemented before production use. This repository is not, by itself, a compliance certification or a production-ready healthcare system.
+
+## At a glance
+
+| Area                    | Decision                        |
+| ----------------------- | ------------------------------- |
+| Runtime                 | Node.js 22+                     |
+| Framework               | NestJS 12 on Fastify            |
+| Language                | TypeScript 5, strict mode       |
+| Package manager         | pnpm 11.17                      |
+| Primary database        | PostgreSQL 17 + TypeORM         |
+| Optional infrastructure | MongoDB and Redis               |
+| API documentation       | Swagger at `/docs` when enabled |
+| Deployment shape        | One stateless API deployable    |
+| Architecture guard      | `pnpm architecture:check`       |
 
 ## Start here
 
-1. Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
-2. Read [`docs/MODULE-BOUNDARIES.md`](docs/MODULE-BOUNDARIES.md) before adding imports.
-3. Use [`docs/ADDING-A-FEATURE.md`](docs/ADDING-A-FEATURE.md) for feature work.
-4. Run `pnpm architecture:check` in CI and locally.
+- [Documentation hub](docs/README.md) — curated entry point for engineering docs.
+- [Architecture](docs/ARCHITECTURE.md) — runtime shape and dependency direction.
+- [Module boundaries](docs/MODULE-BOUNDARIES.md) — import rules enforced in CI.
+- [Adding a feature](docs/ADDING-A-FEATURE.md) — implementation workflow.
+- [API conventions](docs/API-CONVENTIONS.md) — versioning, envelopes, and errors.
+- [Deployment](docs/DEPLOYMENT.md) — local and production topology.
 
-## Important rule
+## Local development
 
-A module owns its API, application logic, domain model and persistence adapters. There is no global business `controllers/`, `services/`, `repositories/`, `dto/`, or `entities/` folder.
+### Prerequisites
 
-## Local bootstrap
+- Node.js 22 or newer
+- pnpm 11.17 or a compatible pnpm 11 release
+- Docker Desktop or another Docker runtime
+
+### Bootstrap
 
 ```bash
+pnpm install --frozen-lockfile
 cp .env.example .env
 docker compose up -d postgres
-pnpm install
 pnpm start:dev
 ```
 
-Swagger: `http://localhost:3000/docs`
-Health: `GET /api/health/live`
+On PowerShell, use `Copy-Item .env.example .env` instead of `cp`.
 
-The generated feature handlers are placeholders by design; business implementation comes next.
+The API listens on `http://localhost:3000` by default.
+
+| Endpoint                | Purpose                                                     |
+| ----------------------- | ----------------------------------------------------------- |
+| `GET /api/health/live`  | Process liveness; version-neutral                           |
+| `GET /api/health/ready` | Readiness endpoint; version-neutral in the current scaffold |
+| `GET /docs`             | Swagger UI when `DOCS_ENABLED=true`                         |
+
+The default API version is `v1`, so versioned feature routes are served under `/api/v1/...`.
+
+## Common commands
+
+```bash
+pnpm start:dev          # development server with watch mode
+pnpm lint               # ESLint
+pnpm test               # unit and repository test suite
+pnpm test:e2e           # API e2e suite
+pnpm architecture:check
+pnpm build
+pnpm check              # architecture check, lint, tests, and build
+```
+
+## Repository shape
+
+```text
+apps/api/                 API composition root, bootstrap, health checks, e2e tests
+libs/modules/             Business bounded contexts
+libs/platform/            Technical infrastructure shared by the runtime
+libs/shared-kernel/       Small stable cross-cutting domain contracts
+tools/architecture/       Static dependency-boundary checks
+docs/                     Engineering documentation and ADRs
+```
+
+Each business module owns its feature API, application handlers, domain code, persistence adapters, and tests. Cross-module consumers may import only the module's `public-api.ts` entry point.
+
+## Bounded contexts
+
+`auth`, `user-management`, `organizations`, `patients`, `practitioners`, `file-management`, `catalog`, `pricing`, `inventory`, `orders`, `payments`, `notifications`, `prescriptions`, `appointments`, and `audit` are composed into `apps/api/src/app.module.ts`.
+
+The module READMEs under [`libs/modules`](libs/modules) list the current feature slices for each context. They describe the scaffolded capability surface; they do not imply that every workflow is fully implemented.
+
+## Configuration
+
+Copy `.env.example` to `.env` for local work. PostgreSQL is required by the default database configuration. MongoDB and Redis are opt-in integrations controlled by `MONGO_ENABLED` and `REDIS_ENABLED`.
+
+Never commit real credentials, signing keys, patient data, payment data, or provider secrets. See [security architecture](docs/SECURITY.md) before connecting external systems.
+
+## Engineering contract
+
+Before opening a pull request:
+
+```bash
+pnpm architecture:check
+pnpm lint
+pnpm test
+pnpm build
+```
+
+For changes that affect a public module contract, database schema, API behavior, or operational behavior, update the relevant documentation and ADR when the decision is durable.

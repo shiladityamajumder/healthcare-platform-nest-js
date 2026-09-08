@@ -1,21 +1,46 @@
 # API conventions
 
-- URI versioning: `/api/v1/...`.
-- Each feature owns its controller and DTOs.
-- Controllers are thin: authentication/authorization metadata, transport validation, call a use case, return result.
-- Stable success envelope and error envelope are platform-level HTTP concerns.
-- The global envelope is `{ success, message, data, error, meta }`; `meta` carries request, correlation, API-version and timestamp context.
-- Throw shared-kernel application errors from use cases; do not construct HTTP error responses in domain or application code.
-- Pagination, idempotency keys and correlation/request IDs should be standardized globally.
-- Never leak TypeORM entities or external-provider responses as public API models.
-- Breaking API changes require a new API version or explicit migration plan.
+The HTTP API is versioned, typed at the boundary, and consistent in success and failure responses. Controllers translate transport concerns; application handlers own use-case orchestration.
 
-## Recommended route ownership
+## Addressing
 
-```text
-Auth registration  -> libs/modules/auth/src/features/registration/api/http/v1
-File upload        -> libs/modules/file-management/src/features/initiate-upload/api/http/v1
-Notification send  -> libs/modules/notifications/src/features/send-notification/api/http/v1
+- Global prefix: `/api` by default (`API_PREFIX`).
+- URI versioning: `/v1` by default (`API_VERSION`).
+- A typical feature route is `/api/v1/auth/login`.
+- Health routes are version-neutral: `/api/health/live` and `/api/health/ready`.
+- Swagger UI is `/docs` when `DOCS_ENABLED=true`.
+
+Breaking changes require a new API version or a documented migration plan. Do not silently change the meaning of an existing field.
+
+## Response envelopes
+
+Successful responses use:
+
+```json
+{
+  "success": true,
+  "message": "Operation completed successfully.",
+  "data": {},
+  "error": null,
+  "meta": {
+    "requestId": "...",
+    "correlationId": "...",
+    "apiVersion": "v1",
+    "timestamp": "2026-01-01T00:00:00.000Z"
+  }
+}
 ```
 
-There is intentionally no shared `apps/api/controllers` folder.
+Errors use `success: false`, `data: null`, and an error object containing a stable `code` and non-sensitive `details`. Pagination metadata belongs under `meta.pagination`.
+
+## Controller rules
+
+- Keep controllers thin: validation, authorization metadata, handler invocation, and transport mapping.
+- Use request and response DTOs; do not expose TypeORM entities or provider responses.
+- Use `ValidationPipe` rules already configured at bootstrap: transformation, whitelisting, and rejection of unknown properties.
+- Map business failures to shared application errors. Domain and application layers must not construct HTTP responses.
+- Preserve `X-Request-ID`, `X-Correlation-ID`, and `X-API-Version` for supportability.
+
+## Write safety
+
+Use idempotency keys for retryable commands that create or mutate financial, inventory, appointment, or externally visible state. Validate webhook signatures before parsing business payloads and make delivery processing idempotent.
