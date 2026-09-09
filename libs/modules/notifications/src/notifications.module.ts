@@ -6,12 +6,7 @@ import { DeliveryStatusModule } from './features/delivery-status/delivery-status
 
 /** Composition root for the Notifications bounded context. */
 @Module({
-  imports: [
-    SendNotificationModule,
-    PreferencesModule,
-    TemplatesModule,
-    DeliveryStatusModule
-  ],
+  imports: [SendNotificationModule, PreferencesModule, TemplatesModule, DeliveryStatusModule],
   exports: [],
 })
 export class NotificationsModule {}

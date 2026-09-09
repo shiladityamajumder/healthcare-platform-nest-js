@@ -6,12 +6,7 @@ import { WebhookModule } from './features/webhook/webhook.module';
 
 /** Composition root for the Payments bounded context. */
 @Module({
-  imports: [
-    CreatePaymentModule,
-    CapturePaymentModule,
-    RefundPaymentModule,
-    WebhookModule
-  ],
+  imports: [CreatePaymentModule, CapturePaymentModule, RefundPaymentModule, WebhookModule],
   exports: [],
 })
 export class PaymentsModule {}

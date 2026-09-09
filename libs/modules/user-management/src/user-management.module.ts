@@ -14,7 +14,7 @@ import { RolesModule } from './features/roles/roles.module';
     ListUsersModule,
     UpdateUserModule,
     ActivateUserModule,
-    RolesModule
+    RolesModule,
   ],
   exports: [],
 })

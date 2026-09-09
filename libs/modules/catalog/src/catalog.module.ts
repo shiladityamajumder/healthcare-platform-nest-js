@@ -14,7 +14,7 @@ import { BrandsModule } from './features/brands/brands.module';
     ListProductsModule,
     UpdateProductModule,
     CategoriesModule,
-    BrandsModule
+    BrandsModule,
   ],
   exports: [],
 })

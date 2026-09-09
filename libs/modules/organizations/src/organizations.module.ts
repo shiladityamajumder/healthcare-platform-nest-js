@@ -10,7 +10,7 @@ import { FacilitiesModule } from './features/facilities/facilities.module';
     CreateOrganizationModule,
     GetOrganizationModule,
     UpdateOrganizationModule,
-    FacilitiesModule
+    FacilitiesModule,
   ],
   exports: [],
 })

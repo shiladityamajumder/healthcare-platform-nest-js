@@ -14,7 +14,7 @@ import { ReturnsModule } from './features/returns/returns.module';
     ListOrdersModule,
     CancelOrderModule,
     UpdateStatusModule,
-    ReturnsModule
+    ReturnsModule,
   ],
   exports: [],
 })

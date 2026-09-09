@@ -10,7 +10,7 @@ import { CancelAppointmentModule } from './features/cancel-appointment/cancel-ap
     AvailabilityModule,
     BookAppointmentModule,
     RescheduleAppointmentModule,
-    CancelAppointmentModule
+    CancelAppointmentModule,
   ],
   exports: [],
 })

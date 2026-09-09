@@ -25,6 +25,15 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-empty-object-type': ['error', { allowInterfaces: 'always' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
       'no-restricted-imports': [
         'error',
         {
@@ -36,6 +45,22 @@ export default tseslint.config(
           ],
         },
       ],
+    },
+  },
+  {
+    files: ['**/*.handler.ts'],
+    rules: {
+      // Scaffold handlers are async by contract and will gain awaited ports later.
+      '@typescript-eslint/require-await': 'off',
+    },
+  },
+  {
+    files: ['tools/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+      },
     },
   },
 );

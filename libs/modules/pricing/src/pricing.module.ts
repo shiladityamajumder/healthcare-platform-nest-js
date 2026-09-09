@@ -6,12 +6,7 @@ import { TaxRulesModule } from './features/tax-rules/tax-rules.module';
 
 /** Composition root for the Pricing bounded context. */
 @Module({
-  imports: [
-    GetEffectivePriceModule,
-    SetPriceModule,
-    PriceBooksModule,
-    TaxRulesModule
-  ],
+  imports: [GetEffectivePriceModule, SetPriceModule, PriceBooksModule, TaxRulesModule],
   exports: [],
 })
 export class PricingModule {}

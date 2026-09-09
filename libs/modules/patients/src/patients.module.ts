@@ -12,7 +12,7 @@ import { ConsentsModule } from './features/consents/consents.module';
     GetProfileModule,
     UpdateProfileModule,
     AddressesModule,
-    ConsentsModule
+    ConsentsModule,
   ],
   exports: [],
 })

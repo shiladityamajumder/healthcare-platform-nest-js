@@ -20,7 +20,7 @@ import { MfaModule } from './features/mfa/mfa.module';
     ResetPasswordModule,
     ChangePasswordModule,
     VerifyEmailModule,
-    MfaModule
+    MfaModule,
   ],
   exports: [],
 })

@@ -10,7 +10,7 @@ import { AttachDocumentModule } from './features/attach-document/attach-document
     CreatePrescriptionModule,
     GetPrescriptionModule,
     ReviewPrescriptionModule,
-    AttachDocumentModule
+    AttachDocumentModule,
   ],
   exports: [],
 })

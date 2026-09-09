@@ -22,6 +22,7 @@ import { PrescriptionsModule } from '@modules/prescriptions';
 import { AppointmentsModule } from '@modules/appointments';
 import { AuditModule } from '@modules/audit';
 import { HealthModule } from './health/health.module';
+import { BaseModule } from './base/base.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { HealthModule } from './health/health.module';
     HttpKernelModule,
     CqrsModule.forRoot(),
     HealthModule,
+    BaseModule,
     AuthModule,
     UserManagementModule,
     OrganizationsModule,

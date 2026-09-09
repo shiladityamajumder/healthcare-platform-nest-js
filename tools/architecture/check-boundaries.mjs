@@ -46,7 +46,9 @@ for (const file of sourceRoots.flatMap(walk)) {
     if (spec.startsWith('@modules/')) {
       const parts = spec.split('/');
       if (parts.length !== 2) {
-        errors.push(`${path.relative(root, file)} -> ${spec}: import bounded contexts only through @modules/<name>.`);
+        errors.push(
+          `${path.relative(root, file)} -> ${spec}: import bounded contexts only through @modules/<name>.`,
+        );
       }
       continue;
     }
@@ -57,15 +59,24 @@ for (const file of sourceRoots.flatMap(walk)) {
     const targetLayer = layerOf(resolved);
 
     if (currentModule && targetModule && currentModule !== targetModule) {
-      errors.push(`${path.relative(root, file)} -> ${spec}: relative cross-module import is forbidden.`);
+      errors.push(
+        `${path.relative(root, file)} -> ${spec}: relative cross-module import is forbidden.`,
+      );
     }
 
     if (currentModule && targetModule === currentModule) {
-      if (currentLayer === 'domain' && ['application', 'infrastructure', 'api'].includes(targetLayer)) {
-        errors.push(`${path.relative(root, file)} -> ${spec}: domain must not depend on ${targetLayer}.`);
+      if (
+        currentLayer === 'domain' &&
+        ['application', 'infrastructure', 'api'].includes(targetLayer)
+      ) {
+        errors.push(
+          `${path.relative(root, file)} -> ${spec}: domain must not depend on ${targetLayer}.`,
+        );
       }
       if (currentLayer === 'application' && ['infrastructure', 'api'].includes(targetLayer)) {
-        errors.push(`${path.relative(root, file)} -> ${spec}: application must depend on ports, not ${targetLayer}.`);
+        errors.push(
+          `${path.relative(root, file)} -> ${spec}: application must depend on ports, not ${targetLayer}.`,
+        );
       }
     }
   }
@@ -73,12 +84,15 @@ for (const file of sourceRoots.flatMap(walk)) {
 
 for (const file of walk(path.join(root, 'libs', 'platform'))) {
   const text = fs.readFileSync(file, 'utf8');
-  if (text.includes('@modules/')) errors.push(`${path.relative(root, file)}: platform cannot depend on business modules.`);
+  if (text.includes('@modules/'))
+    errors.push(`${path.relative(root, file)}: platform cannot depend on business modules.`);
 }
 for (const file of walk(path.join(root, 'libs', 'shared-kernel'))) {
   const text = fs.readFileSync(file, 'utf8');
   if (text.includes('@modules/') || text.includes('@platform/')) {
-    errors.push(`${path.relative(root, file)}: shared-kernel cannot depend on platform or business modules.`);
+    errors.push(
+      `${path.relative(root, file)}: shared-kernel cannot depend on platform or business modules.`,
+    );
   }
 }
 

@@ -4,10 +4,7 @@ import { GetAuditEntryModule } from './features/get-audit-entry/get-audit-entry.
 
 /** Composition root for the Audit bounded context. */
 @Module({
-  imports: [
-    SearchAuditLogModule,
-    GetAuditEntryModule
-  ],
+  imports: [SearchAuditLogModule, GetAuditEntryModule],
   exports: [],
 })
 export class AuditModule {}

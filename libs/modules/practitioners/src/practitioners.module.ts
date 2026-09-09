@@ -6,12 +6,7 @@ import { LicensesModule } from './features/licenses/licenses.module';
 
 /** Composition root for the Practitioners bounded context. */
 @Module({
-  imports: [
-    CreateProfileModule,
-    GetProfileModule,
-    UpdateProfileModule,
-    LicensesModule
-  ],
+  imports: [CreateProfileModule, GetProfileModule, UpdateProfileModule, LicensesModule],
   exports: [],
 })
 export class PractitionersModule {}

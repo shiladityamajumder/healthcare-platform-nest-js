@@ -14,7 +14,7 @@ import { WarehousesModule } from './features/warehouses/warehouses.module';
     ReleaseReservationModule,
     AdjustStockModule,
     TransferStockModule,
-    WarehousesModule
+    WarehousesModule,
   ],
   exports: [],
 })

@@ -12,7 +12,7 @@ import { GenerateDownloadUrlModule } from './features/generate-download-url/gene
     CompleteUploadModule,
     GetFileModule,
     DeleteFileModule,
-    GenerateDownloadUrlModule
+    GenerateDownloadUrlModule,
   ],
   exports: [],
 })
