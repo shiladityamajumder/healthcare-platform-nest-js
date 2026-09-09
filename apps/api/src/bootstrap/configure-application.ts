@@ -1,12 +1,11 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { BaseModule } from '../base/base.module';
+import { HealthModule } from '../health/health.module';
 
 export function configureApplication(app: NestFastifyApplication): void {
   const apiPrefix = process.env.API_PREFIX ?? 'api';
-  const publicBaseUrl = (
-    process.env.PUBLIC_BASE_URL ?? `http://localhost:${process.env.PORT ?? '3000'}`
-  ).replace(/\/$/, '');
 
   app.setGlobalPrefix(apiPrefix);
   app.enableVersioning({
@@ -27,10 +26,11 @@ export function configureApplication(app: NestFastifyApplication): void {
       .setTitle('Healthcare Platform API')
       .setDescription('Modular monolith HTTP API')
       .setVersion('1.0')
-      .addServer(`${publicBaseUrl}/${apiPrefix}`, 'Configured API base URL')
       .addBearerAuth()
       .build();
-    const document = SwaggerModule.createDocument(app, config);
+    const document = SwaggerModule.createDocument(app, config, {
+      include: [BaseModule, HealthModule],
+    });
     SwaggerModule.setup('docs', app, document, {
       useGlobalPrefix: true,
       jsonDocumentUrl: 'docs/openapi.json',

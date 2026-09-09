@@ -8,7 +8,7 @@ The HTTP API is versioned, typed at the boundary, and consistent in success and 
 - URI versioning: `/v1` by default (`API_VERSION`).
 - A typical feature route is `/api/v1/auth/login`.
 - Health routes are version-neutral: `/api/health/live` and `/api/health/ready`.
-- Swagger UI is `/docs` when `DOCS_ENABLED=true`.
+- Swagger UI is `/api/docs` by default when `DOCS_ENABLED=true` (the `/api` segment follows `API_PREFIX`).
 
 Breaking changes require a new API version or a documented migration plan. Do not silently change the meaning of an existing field.
 

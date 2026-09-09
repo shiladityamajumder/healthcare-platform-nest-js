@@ -21,17 +21,17 @@ NestJS modular monolith for a healthcare platform. The repository is organized a
 
 ## At a glance
 
-| Area                    | Decision                        |
-| ----------------------- | ------------------------------- |
-| Runtime                 | Node.js 22+                     |
-| Framework               | NestJS 12 on Fastify            |
-| Language                | TypeScript 5, strict mode       |
-| Package manager         | pnpm 11.17                      |
-| Primary database        | PostgreSQL 17 + TypeORM         |
-| Optional infrastructure | MongoDB and Redis               |
-| API documentation       | Swagger at `/docs` when enabled |
-| Deployment shape        | One stateless API deployable    |
-| Architecture guard      | `pnpm architecture:check`       |
+| Area                    | Decision                            |
+| ----------------------- | ----------------------------------- |
+| Runtime                 | Node.js 22+                         |
+| Framework               | NestJS 12 on Fastify                |
+| Language                | TypeScript 5, strict mode           |
+| Package manager         | pnpm 11.17                          |
+| Primary database        | PostgreSQL 17 + TypeORM             |
+| Optional infrastructure | MongoDB and Redis                   |
+| API documentation       | Swagger at `/api/docs` when enabled |
+| Deployment shape        | One stateless API deployable        |
+| Architecture guard      | `pnpm architecture:check`           |
 
 ## Start here
 
@@ -67,7 +67,7 @@ The API listens on `http://localhost:3000` by default.
 | ----------------------- | ----------------------------------------------------------- |
 | `GET /api/health/live`  | Process liveness; version-neutral                           |
 | `GET /api/health/ready` | Readiness endpoint; version-neutral in the current scaffold |
-| `GET /docs`             | Swagger UI when `DOCS_ENABLED=true`                         |
+| `GET /api/docs`         | Swagger UI when `DOCS_ENABLED=true`                         |
 
 The default API version is `v1`, so versioned feature routes are served under `/api/v1/...`.
 
@@ -98,7 +98,7 @@ Each business module owns its feature API, application handlers, domain code, pe
 
 ## Bounded contexts
 
-`auth`, `user-management`, `organizations`, `patients`, `practitioners`, `file-management`, `catalog`, `pricing`, `inventory`, `orders`, `payments`, `notifications`, `prescriptions`, `appointments`, and `audit` are composed into `apps/api/src/app.module.ts`.
+The bounded-context libraries are scaffolded under `libs/modules`. Only implemented HTTP modules are composed into `apps/api/src/app.module.ts`; the current API exposes the base metadata and health endpoints. A feature module should be added to the composition root when its HTTP workflow is implemented.
 
 The module READMEs under [`libs/modules`](libs/modules) list the current feature slices for each context. They describe the scaffolded capability surface; they do not imply that every workflow is fully implemented.
 
