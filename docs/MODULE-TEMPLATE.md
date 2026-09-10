@@ -27,10 +27,9 @@ libs/modules/<context>/
     │       │   └── <feature>.handler.ts
     │       └── __tests__/
     ├── infrastructure/
-    │   ├── persistence/typeorm/
-    │   │   ├── entities/
-    │   │   ├── repositories/
-    │   │   └── migrations/
+    │   ├── persistence/postgres/
+    │   │   ├── queries/
+    │   │   └── repositories/
     │   └── providers/
     └── testing/
         ├── factories/
@@ -41,7 +40,7 @@ libs/modules/<context>/
 
 - `public-api.ts` is the only cross-context import target.
 - `contracts/` contains narrow facades or versioned integration contracts, not an export-everything barrel.
-- `domain/` contains business rules, not NestJS controllers or TypeORM decorators where avoidable.
+- `domain/` contains business rules, not NestJS controllers or persistence decorators where avoidable.
 - `application/` coordinates a use case through ports.
 - `infrastructure/` implements technical adapters and owns persistence details.
 - Feature tests should prove behavior without requiring a running HTTP server.

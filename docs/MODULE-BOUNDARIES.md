@@ -13,7 +13,7 @@ Boundaries are part of the system design, not a convention to remember during re
 7. Domain code must not depend on application, infrastructure, or API code.
 8. Application code must depend on ports and contracts, not infrastructure or API code.
 9. HTTP DTOs, domain objects, and persistence entities are different models. Do not reuse one as another.
-10. Repositories, ORM entities, migrations, and provider adapters remain private to their owning context.
+10. Repositories, SQL query files, and provider adapters remain private to their owning context.
 
 ## Allowed cross-module usage
 

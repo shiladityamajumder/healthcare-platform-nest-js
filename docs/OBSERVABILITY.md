@@ -8,7 +8,7 @@ Observability is a platform concern with business context supplied by each modul
 - Request and correlation IDs propagated in headers and log context.
 - Trace and span IDs when distributed tracing is enabled.
 - HTTP latency, throughput, status, and error-rate metrics.
-- Database pool saturation, query latency, migration status, and connection errors.
+- Database pool saturation, query latency, and connection errors.
 - External-provider latency, timeout, retry, and failure metrics.
 - Business metrics owned by the relevant context, such as appointment booking or payment transitions.
 

@@ -7,7 +7,7 @@ Tests should provide fast feedback at the lowest level that proves the behavior,
 | Layer        | Purpose                                                     | Typical location                |
 | ------------ | ----------------------------------------------------------- | ------------------------------- |
 | Unit         | Business rules and handlers with ports mocked               | Feature `__tests__` directories |
-| Integration  | Repository, ORM, transaction, and provider adapter behavior | Context test suites             |
+| Integration  | Repository, SQL, transaction, and provider adapter behavior | Context test suites             |
 | Contract     | Public facades, events, and external provider contracts     | Context or platform tests       |
 | E2E          | High-value HTTP journeys across the composed application    | `apps/api/test/e2e`             |
 | Architecture | Forbidden dependency detection                              | `pnpm architecture:check`       |

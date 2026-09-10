@@ -36,7 +36,7 @@ Errors use `success: false`, `data: null`, and an error object containing a stab
 ## Controller rules
 
 - Keep controllers thin: validation, authorization metadata, handler invocation, and transport mapping.
-- Use request and response DTOs; do not expose TypeORM entities or provider responses.
+- Use request and response DTOs; do not expose persistence models or provider responses.
 - Use `ValidationPipe` rules already configured at bootstrap: transformation, whitelisting, and rejection of unknown properties.
 - Map business failures to shared application errors. Domain and application layers must not construct HTTP responses.
 - Preserve `X-Request-ID`, `X-Correlation-ID`, and `X-API-Version` for supportability.

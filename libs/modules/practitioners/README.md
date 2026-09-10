@@ -19,5 +19,5 @@ These directories describe the current scaffolded capability surface. A feature 
 
 - Keep business rules inside this context.
 - Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep ORM entities, repositories, migrations, and provider adapters private.
+- Keep SQL repositories, query files, and provider adapters private.
 - Use integration events or a documented facade for cross-context collaboration.

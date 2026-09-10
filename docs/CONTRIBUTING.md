@@ -14,7 +14,7 @@ Do not move code into `libs/shared-kernel` or `libs/platform` only to remove loc
 
 - [ ] Scope and owning context are clear.
 - [ ] Public API or facade changes have been reviewed by consumers.
-- [ ] Database changes include a migration and rollback considerations.
+- [ ] Database query or table-contract changes are reviewed with the external database owner.
 - [ ] Security, audit, privacy, and idempotency impact is addressed.
 - [ ] Unit tests cover the business rule.
 - [ ] Integration/e2e tests cover relevant boundaries.

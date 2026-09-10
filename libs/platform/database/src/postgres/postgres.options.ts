@@ -1,7 +1,7 @@
 import type { ConfigService } from '@nestjs/config';
-import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import type { PoolConfig } from 'pg';
 
-export function postgresOptions(config: ConfigService): TypeOrmModuleOptions {
+export function postgresOptions(config: ConfigService): PoolConfig {
   const databaseUrl = config
     .get<string>('DATABASE_URL')
     ?.replace(/^postgresql\+asyncpg:\/\//, 'postgresql://');
@@ -11,24 +11,18 @@ export function postgresOptions(config: ConfigService): TypeOrmModuleOptions {
   const enableChannelBinding = databaseUrl?.includes('channel_binding=require') ?? false;
 
   return {
-    type: 'postgres',
     ...(databaseUrl
-      ? { url: databaseUrl }
+      ? { connectionString: databaseUrl }
       : {
           host: config.getOrThrow<string>('DATABASE_HOST'),
           port: Number(config.get<string>('DATABASE_PORT') ?? 5432),
           database: config.getOrThrow<string>('DATABASE_NAME'),
-          username: config.getOrThrow<string>('DATABASE_USER'),
+          user: config.getOrThrow<string>('DATABASE_USER'),
           password: config.getOrThrow<string>('DATABASE_PASSWORD'),
         }),
     ssl: sslEnabled ? { rejectUnauthorized } : false,
-    autoLoadEntities: true,
-    synchronize: false,
-    logging: false,
-    extra: {
-      max: Number(config.get<string>('DATABASE_POOL_SIZE') ?? 20),
-      ...(enableChannelBinding ? { enableChannelBinding: true } : {}),
-      ...(endpointId ? { options: `endpoint=${endpointId}` } : {}),
-    },
+    max: Number(config.get<string>('DATABASE_POOL_SIZE') ?? 20),
+    ...(enableChannelBinding ? { enableChannelBinding: true } : {}),
+    ...(endpointId ? { options: `endpoint=${endpointId}` } : {}),
   };
 }

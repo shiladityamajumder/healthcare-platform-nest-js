@@ -9,7 +9,7 @@ Use a vertical feature slice for a new workflow. The goal is to keep the transpo
 3. Create a feature directory under `libs/modules/<context>/src/features/<feature>`.
 4. Add the HTTP controller and DTOs only if the workflow is externally exposed.
 5. Add the application command/query and handler.
-6. Depend on ports or contracts from the application layer; keep ORM/provider code in infrastructure.
+6. Depend on ports or contracts from the application layer; keep SQL/provider code in infrastructure.
 7. Register the feature module in the bounded-context module.
 8. Add focused unit tests, then integration or e2e coverage when the workflow crosses real boundaries.
 9. Update the context README, API documentation, and an ADR when the change alters a durable architectural decision.
@@ -41,8 +41,8 @@ If another bounded context needs a result immediately, add the smallest useful o
 ## Definition of done
 
 - Input is validated and output is a public response DTO.
-- Business rules are covered independently of NestJS and TypeORM.
+- Business rules are covered independently of NestJS and PostgreSQL.
 - Authorization, idempotency, audit, and sensitive-data handling are explicit where relevant.
-- Database changes have a migration and constraints for race-sensitive invariants.
+- Database changes are coordinated with the external schema owner and retain constraints for race-sensitive invariants.
 - Public contract and operational impact are documented.
 - `pnpm check` passes.

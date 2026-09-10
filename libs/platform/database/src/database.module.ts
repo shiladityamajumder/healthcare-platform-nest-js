@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { Pool } from 'pg';
 import { postgresOptions } from './postgres/postgres.options';
-import { TypeOrmTransactionManager } from './transaction/typeorm-transaction-manager';
+import { PostgresDatabase } from './postgres/postgres.database';
+import { POSTGRES_POOL } from './postgres/postgres.tokens';
+import { PostgresTransactionManager } from './transaction/postgres-transaction-manager';
 import { TRANSACTION_MANAGER } from './transaction/transaction-manager';
 import { MongoClient } from 'mongodb';
 import { MONGO_CLIENT } from './mongo/mongo.tokens';
@@ -12,18 +13,7 @@ import { MongoDatabase } from './mongo/mongo.database';
 const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
 
 @Module({
-  imports: [
-    ConfigModule,
-    ...(databaseEnabled
-      ? [
-          TypeOrmModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: postgresOptions,
-          }),
-        ]
-      : []),
-  ],
+  imports: [ConfigModule],
   providers: [
     {
       provide: MONGO_CLIENT,
@@ -49,14 +39,26 @@ const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
     ...(databaseEnabled
       ? [
           {
+            provide: POSTGRES_POOL,
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => new Pool(postgresOptions(config)),
+          },
+          PostgresDatabase,
+          PostgresTransactionManager,
+          {
             provide: TRANSACTION_MANAGER,
-            inject: [DataSource],
-            useFactory: (dataSource: DataSource) => new TypeOrmTransactionManager(dataSource),
+            useExisting: PostgresTransactionManager,
           },
         ]
       : []),
   ],
-  exports: [...(databaseEnabled ? [TRANSACTION_MANAGER] : []), MongoDatabase, MONGO_CLIENT],
+  exports: [
+    ...(databaseEnabled
+      ? [POSTGRES_POOL, PostgresDatabase, PostgresTransactionManager, TRANSACTION_MANAGER]
+      : []),
+    MongoDatabase,
+    MONGO_CLIENT,
+  ],
 })
 export class DatabaseModule {}
 

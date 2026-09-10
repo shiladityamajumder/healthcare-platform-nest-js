@@ -24,7 +24,7 @@ flowchart LR
 - Keep containers stateless; store files in object storage, not the container filesystem.
 - Use managed PostgreSQL with backups, point-in-time recovery, encryption, and restricted network access.
 - Supply secrets through a secret manager or workload identity, never through committed files.
-- Run migrations as a controlled release step before serving code that requires the new schema.
+- Provision the required PostgreSQL schema through the external database release process before serving code that requires it.
 - Centralize structured logs, metrics, traces, and audit events.
 - Define health semantics that distinguish process liveness from dependency readiness before production rollout.
 - Set resource limits, graceful shutdown, timeouts, retry policies, and rate limits explicitly.
@@ -35,4 +35,4 @@ The `Dockerfile` builds the Nest API and starts `dist/apps/api/main.js`. The ima
 
 ## Release gate
 
-No release should rely on the scaffold's placeholder handlers. Verify API contracts, migrations, authorization, audit trails, data retention, and disaster-recovery procedures in the target environment.
+No release should rely on the scaffold's placeholder handlers. Verify API contracts, authorization, audit trails, data retention, and disaster-recovery procedures in the target environment.

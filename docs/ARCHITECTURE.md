@@ -40,8 +40,8 @@ flowchart LR
 - Controllers translate transport input and output. They do not contain business decisions.
 - Application handlers coordinate a use case and depend on ports rather than concrete infrastructure.
 - Domain code expresses business rules and should remain framework-agnostic where practical.
-- Infrastructure implements ports and owns TypeORM, provider SDKs, storage, and other technical details.
-- ORM entities, repositories, and migrations are private to their owning bounded context.
+- Infrastructure implements ports and owns SQL repositories, provider SDKs, storage, and other technical details.
+- SQL repositories and query files are private to their owning bounded context.
 
 ## Feature slices
 
@@ -58,7 +58,7 @@ Use the least coupled mechanism that satisfies the use case:
 3. Versioned integration event when a reaction can be asynchronous.
 4. Transactional outbox when delivery must survive a process or database failure.
 
-Consumers may import only `@modules/<name>`, which resolves to that context's `src/public-api.ts`. They must not import another module's features, domain objects, ORM entities, repositories, or providers.
+Consumers may import only `@modules/<name>`, which resolves to that context's `src/public-api.ts`. They must not import another module's features, domain objects, SQL repositories, or providers.
 
 ## Data ownership
 
@@ -69,7 +69,7 @@ One PostgreSQL database is acceptable for the monolith, but ownership is logical
 - other contexts use a public contract or a dedicated read model;
 - cross-context reporting must not turn private business repositories into a shared query layer.
 
-The database connection is platform-owned. Schema artifacts are module-owned and should evolve through migrations with `synchronize: false`.
+The database connection is platform-owned. The database schema is external to this application, while SQL repositories and query files remain private to their owning context.
 
 ## Transactions and consistency
 

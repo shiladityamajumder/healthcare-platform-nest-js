@@ -21,17 +21,17 @@ NestJS modular monolith for a healthcare platform. The repository is organized a
 
 ## At a glance
 
-| Area                    | Decision                            |
-| ----------------------- | ----------------------------------- |
-| Runtime                 | Node.js 22+                         |
-| Framework               | NestJS 12 on Fastify                |
-| Language                | TypeScript 5, strict mode           |
-| Package manager         | pnpm 11.17                          |
-| Primary database        | PostgreSQL 17 + TypeORM             |
-| Optional infrastructure | MongoDB and Redis                   |
-| API documentation       | Swagger at `/api/docs` when enabled |
-| Deployment shape        | One stateless API deployable        |
-| Architecture guard      | `pnpm architecture:check`           |
+| Area                    | Decision                                     |
+| ----------------------- | -------------------------------------------- |
+| Runtime                 | Node.js 22+                                  |
+| Framework               | NestJS 12 on Fastify                         |
+| Language                | TypeScript 5, strict mode                    |
+| Package manager         | pnpm 11.17                                   |
+| Primary database        | PostgreSQL 17 + parameterized raw SQL (`pg`) |
+| Optional infrastructure | MongoDB and Redis                            |
+| API documentation       | Swagger at `/api/docs` when enabled          |
+| Deployment shape        | One stateless API deployable                 |
+| Architecture guard      | `pnpm architecture:check`                    |
 
 ## Start here
 
