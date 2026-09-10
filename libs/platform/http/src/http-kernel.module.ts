@@ -1,3 +1,6 @@
+// Linked with: @nestjs/common, @nestjs/core, @platform/execution.
+// Used by: the application module or feature root during NestJS startup.
+// Other linkup: The file participates in the package export and dependency-injection flow.
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ExecutionModule, OperationExecutionInterceptor } from '@platform/execution';
@@ -6,6 +9,7 @@ import { ApiExceptionFilter } from './errors/api-exception.filter';
 import { ApiResponseInterceptor } from './response/api-response.interceptor';
 import { RequestContextMiddleware } from './context/request-context.middleware';
 
+// Register the feature components and their dependencies with NestJS.
 @Module({
   imports: [ExecutionModule, LoggingModule],
   providers: [

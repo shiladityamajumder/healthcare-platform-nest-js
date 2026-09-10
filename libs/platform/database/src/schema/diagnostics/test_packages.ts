@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `diagnostics.test_packages`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface DiagnosticsTestPackagesRow {
   code: string; // VARCHAR(64)
   name: string; // VARCHAR(255)

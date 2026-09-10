@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `clinical.diagnoses`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface ClinicalDiagnosesRow {
   consultation_id: string; // UUID
   code_system: string | null; // VARCHAR(64)

@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `catalog.substitution_groups`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface CatalogSubstitutionGroupsRow {
   salt_signature: string; // VARCHAR(512)
   dosage_form_id: string | null; // UUID

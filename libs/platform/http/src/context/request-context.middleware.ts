@@ -1,3 +1,6 @@
+// Linked with: @nestjs/common, fastify, node:http.
+// Used by: the package code that imports this component.
+// Other linkup: The file participates in the package export and dependency-injection flow.
 import { Injectable, type NestMiddleware } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { ServerResponse } from 'node:http';
@@ -8,6 +11,7 @@ import { runWithRequestContext } from './request-context';
 type Next = (error?: Error) => void;
 type MiddlewareReply = FastifyReply | ServerResponse;
 
+// Define the shared types or behavior used by the surrounding package.
 function headerValue(value: string | string[] | undefined): string | undefined {
   const normalized = Array.isArray(value) ? value[0] : value;
   return normalized?.trim() || undefined;

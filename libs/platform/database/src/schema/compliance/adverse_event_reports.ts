@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `compliance.adverse_event_reports`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface ComplianceAdverseEventReportsRow {
   report_number: string; // VARCHAR(64)
   patient_profile_id: string | null; // UUID

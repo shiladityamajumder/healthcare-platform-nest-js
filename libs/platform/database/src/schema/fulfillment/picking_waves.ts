@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `fulfillment.picking_waves`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface FulfillmentPickingWavesRow {
   wave_number: string; // VARCHAR(64)
   warehouse_id: string; // UUID

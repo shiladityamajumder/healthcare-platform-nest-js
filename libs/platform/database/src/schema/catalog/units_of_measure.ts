@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `catalog.units_of_measure`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface CatalogUnitsOfMeasureRow {
   code: string; // VARCHAR(32)
   name: string; // VARCHAR(64)

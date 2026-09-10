@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `procurement.goods_receipt_quality_checks`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface ProcurementGoodsReceiptQualityChecksRow {
   goods_receipt_item_id: string; // UUID
   check_type: string; // VARCHAR(64)

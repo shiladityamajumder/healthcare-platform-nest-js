@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `identity.api_client_secrets`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface IdentityApiClientSecretsRow {
   api_client_id: string; // UUID
   secret_hash: string; // VARCHAR(255)

@@ -1,4 +1,8 @@
+// Linked with: ./identity, ./organization, ./customer.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Plain PostgreSQL row shapes for the externally managed healthcare database. */
+// Describe the database row shape consumed by repositories and transaction code.
 export * from './identity';
 export * from './organization';
 export * from './customer';

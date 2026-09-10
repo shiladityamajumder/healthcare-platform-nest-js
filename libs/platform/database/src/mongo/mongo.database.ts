@@ -1,8 +1,12 @@
+// Linked with: @nestjs/common, @nestjs/config, mongodb.
+// Used by: the package code that imports this component.
+// Other linkup: The file participates in the package export and dependency-injection flow.
 import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Db, MongoClient } from 'mongodb';
 import { MONGO_CLIENT } from './mongo.tokens';
 
+// Define the shared types or behavior used by the surrounding package.
 @Injectable()
 export class MongoDatabase implements OnModuleInit, OnModuleDestroy {
   private database: Db | undefined;

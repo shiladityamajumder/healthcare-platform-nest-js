@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `finance.invoices`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface FinanceInvoicesRow {
   invoice_number: string; // VARCHAR(64)
   order_id: string; // UUID

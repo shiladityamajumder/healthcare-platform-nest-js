@@ -1,4 +1,8 @@
+// Linked with: database repositories, migrations, and transaction code.
+// Used by: the package code that imports this component.
+// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `membership.plan_benefits`. */
+// Describe the database row shape consumed by repositories and transaction code.
 export interface MembershipPlanBenefitsRow {
   plan_id: string; // UUID
   benefit_code: string; // VARCHAR(64)

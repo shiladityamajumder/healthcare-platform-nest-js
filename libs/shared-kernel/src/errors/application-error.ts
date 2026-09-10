@@ -1,9 +1,13 @@
+// Linked with: the surrounding package and its exported types.
+// Used by: the package code that imports this component.
+// Other linkup: The file participates in the package export and dependency-injection flow.
 /**
  * Framework-independent errors used by domain and application code.
  *
  * HTTP translation belongs to the platform HTTP layer. This keeps business
  * modules from depending on Nest or Fastify just to report an expected error.
  */
+// Define the shared types or behavior used by the surrounding package.
 export class AppError extends Error {
   public constructor(
     public readonly code: string,

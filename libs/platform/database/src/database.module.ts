@@ -1,3 +1,6 @@
+// Linked with: @nestjs/common, @nestjs/config, pg.
+// Used by: the application module or feature root during NestJS startup.
+// Other linkup: The file participates in the package export and dependency-injection flow.
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
@@ -10,6 +13,7 @@ import { MongoClient } from 'mongodb';
 import { MONGO_CLIENT } from './mongo/mongo.tokens';
 import { MongoDatabase } from './mongo/mongo.database';
 
+// Register the feature components and their dependencies with NestJS.
 const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
 
 @Global()

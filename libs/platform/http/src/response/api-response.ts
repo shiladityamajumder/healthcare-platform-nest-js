@@ -1,5 +1,9 @@
+// Linked with: ../context/request-context.
+// Used by: the package code that imports this component.
+// Other linkup: The file participates in the package export and dependency-injection flow.
 import { getApiVersion, getCorrelationId, getRequestId } from '../context/request-context';
 
+// Define the shared types or behavior used by the surrounding package.
 export interface ApiResponse<T> {
   success: true;
   message: string;

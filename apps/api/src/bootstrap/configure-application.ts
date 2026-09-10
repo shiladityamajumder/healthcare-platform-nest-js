@@ -1,9 +1,13 @@
+// Linked with: @nestjs/common, @nestjs/platform-fastify, @nestjs/swagger.
+// Used by: the package code that imports this component.
+// Other linkup: The file participates in the package export and dependency-injection flow.
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { BaseModule } from '../base/base.module';
 import { HealthModule } from '../health/health.module';
 
+// Define the shared types or behavior used by the surrounding package.
 export function configureApplication(app: NestFastifyApplication): void {
   const apiPrefix = process.env.API_PREFIX ?? 'api';
 
