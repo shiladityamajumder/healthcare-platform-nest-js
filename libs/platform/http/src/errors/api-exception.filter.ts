@@ -1,11 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
 import {
   AppError,
@@ -19,11 +12,12 @@ import {
   OperationTimeoutError,
   ValidationError,
 } from '@shared/errors';
+import { AppLogger } from '@platform/logging';
 import { ApiResponseFactory } from '../response/api-response';
 
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(ApiExceptionFilter.name);
+  public constructor(private readonly logger: AppLogger) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<FastifyReply>();
@@ -50,7 +44,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    this.logger.error(exception instanceof Error ? exception.stack : 'Unknown exception');
+    this.logger.errorEvent('Unhandled application exception', {}, exception);
     sendError(
       response,
       HttpStatus.INTERNAL_SERVER_ERROR,

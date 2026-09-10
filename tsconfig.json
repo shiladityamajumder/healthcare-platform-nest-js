@@ -19,6 +19,7 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@platform/config": ["libs/platform/config/src/index"],
+      "@platform/execution": ["libs/platform/execution/src/index"],
       "@platform/database": ["libs/platform/database/src/index"],
       "@platform/http": ["libs/platform/http/src/index"],
       "@platform/logging": ["libs/platform/logging/src/index"],

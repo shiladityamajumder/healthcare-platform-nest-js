@@ -27,10 +27,13 @@ export class RequestContextMiddleware implements NestMiddleware {
     setHeader(reply, 'X-API-Version', apiVersion);
 
     rawResponse(reply).once('finish', () => {
-      this.logger.log(
-        `${request.method} ${request.url} ${rawResponse(reply).statusCode} requestId=${requestId}`,
-        RequestContextMiddleware.name,
-      );
+      this.logger.infoEvent('HTTP request completed', {
+        method: request.method,
+        url: request.url,
+        status_code: rawResponse(reply).statusCode,
+        request_id: requestId,
+        correlation_id: correlationId,
+      });
     });
 
     runWithRequestContext({ requestId, correlationId, apiVersion }, () => next());

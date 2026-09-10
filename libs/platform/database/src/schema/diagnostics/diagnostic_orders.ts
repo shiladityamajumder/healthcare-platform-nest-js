@@ -16,7 +16,7 @@ export interface DiagnosticsDiagnosticOrdersRow {
   collection_fee: string; // NUMERIC(16, 2)
   grand_total: string; // NUMERIC(16, 2)
   payment_status: string; // VARCHAR(32)
-  address_snapshot: unknown | null; // JSONB
+  address_snapshot: unknown; // JSONB
   id: string; // UUID
   updated_at: Date; // TIMESTAMP WITH TIME ZONE
   created_at: Date; // TIMESTAMP WITH TIME ZONE

@@ -15,7 +15,7 @@ export interface CommerceOrdersRow {
   fulfillment_status: string; // VARCHAR(32)
   prescription_status: string; // VARCHAR(32)
   shipping_address_snapshot: unknown; // JSONB
-  billing_address_snapshot: unknown | null; // JSONB
+  billing_address_snapshot: unknown; // JSONB
   placed_at: Date; // TIMESTAMP WITH TIME ZONE
   confirmed_at: Date | null; // TIMESTAMP WITH TIME ZONE
   cancelled_at: Date | null; // TIMESTAMP WITH TIME ZONE

@@ -6,5 +6,6 @@ export * from './mongo/mongo.tokens';
 export * from './postgres/postgres.options';
 export * from './postgres/postgres.database';
 export * from './postgres/postgres.tokens';
+export * from './postgres/transaction-context';
 export * from './schema/table-names';
 export * from './schema';

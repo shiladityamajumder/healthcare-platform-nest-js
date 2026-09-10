@@ -5,7 +5,7 @@ export interface PlatformIdempotencyKeysRow {
   request_hash: string; // VARCHAR(64)
   request_metadata: unknown; // JSONB
   response_code: number | null; // INTEGER
-  response_body: unknown | null; // JSONB
+  response_body: unknown; // JSONB
   locked_until: Date | null; // TIMESTAMP WITH TIME ZONE
   expires_at: Date; // TIMESTAMP WITH TIME ZONE
   id: string; // UUID

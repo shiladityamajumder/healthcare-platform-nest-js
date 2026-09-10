@@ -8,8 +8,8 @@ export interface PlatformAuditLogsRow {
   request_id: string | null; // UUID
   trace_id: string | null; // VARCHAR(64)
   ip_address: string | null; // INET
-  before_data: unknown | null; // JSONB
-  after_data: unknown | null; // JSONB
+  before_data: unknown; // JSONB
+  after_data: unknown; // JSONB
   metadata_json: unknown; // JSONB
   occurred_at: Date; // TIMESTAMP WITH TIME ZONE
   id: string; // UUID

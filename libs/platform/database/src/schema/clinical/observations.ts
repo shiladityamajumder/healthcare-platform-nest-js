@@ -8,7 +8,7 @@ export interface ClinicalObservationsRow {
   value_quantity: string | null; // NUMERIC(18, 6)
   value_unit: string | null; // VARCHAR(32)
   value_text: string | null; // TEXT
-  value_json: unknown | null; // JSONB
+  value_json: unknown; // JSONB
   observed_at: Date; // TIMESTAMP WITH TIME ZONE
   id: string; // UUID
   updated_at: Date; // TIMESTAMP WITH TIME ZONE

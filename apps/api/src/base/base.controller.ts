@@ -1,5 +1,7 @@
 import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
+import { NonTransactional } from '@platform/execution';
 
+@NonTransactional()
 @Controller({ path: '', version: VERSION_NEUTRAL })
 export class BaseController {
   @Get()

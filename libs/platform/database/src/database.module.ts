@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { postgresOptions } from './postgres/postgres.options';
@@ -12,6 +12,7 @@ import { MongoDatabase } from './mongo/mongo.database';
 
 const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
 
+@Global()
 @Module({
   imports: [ConfigModule],
   providers: [
