@@ -1,9 +1,9 @@
-// Linked with: @nestjs/common.
-// Used by: the application module or feature root during NestJS startup.
-// Other linkup: The file participates in the package export and dependency-injection flow.
+// * Linked with: @nestjs/common.
+// * Used by: the application module or feature root during NestJS startup.
+// * Other linkup: The file participates in the package export and dependency-injection flow.
 import { Global, Injectable, Logger, Module } from '@nestjs/common';
 
-// Register the feature components and their dependencies with NestJS.
+// * Register the feature components and their dependencies with NestJS.
 export type LogMetadata = Readonly<Record<string, unknown>>;
 
 /** Application logger boundary. Keep business rules out of this library. */

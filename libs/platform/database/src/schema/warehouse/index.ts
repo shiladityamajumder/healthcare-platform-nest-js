@@ -1,8 +1,8 @@
-// Linked with: ./warehouses, ./zones, ./inventory_adjustments.
-// Used by: the package code that imports this component.
-// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Linked with: ./warehouses, ./zones, ./inventory_adjustments.
+// * Used by: the package code that imports this component.
+// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Row shapes for the warehouse PostgreSQL schema. */
-// Describe the database row shape consumed by repositories and transaction code.
+// * Describe the database row shape consumed by repositories and transaction code.
 export type { WarehouseWarehousesRow } from './warehouses';
 export type { WarehouseZonesRow } from './zones';
 export type { WarehouseInventoryAdjustmentsRow } from './inventory_adjustments';

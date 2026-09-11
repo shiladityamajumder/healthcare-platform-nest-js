@@ -1,9 +1,9 @@
-// Linked with: node:async_hooks.
-// Used by: the package code that imports this component.
-// Other linkup: The file participates in the package export and dependency-injection flow.
+// * Linked with: node:async_hooks.
+// * Used by: the package code that imports this component.
+// * Other linkup: The file participates in the package export and dependency-injection flow.
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-// Define the shared types or behavior used by the surrounding package.
+// * Define the shared types or behavior used by the surrounding package.
 export interface RequestContext {
   requestId: string;
   correlationId: string;

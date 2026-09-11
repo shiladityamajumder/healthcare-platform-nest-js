@@ -1,12 +1,12 @@
-// Linked with: @nestjs/common, @nestjs/swagger, ../../../application/create-profile.handler.
-// Used by: API clients through the versioned HTTP route.
-// Other linkup: The request flows from the controller to the application handler and back through the response DTO.
+// * Linked with: @nestjs/common, @nestjs/swagger, ../../../application/create-profile.handler.
+// * Used by: API clients through the versioned HTTP route.
+// * Other linkup: The request flows from the controller to the application handler and back through the response DTO.
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateProfileHandler } from '../../../application/create-profile.handler';
 import { CreateProfileRequestDto } from './dto/create-profile.request.dto';
 
-// Expose the use case through a versioned HTTP endpoint and delegate business work.
+// * Expose the use case through a versioned HTTP endpoint and delegate business work.
 @ApiTags('patients')
 @Controller({ path: 'patients/create-profile', version: '1' })
 export class CreateProfileController {

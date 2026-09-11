@@ -77,13 +77,13 @@ The default API version is `v1`, so versioned feature routes are served under `/
 ## Common commands
 
 ```bash
-pnpm start:dev          # development server with watch mode
-pnpm lint               # ESLint
-pnpm test               # unit and repository test suite
-pnpm test:e2e           # API e2e suite
+pnpm start:dev          # * development server with watch mode
+pnpm lint               # * ESLint
+pnpm test               # * unit and repository test suite
+pnpm test:e2e           # * API e2e suite
 pnpm architecture:check
 pnpm build
-pnpm check              # architecture check, lint, tests, and build
+pnpm check              # * architecture check, lint, tests, and build
 ```
 
 ## Repository shape

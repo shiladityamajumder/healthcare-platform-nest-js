@@ -1,11 +1,11 @@
-// Linked with: @nestjs/common, @nestjs/config, ioredis.
-// Used by: the application module or feature root during NestJS startup.
-// Other linkup: The file participates in the package export and dependency-injection flow.
+// * Linked with: @nestjs/common, @nestjs/config, ioredis.
+// * Used by: the application module or feature root during NestJS startup.
+// * Other linkup: The file participates in the package export and dependency-injection flow.
 import { Global, Inject, Injectable, Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
-// Register the feature components and their dependencies with NestJS.
+// * Register the feature components and their dependencies with NestJS.
 export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
 
 @Injectable()

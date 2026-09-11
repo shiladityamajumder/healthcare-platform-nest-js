@@ -1,11 +1,11 @@
-// Linked with: @eslint/js, typescript-eslint, eslint-config-prettier.
-// Used by: the package code that imports this component.
-// Other linkup: The file participates in the package export and dependency-injection flow.
+// * Linked with: @eslint/js, typescript-eslint, eslint-config-prettier.
+// * Used by: the package code that imports this component.
+// * Other linkup: The file participates in the package export and dependency-injection flow.
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 
-// Define the shared types or behavior used by the surrounding package.
+// * Define the shared types or behavior used by the surrounding package.
 export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked.map((config) => ({
@@ -54,7 +54,7 @@ export default tseslint.config(
   {
     files: ['**/*.handler.ts'],
     rules: {
-      // Scaffold handlers are async by contract and will gain awaited ports later.
+      // * Scaffold handlers are async by contract and will gain awaited ports later.
       '@typescript-eslint/require-await': 'off',
     },
   },

@@ -1,6 +1,6 @@
-// Linked with: @nestjs/common, ./features/create-order/create-order.module, ./features/get-order/get-order.module.
-// Used by: the application module or feature root during NestJS startup.
-// Other linkup: The file participates in the package export and dependency-injection flow.
+// * Linked with: @nestjs/common, ./features/create-order/create-order.module, ./features/get-order/get-order.module.
+// * Used by: the application module or feature root during NestJS startup.
+// * Other linkup: The file participates in the package export and dependency-injection flow.
 import { Module } from '@nestjs/common';
 import { CreateOrderModule } from './features/create-order/create-order.module';
 import { GetOrderModule } from './features/get-order/get-order.module';
@@ -10,7 +10,7 @@ import { UpdateStatusModule } from './features/update-status/update-status.modul
 import { ReturnsModule } from './features/returns/returns.module';
 
 /** Composition root for the Orders bounded context. */
-// Register the feature components and their dependencies with NestJS.
+// * Register the feature components and their dependencies with NestJS.
 @Module({
   imports: [
     CreateOrderModule,

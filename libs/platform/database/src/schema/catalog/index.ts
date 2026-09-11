@@ -1,8 +1,8 @@
-// Linked with: ./categories, ./salts, ./dosage_forms.
-// Used by: the package code that imports this component.
-// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Linked with: ./categories, ./salts, ./dosage_forms.
+// * Used by: the package code that imports this component.
+// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Row shapes for the catalog PostgreSQL schema. */
-// Describe the database row shape consumed by repositories and transaction code.
+// * Describe the database row shape consumed by repositories and transaction code.
 export type { CatalogCategoriesRow } from './categories';
 export type { CatalogSaltsRow } from './salts';
 export type { CatalogDosageFormsRow } from './dosage_forms';

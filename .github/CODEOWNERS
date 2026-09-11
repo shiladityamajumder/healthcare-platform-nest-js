@@ -1,4 +1,4 @@
-# Replace @team-* placeholders with real GitHub teams.
+# ! Replace @team-* placeholders with real GitHub teams.
 /apps/api/ @team-platform
 /libs/platform/ @team-platform
 /libs/shared-kernel/ @team-architecture

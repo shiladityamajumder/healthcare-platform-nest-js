@@ -1,8 +1,8 @@
-// Linked with: database repositories, migrations, and transaction code.
-// Used by: the package code that imports this component.
-// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Linked with: database repositories, migrations, and transaction code.
+// * Used by: the package code that imports this component.
+// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Raw PostgreSQL row shape for `commerce.order_allocations`. */
-// Describe the database row shape consumed by repositories and transaction code.
+// * Describe the database row shape consumed by repositories and transaction code.
 export interface CommerceOrderAllocationsRow {
   order_item_id: string; // UUID
   warehouse_id: string; // UUID

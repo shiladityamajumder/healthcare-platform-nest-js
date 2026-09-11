@@ -1,8 +1,8 @@
-// Linked with: ./practitioner_profiles, ./practitioner_organizations, ./patient_profiles.
-// Used by: the package code that imports this component.
-// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Linked with: ./practitioner_profiles, ./practitioner_organizations, ./patient_profiles.
+// * Used by: the package code that imports this component.
+// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /** Row shapes for the clinical PostgreSQL schema. */
-// Describe the database row shape consumed by repositories and transaction code.
+// * Describe the database row shape consumed by repositories and transaction code.
 export type { ClinicalPractitionerProfilesRow } from './practitioner_profiles';
 export type { ClinicalPractitionerOrganizationsRow } from './practitioner_organizations';
 export type { ClinicalPatientProfilesRow } from './patient_profiles';

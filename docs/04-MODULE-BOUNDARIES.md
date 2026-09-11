@@ -18,12 +18,12 @@ Boundaries are part of the system design, not a convention to remember during re
 ## Allowed cross-module usage
 
 ```ts
-// Allowed: the public contract is the only import target.
+// * Allowed: the public contract is the only import target.
 import { INVENTORY_FACADE, type InventoryFacade } from '@modules/inventory';
 ```
 
 ```ts
-// Forbidden: implementation details leak across the boundary.
+// ! Forbidden: implementation details leak across the boundary.
 import { StockRepository } from '@modules/inventory/src/infrastructure/...';
 import { StockOrmEntity } from '@modules/inventory/src/infrastructure/...';
 ```

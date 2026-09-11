@@ -1,10 +1,10 @@
-// Linked with: node:fs, node:path.
-// Used by: the package code that imports this component.
-// Other linkup: The file participates in the package export and dependency-injection flow.
+// * Linked with: node:fs, node:path.
+// * Used by: the package code that imports this component.
+// * Other linkup: The file participates in the package export and dependency-injection flow.
 import fs from 'node:fs';
 import path from 'node:path';
 
-// Define the shared types or behavior used by the surrounding package.
+// * Define the shared types or behavior used by the surrounding package.
 const root = process.cwd();
 const modulesRoot = path.join(root, 'libs', 'modules');
 const sourceRoots = [path.join(root, 'apps'), path.join(root, 'libs')];

@@ -1,6 +1,6 @@
-// Linked with: @nestjs/common, @nestjs/core, rxjs.
-// Used by: the package code that imports this component.
-// Other linkup: The file participates in the package export and dependency-injection flow.
+// * Linked with: @nestjs/common, @nestjs/core, rxjs.
+// * Used by: the package code that imports this component.
+// * Other linkup: The file participates in the package export and dependency-injection flow.
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { from, lastValueFrom, type Observable } from 'rxjs';
@@ -8,7 +8,7 @@ import { ExecutionService } from './execution.service';
 import { NON_TRANSACTIONAL_METADATA } from './non-transactional.decorator';
 
 /** Wrap every HTTP handler in one logged operation and DB transaction. */
-// Define the shared types or behavior used by the surrounding package.
+// * Define the shared types or behavior used by the surrounding package.
 @Injectable()
 export class OperationExecutionInterceptor implements NestInterceptor {
   public constructor(

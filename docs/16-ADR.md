@@ -4,11 +4,11 @@ ADRs capture decisions that affect the shape, ownership, or operating model of t
 
 ## Index
 
-| ADR | Decision | Status |
-| --- | --- | --- |
-| 0001 | Start as a modular monolith | Accepted |
-| 0002 | Organize work as feature slices | Accepted |
-| 0003 | Keep persistence owned by each context | Accepted |
+| ADR  | Decision                                        | Status   |
+| ---- | ----------------------------------------------- | -------- |
+| 0001 | Start as a modular monolith                     | Accepted |
+| 0002 | Organize work as feature slices                 | Accepted |
+| 0003 | Keep persistence owned by each context          | Accepted |
 | 0004 | Communicate through public contracts and events | Accepted |
 
 ## ADR 0001: Modular monolith before microservices

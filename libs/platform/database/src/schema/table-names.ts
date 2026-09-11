@@ -1,13 +1,13 @@
-// Linked with: database repositories, migrations, and transaction code.
-// Used by: the package code that imports this component.
-// Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Linked with: database repositories, migrations, and transaction code.
+// * Used by: the package code that imports this component.
+// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
 /**
  * Canonical PostgreSQL table names for the externally managed healthcare database.
  *
  * These constants do not create or alter database objects. They are safe to use
  * as fixed SQL identifiers; user data must always be passed as parameters.
  */
-// Describe the database row shape consumed by repositories and transaction code.
+// * Describe the database row shape consumed by repositories and transaction code.
 export const TABLES = {
   identity: {
     users: 'identity.users',
