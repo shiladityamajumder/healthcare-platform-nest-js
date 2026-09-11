@@ -2,7 +2,7 @@
 
 ## Before coding
 
-Read [architecture](ARCHITECTURE.md), [module boundaries](MODULE-BOUNDARIES.md), and the README for the owning context. Confirm whether the change affects a public contract, schema, security control, or operational behavior.
+Read [architecture](02-ARCHITECTURE.md), [module boundaries](04-MODULE-BOUNDARIES.md), and the README for the owning context. Confirm whether the change affects a public contract, schema, security control, or operational behavior.
 
 ## Change ownership
 

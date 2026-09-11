@@ -14,30 +14,41 @@ This directory is the maintained engineering handbook for the Healthcare Platfor
 
 ## Reading paths
 
+### New to NestJS or this codebase
+
+1. [Get oriented](01-GETTING-ORIENTED.md) — a framework-neutral mental model and a practical reading route.
+2. [Runtime flow](03-RUNTIME-FLOW.md) — follow an HTTP request from Fastify through NestJS, the libraries, and PostgreSQL.
+3. [Libraries guide](05-LIBS-GUIDE.md) — what belongs in `libs/`, how its layers connect, and where to add code.
+4. [Libraries reference](06-LIBS-REFERENCE.md) — the complete package and feature inventory.
+
 ### New contributor
 
 1. [Project README](../README.md)
-2. [Architecture](ARCHITECTURE.md)
-3. [Module boundaries](MODULE-BOUNDARIES.md)
-4. [Contributing](CONTRIBUTING.md)
-5. [Adding a feature](ADDING-A-FEATURE.md)
+2. [Architecture](02-ARCHITECTURE.md)
+3. [Module boundaries](04-MODULE-BOUNDARIES.md)
+4. [Contributing](12-CONTRIBUTING.md)
+5. [Adding a feature](10-ADDING-A-FEATURE.md)
 
 ### API or domain work
 
-1. [API conventions](API-CONVENTIONS.md)
-2. [Bounded-context template](MODULE-TEMPLATE.md)
-3. [Database conventions](DATABASE.md)
-4. [Testing strategy](TESTING.md)
+1. [API conventions](07-API-CONVENTIONS.md)
+2. [Bounded-context template](09-MODULE-TEMPLATE.md)
+3. [Database conventions](08-DATABASE.md)
+4. [Testing strategy](11-TESTING.md)
 
 ### Operations and security
 
-1. [Deployment model](DEPLOYMENT.md)
-2. [Observability](OBSERVABILITY.md)
-3. [Security architecture](SECURITY.md)
+1. [Deployment model](13-DEPLOYMENT.md)
+2. [Observability](14-OBSERVABILITY.md)
+3. [Security architecture](15-SECURITY.md)
 
 ### Architectural history
 
-The [ADR index](ADR/) contains the accepted decisions behind the modular monolith, feature slices, persistence ownership, and cross-module communication model.
+The [ADR](16-ADR.md) contains the accepted decisions behind the modular monolith, feature slices, persistence ownership, and cross-module communication model.
+
+## Documentation coverage
+
+All documents in this folder are kept intentionally: onboarding, architecture, API, persistence, testing, deployment, observability, security, contribution rules, templates, and architectural decisions address different stages of development. The four learning guides above complement them; they do not replace the detailed reference documents.
 
 ## Documentation standards
 

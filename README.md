@@ -35,12 +35,15 @@ NestJS modular monolith for a healthcare platform. The repository is organized a
 
 ## Start here
 
-- [Documentation hub](docs/README.md) — curated entry point for engineering docs.
-- [Architecture](docs/ARCHITECTURE.md) — runtime shape and dependency direction.
-- [Module boundaries](docs/MODULE-BOUNDARIES.md) — import rules enforced in CI.
-- [Adding a feature](docs/ADDING-A-FEATURE.md) — implementation workflow.
-- [API conventions](docs/API-CONVENTIONS.md) — versioning, envelopes, and errors.
-- [Deployment](docs/DEPLOYMENT.md) — local and production topology.
+- [Documentation hub](docs/00-README.md) — curated entry point for engineering docs.
+- [Get oriented](docs/01-GETTING-ORIENTED.md) — recommended first read for developers coming from another framework.
+- [Runtime flow](docs/03-RUNTIME-FLOW.md) — trace a request from the API to its libraries and database.
+- [Libraries guide](docs/05-LIBS-GUIDE.md) — how to understand and extend everything under `libs/`.
+- [Architecture](docs/02-ARCHITECTURE.md) — runtime shape and dependency direction.
+- [Module boundaries](docs/04-MODULE-BOUNDARIES.md) — import rules enforced in CI.
+- [Adding a feature](docs/10-ADDING-A-FEATURE.md) — implementation workflow.
+- [API conventions](docs/07-API-CONVENTIONS.md) — versioning, envelopes, and errors.
+- [Deployment](docs/13-DEPLOYMENT.md) — local and production topology.
 
 ## Local development
 
@@ -106,7 +109,7 @@ The module READMEs under [`libs/modules`](libs/modules) list the current feature
 
 Copy `.env.example` to `.env` for local work. PostgreSQL is required by the default database configuration. MongoDB and Redis are opt-in integrations controlled by `MONGO_ENABLED` and `REDIS_ENABLED`.
 
-Never commit real credentials, signing keys, patient data, payment data, or provider secrets. See [security architecture](docs/SECURITY.md) before connecting external systems.
+Never commit real credentials, signing keys, patient data, payment data, or provider secrets. See [security architecture](docs/15-SECURITY.md) before connecting external systems.
 
 ## Engineering contract
 
