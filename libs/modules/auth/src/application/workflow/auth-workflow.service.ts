@@ -26,6 +26,10 @@ import {
   type AuthUser,
   type TokenServicePort,
 } from '../../contracts/auth.ports';
+import {
+  AuthNotificationMessageService,
+  type AuthNotificationChannel,
+} from '../notifications/auth-notification-message.service';
 
 type Input = Record<string, any>;
 
@@ -34,6 +38,7 @@ export class AuthWorkflowService {
   public constructor(
     @Inject(AUTH_REPOSITORY) public readonly repository: AuthRepositoryPort,
     @Inject(AUTH_TOKEN_SERVICE) private readonly tokens: TokenServicePort,
+    private readonly notificationMessages: AuthNotificationMessageService,
   ) {}
 
   public async requirePrincipal(authorization?: string): Promise<AuthPrincipal> {
@@ -61,7 +66,7 @@ export class AuthWorkflowService {
   }
 
   public async issueOtp(
-    channel: string,
+    channel: AuthNotificationChannel,
     destination: string,
     purpose: string,
   ): Promise<Record<string, unknown>> {
@@ -78,6 +83,17 @@ export class AuthWorkflowService {
       expiresAt,
       maxAttempts: Number(process.env.OTP_MAX_ATTEMPTS ?? 5),
     });
+    const notification = this.notificationMessages.buildOtpMessage({
+      channel,
+      destination,
+      purpose,
+      challengeId,
+      code,
+      expiresAt,
+    });
+    // TODO: Dispatch `notification` through the provider-backed NotificationService after commit.
+    // await this.notificationService.send(notification);
+    void notification;
     return {
       accepted: true,
       challengeId,

@@ -83,6 +83,16 @@ header and security scheme in `/api/docs`. Session-creation flows document optio
 `X-Device-Id` and `X-Device-Type` headers. These decorators change documentation only; they do
 not change routes, authentication behavior, or database tables.
 
+## Notification messages
+
+`src/application/notifications/auth-notification-message.service.ts` builds the provider-neutral
+SMS/email payload for every OTP flow. It currently covers phone login, phone registration, email
+verification, and password recovery. It produces a template key, destination, expiry, plain-text
+content, and HTML content for email. `AuthWorkflowService.issueOtp()` stores the challenge first,
+then builds the message. The provider dispatch is intentionally left as a commented `TODO` until
+the notification service is implemented; no SMS or email is sent yet, and no notification tables
+are written.
+
 ## Boundary notes
 
 - Keep business rules inside this context.

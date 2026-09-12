@@ -12,6 +12,7 @@ import { AUTH_REPOSITORY, AUTH_TOKEN_SERVICE } from '../contracts/auth.ports';
 import { AuthWorkflowService } from '../application/workflow/auth-workflow.service';
 import { AuthPostgresRepository } from './persistence/auth.repository';
 import { AuthTokenService } from './token/auth-token.service';
+import { AuthNotificationMessageService } from '../application/notifications/auth-notification-message.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -22,6 +23,7 @@ import { AuthTokenService } from './token/auth-token.service';
     AdministrationRepository,
     AuthPostgresRepository,
     AuthTokenService,
+    AuthNotificationMessageService,
     AuthWorkflowService,
     { provide: AUTH_REPOSITORY, useExisting: AuthPostgresRepository },
     { provide: AUTH_TOKEN_SERVICE, useExisting: AuthTokenService },
@@ -33,6 +35,7 @@ import { AuthTokenService } from './token/auth-token.service';
     SessionRepository,
     AuthPostgresRepository,
     AuthTokenService,
+    AuthNotificationMessageService,
     AuthWorkflowService,
   ],
 })
