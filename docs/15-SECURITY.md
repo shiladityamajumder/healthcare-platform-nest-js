@@ -5,7 +5,7 @@ Security controls belong in the design of each workflow, not only in middleware.
 ## Identity and access
 
 - Authentication establishes identity; authorization evaluates permissions and resource policy.
-- Keep token signing, password hashing, refresh-token rotation, revocation, and replay protection in Auth infrastructure.
+- Keep token signing, password hashing, refresh-token rotation, revocation, and replay protection in auth's application/infrastructure collaborators (`libs/modules/auth/src/application` and `libs/modules/auth/src/infrastructure`).
 - Enforce tenant, organization, patient, practitioner, and resource ownership checks in the application use case.
 - Use least-privilege service accounts and database roles.
 

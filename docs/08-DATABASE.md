@@ -2,7 +2,7 @@
 
 `libs/platform/database` is a client-only PostgreSQL access library. It owns the connection pool, parameterized raw query helper, and transaction primitives. The PostgreSQL database, schemas, tables, constraints, and indexes are managed externally and must already exist before this application starts.
 
-Business contexts own their SQL repositories and query strings under their own infrastructure tree:
+Business contexts own their SQL repositories and query strings. Most scaffolded contexts use an infrastructure tree:
 
 ```text
 libs/modules/<context>/src/infrastructure/persistence/postgres/
@@ -10,13 +10,19 @@ libs/modules/<context>/src/infrastructure/persistence/postgres/
 └── queries/
 ```
 
+Auth is the implemented flat-feature variant: identity and OTP repositories
+live under `src/features/registration`, session persistence under
+`src/features/session-management`, and RBAC persistence under
+`src/features/administration`. Its `src/infrastructure/persistence/auth.repository.ts`
+is only a small DI facade and contains no SQL.
+
 ## Raw SQL rules
 
 - Use `PostgresDatabase.query()` with `$1`, `$2`, ... parameters for all values.
 - Use the fixed `TABLES` constants for schema-qualified table identifiers.
 - Use the exported `*Row` interfaces as query result types.
 - `query()` supports all read and write statements: `SELECT`, `INSERT`, `UPDATE`, and `DELETE`.
-- Keep multi-step writes inside `ExecutionService` (or `PostgresDatabase.transaction()` for low-level infrastructure work).
+- Keep multi-step writes inside the operation execution boundary (or `PostgresDatabase.transaction()` for low-level infrastructure work).
 - Repositories do not commit, roll back, create pools, or call `pool.query()` directly.
 - Never interpolate request data into SQL text, including identifiers.
 - This project does not create, alter, synchronize, migrate, or seed the database.
@@ -29,7 +35,7 @@ HTTP handlers are automatically wrapped by `OperationExecutionInterceptor`. A no
 HTTP request
   -> request context middleware
   -> execution boundary (logs + BEGIN)
-  -> controller -> application handler -> SQL repository
+  -> controller -> application service/handler -> SQL repository
   -> COMMIT on success
   -> ROLLBACK and rethrow on any failure
 ```
@@ -37,6 +43,11 @@ HTTP request
 `PostgresDatabase.query()` detects the active transaction client through `AsyncLocalStorage`, so every repository query in that operation participates in the same transaction. For background jobs and message consumers, call `ExecutionService.execute()` explicitly and set `transactional: true` for workflows that write data.
 
 Use `@NonTransactional()` only for endpoints that must not access PostgreSQL, such as liveness/readiness checks. Do not hold a database transaction across an external network call. For payments, notifications, file providers, and other external work, use explicit state transitions, idempotency, retries, and an outbox or equivalent durable handoff when delivery matters.
+
+Auth's capabilities and JWKS discovery endpoints are the intentional
+non-transactional exceptions. Registration, OTP verification, password reset,
+RBAC replacement, and session rotation remain within one transaction; refresh
+rotation also locks the session row to prevent concurrent double use.
 
 ## Consistency
 

@@ -31,7 +31,7 @@ We gain simpler transactions and operations now while preserving later extractio
 
 **Status:** Accepted
 
-Large module-level controller/service files become merge-conflict and ownership hotspots. Therefore operations such as login, registration and password reset are independent feature folders/submodules with their own HTTP boundary, application handler and tests.
+Large module-level controller/service files become merge-conflict and ownership hotspots. Therefore operations such as login, registration, password reset, and session management are independent feature folders/submodules with their own HTTP boundary, schema, service, focused persistence, and tests. Auth's cross-feature orchestration is kept separately under `src/application/workflow` rather than in one module-level service.
 
 ## ADR 0003: Module-owned persistence
 

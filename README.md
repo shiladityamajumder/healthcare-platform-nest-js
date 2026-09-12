@@ -17,7 +17,7 @@ NestJS modular monolith for a healthcare platform. The repository is organized a
   <img src="https://img.shields.io/badge/pnpm-11.17-F69220?logo=pnpm&logoColor=white" alt="pnpm 11.17" />
 </p>
 
-> **Repository status:** architecture and feature scaffolding are in place. Several handlers are intentionally placeholders and must be implemented before production use. This repository is not, by itself, a compliance certification or a production-ready healthcare system.
+> **Repository status:** architecture and feature scaffolding are in place. The auth context has implemented controller/service/repository flows; many other context handlers remain intentional placeholders and must be implemented before production use. This repository is not, by itself, a compliance certification or a production-ready healthcare system.
 
 ## At a glance
 
@@ -97,13 +97,13 @@ tools/architecture/       Static dependency-boundary checks
 docs/                     Engineering documentation and ADRs
 ```
 
-Each business module owns its feature API, application handlers, domain code, persistence adapters, and tests. Cross-module consumers may import only the module's `public-api.ts` entry point.
+Each business module owns its feature API, application services or handlers, domain code, persistence adapters, and tests. Cross-module consumers may import only the module's `public-api.ts` entry point.
 
 ## Bounded contexts
 
 The bounded-context libraries live under `libs/modules`. Each bounded context owns a composition module and groups its HTTP workflows under `src/features/<workflow>`. The active auth context is composed into `apps/api/src/app.module.ts`; other contexts remain scaffolds until their workflows are implemented and composed.
 
-The module READMEs under [`libs/modules`](libs/modules) list the current feature slices for each context. They describe the scaffolded capability surface; they do not imply that every workflow is fully implemented. Shared technical concerns such as database access, request middleware, logging, execution boundaries, and response/error handling remain centralized under `libs/platform` and `libs/shared-kernel`.
+The module READMEs under [`libs/modules`](libs/modules) list the current feature slices for each context. Auth is the currently implemented context and uses flat feature folders with controllers, services, schemas, and focused repositories. Other contexts describe scaffolded capability surfaces and do not imply that every workflow is fully implemented. Shared technical concerns such as database access, request middleware, logging, execution boundaries, and response/error handling remain centralized under `libs/platform` and `libs/shared-kernel`.
 
 ## Configuration
 

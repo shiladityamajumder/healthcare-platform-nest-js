@@ -2,6 +2,10 @@
 
 Use this shape for a new business context. Do not create every directory up front; add a directory when the context has a real responsibility for it.
 
+This is the command/handler-oriented scaffold used by most unimplemented
+contexts. The implemented auth context uses a flatter variant; see
+`libs/modules/auth/README.md` for its controller/service/schema/repository shape.
+
 ```text
 libs/modules/<context>/
 ├── README.md

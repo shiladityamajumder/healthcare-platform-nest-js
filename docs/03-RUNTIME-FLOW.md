@@ -4,7 +4,7 @@ This guide follows the actual startup and request path in the current repository
 
 ## Current-state note
 
-The current AppModule composes platform libraries, BaseModule, and HealthModule. Most feature slices under libs/modules are scaffolds and are not automatically live endpoints until their context module is imported into AppModule and their handler is implemented.
+The current AppModule composes platform libraries, BaseModule, HealthModule, and AuthModule. Auth routes are live; most other feature slices under libs/modules are scaffolds and are not automatically live endpoints until their context module is imported into AppModule and their service/handler is implemented.
 
 ## Startup path
 
@@ -18,7 +18,7 @@ Main files: main.ts starts the process; bootstrap/configure-application.ts confi
 
 ## Request path
 
-Client -> Fastify -> prefix/version routing -> request context -> DTO validation -> controller -> execution boundary -> handler -> domain/ports -> repository or provider -> database -> response interceptor -> client.
+Client -> Fastify -> prefix/version routing -> request context -> schema/DTO validation -> controller -> execution boundary -> service/handler -> repository or provider -> database -> response interceptor -> client.
 
 ## HTTP kernel
 
@@ -30,15 +30,29 @@ ValidationPipe transforms input, allows only DTO-declared fields, and rejects un
 
 For ordinary controller work, OperationExecutionInterceptor calls ExecutionService. It records the operation and normally opens a PostgreSQL transaction. An exception rolls the transaction back and is then handled by the API exception filter. Use @NonTransactional only for endpoints such as health checks that must work while PostgreSQL is unavailable.
 
-A handler coordinates the use case. It should not depend on HTTP details or run raw SQL directly. Repositories use PostgresDatabase or the supplied SQL executor so queries join the active transaction. Schema files describe database row shapes; they do not create tables or run migrations.
+A service or handler coordinates the use case. It should not depend on HTTP details or run raw SQL directly. Repositories use PostgresDatabase or the supplied SQL executor so queries join the active transaction. Request schema files validate transport input; database row interfaces describe returned columns and do not create tables or run migrations.
+
+Auth follows this concrete path:
+
+```text
+features/<feature>/<feature>.controller.ts
+  -> <feature>.schema.ts
+  -> <feature>.service.ts
+  -> feature repository or application/workflow/auth-workflow.service.ts
+  -> PostgresDatabase.query()
+```
+
+Its registration, password, session, OTP, and RBAC writes are rolled back as a
+unit when any step fails. Refresh rotation additionally uses a row lock to
+prevent two concurrent requests from consuming one refresh token.
 
 ## Trace a feature
 
-1. Find the route in api/http/v1/<feature>.controller.ts.
-2. Read its request and response DTOs.
-3. Follow the command/query to application/<feature>.handler.ts.
-4. Follow only the owner module domain and infrastructure collaborators.
-5. Read **tests**/<feature>.handler.spec.ts for expected behavior.
+1. Find the route in `features/<feature>/<feature>.controller.ts`.
+2. Read its request schema/DTO.
+3. Follow the feature service or application handler.
+4. Follow only the owner module repository, domain, and infrastructure collaborators.
+5. Read the feature tests for expected behavior.
 6. Check the context module and AppModule to confirm the endpoint is actually composed.
 
 For a 404 inspect route/version/module registration. For validation failure inspect the request DTO. For response shape inspect the response interceptor and API conventions. For transaction problems inspect ExecutionService and repository executor use.

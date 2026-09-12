@@ -7,6 +7,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { NonTransactional } from '@platform/execution';
 import { CapabilitiesService } from './capabilities.service';
+import { ApiAuthOperation, ApiAuthResponse } from '../../contracts/swagger';
 
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
@@ -15,12 +16,31 @@ export class CapabilitiesController {
 
   @Get('capabilities')
   @NonTransactional()
+  @ApiAuthOperation(
+    'Get auth capabilities',
+    'Describes enabled registration, login, verification, password-policy, and supported-platform capabilities for clients.',
+  )
+  @ApiAuthResponse('Auth capabilities returned.', {
+    schema: 'auth-capabilities',
+    registration: { emailEnabled: true, phoneEnabled: true },
+    login: { passwordEnabled: true, phoneOtpEnabled: true },
+    verification: { emailRequired: true, phoneRequired: true },
+    passwordPolicy: { minimumLength: 8, minimumCharacterClasses: 3 },
+    supportedPlatforms: ['android', 'ios', 'web'],
+  })
   capabilities() {
     return this.service.capabilities();
   }
 
   @Get('.well-known/jwks.json')
   @NonTransactional()
+  @ApiAuthOperation(
+    'Get signing-key metadata',
+    'Returns the public signing keys used by clients to verify tokens. The current HMAC configuration may return a not-found response because it has no public JWKS.',
+  )
+  @ApiAuthResponse('Signing-key metadata returned.', {
+    keys: [{ kty: 'RSA', kid: 'auth-key-1', use: 'sig', alg: 'RS256' }],
+  })
   jwks() {
     return this.service.jwks();
   }

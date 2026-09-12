@@ -13,19 +13,34 @@ import {
   MinLength,
   ValidateIf,
 } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ForgotPasswordSchema {
-  @IsIn(['email', 'sms']) channel!: string;
+  @ApiProperty({ description: 'Recovery channel.', enum: ['email', 'sms'], example: 'email' })
+  @IsIn(['email', 'sms'])
+  channel!: string;
+  @ApiPropertyOptional({
+    description: 'Account email; required when channel is email.',
+    example: 'user@example.com',
+  })
   @ValidateIf((input: ForgotPasswordSchema) => input.channel === 'email')
   @IsNotEmpty()
   @IsEmail()
   email?: string;
+  @ApiPropertyOptional({
+    description: 'Phone country code; required when channel is sms.',
+    example: '+91',
+  })
   @ValidateIf((input: ForgotPasswordSchema) => input.channel === 'sms')
   @IsNotEmpty()
   @IsString()
   @MinLength(1)
   @MaxLength(8)
   phoneCountryCode?: string;
+  @ApiPropertyOptional({
+    description: 'Phone number; required when channel is sms.',
+    example: '9876543210',
+  })
   @ValidateIf((input: ForgotPasswordSchema) => input.channel === 'sms')
   @IsNotEmpty()
   @IsString()
@@ -35,20 +50,68 @@ export class ForgotPasswordSchema {
 }
 
 export class ResetVerifySchema extends ForgotPasswordSchema {
-  @IsUUID() challengeId!: string;
-  @Matches(/^[0-9]{6}$/) code!: string;
+  @ApiProperty({
+    description: 'Password recovery challenge ID.',
+    format: 'uuid',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @IsUUID()
+  challengeId!: string;
+  @ApiProperty({ description: 'Six-digit recovery code.', example: '123456' })
+  @Matches(/^[0-9]{6}$/)
+  code!: string;
 }
 
 export class ResetPasswordSchema {
-  @IsString() @MinLength(32) @MaxLength(8192) resetToken!: string;
-  @IsString() @MinLength(1) @MaxLength(128) newPassword!: string;
+  @ApiProperty({
+    description: 'Short-lived reset token returned after OTP verification.',
+    example: 'eyJhbGciOiJIUzI1NiIs...',
+    format: 'password',
+  })
+  @IsString()
+  @MinLength(32)
+  @MaxLength(8192)
+  resetToken!: string;
+  @ApiProperty({
+    description: 'New account password.',
+    example: 'NewSecurePass#123',
+    format: 'password',
+  })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(128)
+  newPassword!: string;
 }
 
 export class ChangePasswordSchema {
-  @IsString() @MinLength(1) @MaxLength(128) currentPassword!: string;
-  @IsString() @MinLength(1) @MaxLength(128) newPassword!: string;
+  @ApiProperty({
+    description: 'Current account password.',
+    example: 'CurrentPass#123',
+    format: 'password',
+  })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(128)
+  currentPassword!: string;
+  @ApiProperty({
+    description: 'Replacement account password.',
+    example: 'NewSecurePass#123',
+    format: 'password',
+  })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(128)
+  newPassword!: string;
 }
 
 export class SetPasswordSchema {
-  @IsString() @MinLength(1) @MaxLength(128) newPassword!: string;
+  @ApiProperty({
+    description: 'Password to configure for an account without one.',
+    example: 'SecurePass#123',
+    format: 'password',
+  })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(128)
+  newPassword!: string;
 }

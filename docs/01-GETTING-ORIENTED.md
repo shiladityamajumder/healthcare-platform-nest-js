@@ -11,20 +11,20 @@ NestJS is TypeScript server-side application structure built on top of an HTTP a
 
 | If you know                     | The closest idea here                                 | Where to look                                |
 | ------------------------------- | ----------------------------------------------------- | -------------------------------------------- |
-| Express/Fastify route handler   | Controller method                                     | libs/modules/.../api/http/v1/*.controller.ts |
-| FastAPI router + Pydantic model | Controller + request/response DTO                     | api/http/v1 and api/http/v1/dto              |
-| Django view + form/serializer   | Controller + DTO                                      | api/http/v1                                  |
-| Spring controller/service       | Nest controller + application handler                 | api/http and application                     |
-| Rails controller/service object | Controller + handler                                  | api/http and application                     |
+| Express/Fastify route handler   | Controller method                                     | libs/modules/.../features/*/*.controller.ts |
+| FastAPI router + Pydantic model | Controller + request schema                           | Auth `features/<feature>` folders           |
+| Django view + form/serializer   | Controller + schema/DTO                              | features/<feature>                           |
+| Spring controller/service       | Nest controller + application service                  | Auth `features/<feature>` folders           |
+| Rails controller/service object | Controller + service                                  | Auth `features/<feature>` folders           |
 | Dependency-injection container  | Nest module providers/imports/exports                 | *.module.ts                                  |
 | Middleware                      | Nest middleware, guards, interceptors, filters, pipes | libs/platform/http                           |
 | ORM model/entity                | Not used here; raw PostgreSQL row interfaces are used | libs/platform/database/src/schema            |
 
 ## Core NestJS concepts
 
-Start with a module: it is the dependency container and registration boundary. A feature module registers its controller and handler; AppModule assembles the currently live feature and platform modules.
+Start with a module: it is the dependency container and registration boundary. A feature module registers its controller and application service/handler; AppModule assembles the currently live feature and platform modules.
 
-Controllers translate HTTP requests and responses. DTOs describe validated input and public output; they are not database rows or domain objects. Handlers are injectable use-case classes that coordinate business work through constructor-injected collaborators.
+Controllers translate HTTP requests and responses. Schemas/DTOs describe validated input and public output; they are not database rows or domain objects. Injectable services or handlers coordinate business work through constructor-injected collaborators. Auth services are the current service-based implementation; the other contexts still use the scaffolded handler shape.
 
 Decorators beginning with @ are framework wiring: @Module declares a container, @Controller owns a route, @Get/@Post declare endpoints, and @Injectable marks a constructible provider.
 
@@ -33,7 +33,7 @@ Decorators beginning with @ are framework wiring: @Module declares a container, 
 1. Read the root README, then docs/02-ARCHITECTURE.md and docs/04-MODULE-BOUNDARIES.md.
 2. Open apps/api/src/main.ts, then bootstrap/configure-application.ts, then app.module.ts. This is server creation, global setup, and module wiring.
 3. Read docs/03-RUNTIME-FLOW.md and inspect libs/platform/http plus libs/platform/execution.
-4. Choose one context in libs/modules, read its README, and follow one feature from controller to DTO, command, handler, and test.
+4. Choose one context in libs/modules, read its README, and follow one feature from controller to schema/DTO, service or handler, repository/port, and test.
 5. Use docs/05-LIBS-GUIDE.md and docs/06-LIBS-REFERENCE.md before changing a library.
 
 ## Where code belongs
@@ -47,4 +47,4 @@ The aliases in tsconfig.json are boundaries: use @platform/<package> for technic
 
 ## Before you implement
 
-Choose the owning context first. Define request and response DTOs if the work is HTTP-facing. Keep the controller thin, put workflow decisions in a handler or domain code, use the owner module contract for cross-context work, and add focused tests. Read docs/03-RUNTIME-FLOW.md, docs/05-LIBS-GUIDE.md, docs/10-ADDING-A-FEATURE.md, and docs/11-TESTING.md next.
+Choose the owning context first. Define request and response schemas/DTOs if the work is HTTP-facing. Keep the controller thin, put workflow decisions in a service/handler or domain code, use the owner module contract for cross-context work, and add focused tests. Read docs/03-RUNTIME-FLOW.md, docs/05-LIBS-GUIDE.md, docs/10-ADDING-A-FEATURE.md, and docs/11-TESTING.md next.

@@ -1,6 +1,6 @@
 # Libraries reference
 
-This catalog is the current navigation index for libs/. Feature folders share the file roles explained in 05-LIBS-GUIDE.md: module, controller, request DTO, response DTO, command, handler, and handler test. Many handlers are scaffolds; the catalog describes code shape, not production readiness.
+This catalog is the current navigation index for libs/. Most scaffolded feature folders use the command/handler pattern explained in 05-LIBS-GUIDE.md. Auth is the implemented service-based variant with feature controllers, schemas, services, and focused repositories. Many non-auth handlers are scaffolds; the catalog describes code shape, not production readiness.
 
 ## Business contexts and feature slices
 
@@ -8,7 +8,7 @@ This catalog is the current navigation index for libs/. Feature folders share th
 | --------------- | --------------------------------------------------------------------------------------------------------------- |
 | appointments    | availability, book-appointment, cancel-appointment, reschedule-appointment                                      |
 | audit           | get-audit-entry, search-audit-log                                                                               |
-| auth            | change-password, forgot-password, login, logout, mfa, refresh-token, registration, reset-password, verify-email |
+| auth            | capabilities, registration, login, session-management, password-management, current-user, administration |
 | catalog         | brands, categories, create-product, get-product, list-products, update-product                                  |
 | file-management | complete-upload, delete-file, generate-download-url, get-file, initiate-upload                                  |
 | inventory       | adjust-stock, get-stock, release-reservation, reserve-stock, transfer-stock, warehouses                         |
@@ -22,7 +22,7 @@ This catalog is the current navigation index for libs/. Feature folders share th
 | pricing         | get-effective-price, price-books, set-price, tax-rules                                                          |
 | user-management | activate-user, create-user, get-user, list-users, roles, update-user                                            |
 
-Every context also contains a root module, public API entry point, contract facade, and README. Feature folders contain the repeated seven-file pattern described in 05-LIBS-GUIDE.md; this is why a single explanation applies to all source files in the feature tree.
+Every context also contains a root module, public API entry point, contract facade, and README. Most scaffolded feature folders contain the repeated command/handler pattern described in 05-LIBS-GUIDE.md. Auth instead keeps each feature's controller, schema, service, and feature-owned repository together, with cross-feature contracts under `src/contracts`, orchestration under `src/application/workflow`, and adapters under `src/infrastructure`.
 
 ## Platform packages
 

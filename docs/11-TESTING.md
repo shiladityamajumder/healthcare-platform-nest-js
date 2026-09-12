@@ -6,7 +6,7 @@ Tests should provide fast feedback at the lowest level that proves the behavior,
 
 | Layer        | Purpose                                                     | Typical location                |
 | ------------ | ----------------------------------------------------------- | ------------------------------- |
-| Unit         | Business rules and handlers with ports mocked               | Feature `__tests__` directories |
+| Unit         | Business rules and services/handlers with ports mocked      | Feature test directories         |
 | Integration  | Repository, SQL, transaction, and provider adapter behavior | Context test suites             |
 | Contract     | Public facades, events, and external provider contracts     | Context or platform tests       |
 | E2E          | High-value HTTP journeys across the composed application    | `apps/api/test/e2e`             |
@@ -28,5 +28,5 @@ pnpm architecture:check
 - Test success, validation, authorization, conflict, retry, and failure paths.
 - Add regression coverage for every production bug.
 - Keep tests deterministic and independent; avoid shared mutable state.
-- Do not treat a generated handler that returns `not-implemented` as feature coverage.
+- Do not treat a generated service/handler that returns `not-implemented` as feature coverage.
 - E2E tests should exercise stable user journeys, not duplicate every unit-level validation case.

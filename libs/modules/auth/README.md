@@ -74,6 +74,15 @@ transactions. It uses the platform middleware/interceptor/database layers so
 there is one request ID, one operation log, and one transaction boundary per
 HTTP operation.
 
+## Swagger
+
+Auth controllers use the reusable decorators in `src/contracts/swagger.ts`. Request schemas
+describe required/optional fields and examples; route decorators explain the use case and show
+the unified success envelope. Protected routes also expose the required bearer authorization
+header and security scheme in `/api/docs`. Session-creation flows document optional
+`X-Device-Id` and `X-Device-Type` headers. These decorators change documentation only; they do
+not change routes, authentication behavior, or database tables.
+
 ## Boundary notes
 
 - Keep business rules inside this context.
