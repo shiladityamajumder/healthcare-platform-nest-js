@@ -101,9 +101,9 @@ Each business module owns its feature API, application handlers, domain code, pe
 
 ## Bounded contexts
 
-The bounded-context libraries are scaffolded under `libs/modules`. Only implemented HTTP modules are composed into `apps/api/src/app.module.ts`; the current API exposes the base metadata and health endpoints. A feature module should be added to the composition root when its HTTP workflow is implemented.
+The bounded-context libraries live under `libs/modules`. Each bounded context owns a composition module and groups its HTTP workflows under `src/features/<workflow>`. The active auth context is composed into `apps/api/src/app.module.ts`; other contexts remain scaffolds until their workflows are implemented and composed.
 
-The module READMEs under [`libs/modules`](libs/modules) list the current feature slices for each context. They describe the scaffolded capability surface; they do not imply that every workflow is fully implemented.
+The module READMEs under [`libs/modules`](libs/modules) list the current feature slices for each context. They describe the scaffolded capability surface; they do not imply that every workflow is fully implemented. Shared technical concerns such as database access, request middleware, logging, execution boundaries, and response/error handling remain centralized under `libs/platform` and `libs/shared-kernel`.
 
 ## Configuration
 

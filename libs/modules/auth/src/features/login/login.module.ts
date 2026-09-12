@@ -1,13 +1,15 @@
-// * Linked with: @nestjs/common, ./api/http/v1/login.controller, ./application/login.handler.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+/**
+ * Login feature composition and dependency-injection boundary.
+ * Used backward by AuthModule; connects forward to LoginController, LoginService, and auth infrastructure.
+ */
 import { Module } from '@nestjs/common';
-import { LoginController } from './api/http/v1/login.controller';
-import { LoginHandler } from './application/login.handler';
+import { AuthInfrastructureModule } from '../../infrastructure/auth-infrastructure.module';
+import { LoginController } from './login.controller';
+import { LoginService } from './login.service';
 
-// * Define the shared types or behavior used by the surrounding package.
 @Module({
+  imports: [AuthInfrastructureModule],
   controllers: [LoginController],
-  providers: [LoginHandler],
+  providers: [LoginService],
 })
 export class LoginModule {}

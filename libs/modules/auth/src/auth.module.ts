@@ -1,13 +1,27 @@
-// * Linked with: @nestjs/common, ./features/registration/registration.module, ./features/login/login.module.
-// * Used by: the application module or feature root during NestJS startup.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+/**
+ * Auth bounded-context composition root.
+ * Used backward by the API AppModule; connects forward to every auth feature module.
+ */
 import { Module } from '@nestjs/common';
-import { AuthHttpModule } from './auth-http.module';
+import { AdministrationModule } from './features/administration/administration.module';
+import { CapabilitiesModule } from './features/capabilities/capabilities.module';
+import { CurrentUserModule } from './features/current-user/current-user.module';
+import { LoginModule } from './features/login/login.module';
+import { PasswordManagementModule } from './features/password-management/password-management.module';
+import { RegistrationModule } from './features/registration/registration.module';
+import { SessionManagementModule } from './features/session-management/session-management.module';
 
-/** Composition root for the Auth bounded context. */
-// * Register the feature components and their dependencies with NestJS.
+/** Registers the feature modules without exposing their implementation details. */
 @Module({
-  imports: [AuthHttpModule],
+  imports: [
+    CapabilitiesModule,
+    RegistrationModule,
+    LoginModule,
+    SessionManagementModule,
+    PasswordManagementModule,
+    CurrentUserModule,
+    AdministrationModule,
+  ],
   exports: [],
 })
 export class AuthModule {}
