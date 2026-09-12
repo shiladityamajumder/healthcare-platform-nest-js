@@ -6,6 +6,7 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { BaseModule } from '../base/base.module';
 import { HealthModule } from '../health/health.module';
+import { AuthModule } from '@modules/auth';
 
 // * Define the shared types or behavior used by the surrounding package.
 export function configureApplication(app: NestFastifyApplication): void {
@@ -33,7 +34,8 @@ export function configureApplication(app: NestFastifyApplication): void {
       .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, config, {
-      include: [BaseModule, HealthModule],
+      include: [BaseModule, HealthModule, AuthModule],
+      deepScanRoutes: true,
     });
     SwaggerModule.setup('docs', app, document, {
       useGlobalPrefix: true,

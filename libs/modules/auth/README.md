@@ -18,7 +18,9 @@ This context owns its HTTP endpoints, application use cases, domain rules, persi
 - `reset-password`
 - `verify-email`
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+The HTTP contract is implemented in `src/api/http/v1`. Controllers are transport-only and delegate to `AuthApplicationService`. Persistence is implemented by the DI-bound `AuthPostgresRepository` under `src/infrastructure/persistence/postgres`; it uses parameterized SQL through the shared transaction-aware `PostgresDatabase`. No ORM, entities, schema synchronization, or migration execution is used by this context.
+
+The initial port preserves the FastAPI endpoint paths and camel-case request/response fields. Authentication/session operations run inside the existing operation-execution transaction boundary, which supplies unified execution logging and rollback behavior. Public capability and JWKS discovery endpoints are explicitly marked non-transactional.
 
 ## Boundary notes
 

@@ -9,6 +9,18 @@ import { ApiResponseFactory } from './api-response';
 @Injectable()
 export class ApiResponseInterceptor<T> implements NestInterceptor<T, unknown> {
   intercept(_context: ExecutionContext, next: CallHandler<T>): Observable<unknown> {
-    return next.handle().pipe(map((data) => ApiResponseFactory.success(data)));
+    return next.handle().pipe(
+      map((data) => {
+        if (isPaginatedResult(data))
+          return ApiResponseFactory.success(data.data, undefined, data.pagination);
+        return ApiResponseFactory.success(data);
+      }),
+    );
   }
+}
+
+function isPaginatedResult(
+  value: unknown,
+): value is { data: unknown; pagination: import('./api-response').PaginationMeta } {
+  return typeof value === 'object' && value !== null && 'data' in value && 'pagination' in value;
 }

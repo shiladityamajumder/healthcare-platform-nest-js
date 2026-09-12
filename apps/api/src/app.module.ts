@@ -11,6 +11,7 @@ import { ObservabilityModule } from '@platform/observability';
 import { CacheModule } from '@platform/cache';
 import { HealthModule } from './health/health.module';
 import { BaseModule } from './base/base.module';
+import { AuthModule } from '@modules/auth';
 
 // * Register the feature components and their dependencies with NestJS.
 @Module({
@@ -24,6 +25,7 @@ import { BaseModule } from './base/base.module';
     CqrsModule.forRoot(),
     HealthModule,
     BaseModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

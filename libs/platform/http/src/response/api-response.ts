@@ -39,13 +39,17 @@ export interface ApiErrorResponse {
 }
 
 export class ApiResponseFactory {
-  public static success<T>(data: T, message = 'Operation completed successfully.'): ApiResponse<T> {
+  public static success<T>(
+    data: T,
+    message = 'Operation completed successfully.',
+    pagination?: PaginationMeta,
+  ): ApiResponse<T> {
     return {
       success: true,
       message,
       data,
       error: null,
-      meta: buildMeta(),
+      meta: buildMeta(pagination),
     };
   }
 
@@ -60,11 +64,12 @@ export class ApiResponseFactory {
   }
 }
 
-function buildMeta(): ResponseMeta {
+function buildMeta(pagination?: PaginationMeta): ResponseMeta {
   return {
     requestId: getRequestId(),
     correlationId: getCorrelationId(),
     apiVersion: getApiVersion(),
     timestamp: new Date().toISOString(),
+    ...(pagination ? { pagination } : {}),
   };
 }
