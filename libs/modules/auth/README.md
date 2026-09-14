@@ -45,6 +45,15 @@ Repositories use parameterized SQL through the shared transaction-aware
 synchronization, migration execution, or database table changes are used by this
 context.
 
+SQL statements are kept in `src/infrastructure/persistence/sql/auth.sql` and
+loaded by the auth persistence adapter. Services contain no SQL and repositories
+bind request values separately from SQL text. Repository operations that need a
+read-after-write, such as user creation, user updates, RBAC replacement, and
+paginated user listing, use one SQL statement with CTEs or window functions.
+Argon2 password verification and application token generation remain outside SQL
+because they are application responsibilities; those flows may therefore need
+more than one database round trip.
+
 The initial port preserves the FastAPI endpoint paths and camel-case request/response fields. Authentication/session operations run inside the existing operation-execution transaction boundary, which supplies unified execution logging and rollback behavior. Public capability and JWKS discovery endpoints are explicitly marked non-transactional.
 
 ## Request, logging, and transaction flow

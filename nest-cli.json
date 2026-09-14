@@ -16,7 +16,14 @@
       "entryFile": "main",
       "sourceRoot": "apps/api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/api/tsconfig.app.json"
+        "tsConfigPath": "apps/api/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../libs/modules/auth/src/infrastructure/persistence/sql/**/*",
+            "outDir": "dist/apps/api",
+            "watchAssets": true
+          }
+        ]
       }
     }
   }

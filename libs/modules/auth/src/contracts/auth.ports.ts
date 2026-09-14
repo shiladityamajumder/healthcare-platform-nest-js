@@ -135,6 +135,7 @@ export interface OtpRecord {
 // * Contract [AuthRepositoryPort]: Defines the stable shape shared across auth layers.
 export interface AuthRepositoryPort {
   findUserById(id: string): Promise<AuthUser | null>;
+  findPrincipal(sessionId: string, userId: string): Promise<AuthPrincipal | null>;
   findUserForLogin(identity: {
     email?: string;
     phoneCountryCode?: string;

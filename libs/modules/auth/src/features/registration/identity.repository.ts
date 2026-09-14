@@ -7,26 +7,18 @@
  * Used backward by registration/login/current-user/administration services; connects forward to PostgresDatabase.
  * Database queries reuse the transaction client opened by HTTP execution.
  */
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { PostgresDatabase } from '@platform/database';
 import { DatabaseError, NotFoundError } from '@shared/errors';
+import { loadAuthSql } from '../../infrastructure/persistence/sql-loader';
 import type {
   AuthLoginUser,
+  AuthPrincipal,
   AuthUser,
   UserWriteInput,
   ProfileInput,
 } from '../../contracts/auth.ports';
-
-export const AUTH_USER_SELECT = `
-  SELECT u.id, u.email, u.email_verified_at, u.phone_country_code, u.phone_number,
-         u.phone_verified_at, u.status, u.preferred_locale, u.timezone,
-         p.first_name, p.last_name, p.preferred_name, p.avatar_file_id,
-         f.public_url AS avatar_url
-  FROM identity.users u
-  LEFT JOIN identity.user_profiles p ON p.user_id = u.id AND p.is_deleted = false
-  LEFT JOIN platform.file_objects f ON f.id = p.avatar_file_id
-    AND f.status = 'available' AND f.access_type = 'public' AND f.malware_scan_status = 'clean'`;
 
 type Row = Record<string, any>;
 
@@ -37,25 +29,24 @@ export class IdentityRepository {
 
   // * Function [findUserById]: Handles the findUserById operation for this authentication component.
   public async findUserById(id: string): Promise<AuthUser | null> {
-    const result = await this.database.query<Row>(`${AUTH_USER_SELECT} WHERE u.id = $1`, [id]);
+    const result = await this.database.query<Row>(loadAuthSql('identity.find-user-by-id'), [id]);
     return result.rows[0] ? mapUser(result.rows[0]) : null;
   }
 
   // * Function [findUserByEmail]: Handles the findUserByEmail operation for this authentication component.
   public async findUserByEmail(email: string): Promise<AuthUser | null> {
-    const result = await this.database.query<Row>(
-      `${AUTH_USER_SELECT} WHERE u.email_normalized = $1`,
-      [email],
-    );
+    const result = await this.database.query<Row>(loadAuthSql('identity.find-user-by-email'), [
+      email,
+    ]);
     return result.rows[0] ? mapUser(result.rows[0]) : null;
   }
 
   // * Function [findUserByPhone]: Handles the findUserByPhone operation for this authentication component.
   public async findUserByPhone(countryCode: string, phoneNumber: string): Promise<AuthUser | null> {
-    const result = await this.database.query<Row>(
-      `${AUTH_USER_SELECT} WHERE u.phone_country_code = $1 AND u.phone_number = $2`,
-      [countryCode, phoneNumber],
-    );
+    const result = await this.database.query<Row>(loadAuthSql('identity.find-user-by-phone'), [
+      countryCode,
+      phoneNumber,
+    ]);
     return result.rows[0] ? mapUser(result.rows[0]) : null;
   }
 
@@ -66,16 +57,13 @@ export class IdentityRepository {
     phoneNumber?: string;
   }): Promise<AuthLoginUser | null> {
     // Select credential state only for login; normal user responses never expose these columns.
-    const predicate = identity.email
-      ? 'u.email_normalized = $1'
-      : 'u.phone_country_code = $1 AND u.phone_number = $2';
+    const statement = identity.email
+      ? loadAuthSql('identity.find-user-for-login-email')
+      : loadAuthSql('identity.find-user-for-login-phone');
     const values = identity.email
       ? [identity.email]
       : [identity.phoneCountryCode, identity.phoneNumber];
-    const result = await this.database.query<Row>(
-      `${AUTH_USER_SELECT.replace('SELECT ', 'SELECT u.password_hash, u.locked_until, u.failed_login_count, ')} WHERE ${predicate}`,
-      values,
-    );
+    const result = await this.database.query<Row>(statement, values);
     if (!result.rows[0]) return null;
     return {
       ...mapUser(result.rows[0]),
@@ -87,28 +75,21 @@ export class IdentityRepository {
 
   // * Function [createUser]: Creates or issues the requested authentication resource.
   public async createUser(input: UserWriteInput): Promise<AuthUser> {
-    const result = await this.database.query<Row>(
-      `INSERT INTO identity.users
-        (email, email_normalized, phone_country_code, phone_number, password_hash, status,
-         preferred_locale, timezone, terms_version, privacy_version, created_by, updated_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11) RETURNING id`,
-      [
-        input.email ?? null,
-        input.email?.toLowerCase() ?? null,
-        input.phoneCountryCode ?? null,
-        input.phoneNumber ?? null,
-        input.passwordHash ?? null,
-        input.status,
-        input.preferredLocale,
-        input.timezone,
-        input.termsVersion ?? null,
-        input.privacyVersion ?? null,
-        input.actorUserId ?? null,
-      ],
-    );
-    const user = await this.findUserById(result.rows[0].id);
-    if (!user) throw new DatabaseError('The created identity could not be loaded.');
-    return user;
+    const result = await this.database.query<Row>(loadAuthSql('identity.create-user'), [
+      input.email ?? null,
+      input.email?.toLowerCase() ?? null,
+      input.phoneCountryCode ?? null,
+      input.phoneNumber ?? null,
+      input.passwordHash ?? null,
+      input.status,
+      input.preferredLocale,
+      input.timezone,
+      input.termsVersion ?? null,
+      input.privacyVersion ?? null,
+      input.actorUserId ?? null,
+    ]);
+    if (!result.rows[0]) throw new DatabaseError('The created identity could not be loaded.');
+    return mapUser(result.rows[0]);
   }
 
   // * Function [updateUser]: Handles the updateUser operation for this authentication component.
@@ -128,15 +109,12 @@ export class IdentityRepository {
     ];
     const entries = Object.entries(values).filter(([key]) => allowed.includes(key));
     if (entries.length === 0) return this.findUserById(id) as Promise<AuthUser>;
-    const assignments = entries.map(([key], index) => `${key} = $${index + 1}`).join(', ');
-    const result = await this.database.query<Row>(
-      `UPDATE identity.users SET ${assignments}, updated_at = now(), row_version = row_version + 1 WHERE id = $${entries.length + 1} RETURNING id`,
-      [...entries.map(([, value]) => value), id],
-    );
+    const result = await this.database.query<Row>(loadAuthSql('identity.update-user'), [
+      id,
+      JSON.stringify(Object.fromEntries(entries)),
+    ]);
     if (!result.rows[0]) throw new NotFoundError('The user was not found.');
-    const user = await this.findUserById(id);
-    if (!user) throw new NotFoundError('The user was not found.');
-    return user;
+    return mapUser(result.rows[0]);
   }
 
   // * Function [createProfile]: Creates or issues the requested authentication resource.
@@ -150,50 +128,32 @@ export class IdentityRepository {
     };
     const entries = Object.entries(fields).filter(([, value]) => value !== undefined);
     if (!entries.length) return;
-    const updated = await this.database.query(
-      `UPDATE identity.user_profiles SET ${entries
-        .map(([field], index) => `${field} = $${index + 2}`)
-        .join(
-          ', ',
-        )}, updated_at = now(), row_version = row_version + 1 WHERE user_id = $1 AND is_deleted = false`,
-      [userId, ...entries.map(([, value]) => value)],
-    );
-    if (!updated.rowCount && entries.some(([, value]) => value !== null))
-      await this.database.query(
-        `INSERT INTO identity.user_profiles (user_id, first_name, last_name, preferred_name, avatar_file_id) VALUES ($1,$2,$3,$4,$5)`,
-        [
-          userId,
-          input.firstName ?? null,
-          input.lastName ?? null,
-          input.preferredName ?? null,
-          input.avatarFileId ?? null,
-        ],
-      );
+    await this.database.query(loadAuthSql('identity.upsert-profile'), [
+      userId,
+      JSON.stringify(input),
+    ]);
   }
 
   // * Function [findRoleByCode]: Handles the findRoleByCode operation for this authentication component.
   public async findRoleByCode(code: string): Promise<{ id: string } | null> {
-    const result = await this.database.query<Row>(
-      `SELECT id FROM identity.roles WHERE code = $1 AND is_deleted = false`,
-      [code],
-    );
+    const result = await this.database.query<Row>(loadAuthSql('identity.find-role-by-code'), [
+      code,
+    ]);
     return result.rows[0] ? { id: result.rows[0].id } : null;
   }
 
   // * Function [assignRole]: Creates or issues the requested authentication resource.
   public async assignRole(userId: string, roleId: string, actorUserId?: string): Promise<void> {
-    await this.database.query(
-      `INSERT INTO identity.user_roles (user_id, role_id, created_by, updated_by) VALUES ($1,$2,$3,$3) ON CONFLICT (user_id, role_id, scope_type, scope_id) DO UPDATE SET is_active = true, updated_at = now(), row_version = identity.user_roles.row_version + 1`,
-      [userId, roleId, actorUserId ?? null],
-    );
+    await this.database.query(loadAuthSql('identity.assign-role'), [
+      userId,
+      roleId,
+      actorUserId ?? null,
+    ]);
   }
 
   // * Function [authorization]: Retrieves and returns the requested authentication data.
   public async authorization(userId: string): Promise<{ roles: string[]; permissions: string[] }> {
-    const result = await this.database.query<Row>(
-      `SELECT DISTINCT r.code AS role_code, p.code AS permission_code FROM identity.user_roles ur JOIN identity.roles r ON r.id = ur.role_id AND r.is_deleted = false LEFT JOIN identity.role_permissions rp ON rp.role_id = r.id LEFT JOIN identity.permissions p ON p.id = rp.permission_id AND p.is_deleted = false WHERE ur.user_id = $1 AND ur.is_active = true AND (ur.valid_from IS NULL OR ur.valid_from <= now()) AND (ur.valid_until IS NULL OR ur.valid_until > now())`,
-      [userId],
-    );
+    const result = await this.database.query<Row>(loadAuthSql('identity.authorization'), [userId]);
     return {
       roles: [
         ...new Set(
@@ -210,6 +170,23 @@ export class IdentityRepository {
     };
   }
 
+  // * Function [findPrincipal]: Loads the active session, user, roles, and permissions in one query.
+  public async findPrincipal(sessionId: string, userId: string): Promise<AuthPrincipal | null> {
+    const result = await this.database.query<Row>(loadAuthSql('identity.find-principal'), [
+      sessionId,
+      userId,
+    ]);
+    const row = result.rows[0];
+    return row
+      ? {
+          userId: row.user_id,
+          sessionId: row.session_id,
+          roles: (row.roles as string[]) ?? [],
+          permissions: (row.permissions as string[]) ?? [],
+        }
+      : null;
+  }
+
   // * Function [listUsers]: Handles the listUsers operation for this authentication component.
   public async listUsers(
     limit: number,
@@ -218,31 +195,13 @@ export class IdentityRepository {
     status?: string,
   ): Promise<{ rows: AuthUser[]; total: number }> {
     // Build predicates separately while keeping every user-provided value parameterized.
-    const where: string[] = [];
-    const values: unknown[] = [];
-    if (search) {
-      values.push(`%${search.toLowerCase()}%`);
-      where.push(
-        `(u.email_normalized LIKE $${values.length} OR u.phone_number LIKE $${values.length})`,
-      );
-    }
-    if (status) {
-      values.push(status);
-      where.push(`u.status = $${values.length}`);
-    }
-    const clause = where.length ? `WHERE ${where.join(' AND ')}` : '';
-    const count = await this.database.query<Row>(
-      `SELECT count(*)::int AS total FROM identity.users u ${clause}`,
-      values,
-    );
-    const limitIndex = values.length + 1;
-    const offsetIndex = values.length + 2;
-    values.push(limit, offset);
-    const result = await this.database.query<Row>(
-      `${AUTH_USER_SELECT} ${clause} ORDER BY u.created_at DESC LIMIT $${limitIndex} OFFSET $${offsetIndex}`,
-      values,
-    );
-    return { rows: result.rows.map(mapUser), total: count.rows[0].total };
+    const result = await this.database.query<Row>(loadAuthSql('identity.list-users'), [
+      search ? `%${search.toLowerCase()}%` : null,
+      status ?? null,
+      limit,
+      offset,
+    ]);
+    return { rows: result.rows.map(mapUser), total: Number(result.rows[0]?.total_count ?? 0) };
   }
 }
 

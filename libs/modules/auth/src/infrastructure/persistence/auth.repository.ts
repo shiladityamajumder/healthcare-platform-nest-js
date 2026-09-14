@@ -17,6 +17,7 @@ import type { AuthRepositoryPort } from '../../contracts/auth.ports';
 @Injectable()
 export class AuthPostgresRepository implements AuthRepositoryPort {
   public readonly findUserById: AuthRepositoryPort['findUserById'];
+  public readonly findPrincipal: AuthRepositoryPort['findPrincipal'];
   public readonly findUserByEmail: AuthRepositoryPort['findUserByEmail'];
   public readonly findUserByPhone: AuthRepositoryPort['findUserByPhone'];
   public readonly findUserForLogin: AuthRepositoryPort['findUserForLogin'];
@@ -62,6 +63,7 @@ export class AuthPostgresRepository implements AuthRepositoryPort {
     private readonly administration: AdministrationRepository,
   ) {
     this.findUserById = this.identity.findUserById.bind(this.identity);
+    this.findPrincipal = this.identity.findPrincipal.bind(this.identity);
     this.findUserByEmail = this.identity.findUserByEmail.bind(this.identity);
     this.findUserByPhone = this.identity.findUserByPhone.bind(this.identity);
     this.findUserForLogin = this.identity.findUserForLogin.bind(this.identity);

@@ -11,6 +11,7 @@
 import { Injectable } from '@nestjs/common';
 import { PostgresDatabase } from '@platform/database';
 import type { OtpRecord } from '../../contracts/auth.ports';
+import { loadAuthSql } from '../../infrastructure/persistence/sql-loader';
 
 type Row = Record<string, any>;
 
@@ -29,28 +30,22 @@ export class OtpRepository {
     expiresAt: Date;
     maxAttempts: number;
   }): Promise<{ id: string; expiresAt: Date }> {
-    const result = await this.database.query<Row>(
-      `INSERT INTO identity.otp_challenges (id, channel, destination_hash, purpose, otp_hash, expires_at, max_attempts) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id, expires_at`,
-      [
-        input.id,
-        input.channel,
-        input.destinationHash,
-        input.purpose,
-        input.otpHash,
-        input.expiresAt,
-        input.maxAttempts,
-      ],
-    );
+    const result = await this.database.query<Row>(loadAuthSql('otp.create'), [
+      input.id,
+      input.channel,
+      input.destinationHash,
+      input.purpose,
+      input.otpHash,
+      input.expiresAt,
+      input.maxAttempts,
+    ]);
     return { id: result.rows[0].id, expiresAt: result.rows[0].expires_at };
   }
 
   // * Function [findOtp]: Handles the findOtp operation for this authentication component.
   public async findOtp(id: string): Promise<OtpRecord | null> {
     // The row lock serializes simultaneous verification attempts for one challenge.
-    const result = await this.database.query<Row>(
-      `SELECT id, channel, destination_hash, purpose, otp_hash, attempts, max_attempts, expires_at, consumed_at, blocked_at FROM identity.otp_challenges WHERE id = $1 FOR UPDATE`,
-      [id],
-    );
+    const result = await this.database.query<Row>(loadAuthSql('otp.find-for-update'), [id]);
     const row = result.rows[0];
     return row
       ? {
@@ -75,9 +70,6 @@ export class OtpRepository {
     consumed: boolean,
     blocked: boolean,
   ): Promise<void> {
-    await this.database.query(
-      `UPDATE identity.otp_challenges SET attempts = $2, consumed_at = CASE WHEN $3 THEN now() ELSE consumed_at END, blocked_at = CASE WHEN $4 THEN now() ELSE blocked_at END, updated_at = now(), row_version = row_version + 1 WHERE id = $1`,
-      [id, attempts, consumed, blocked],
-    );
+    await this.database.query(loadAuthSql('otp.consume'), [id, attempts, consumed, blocked]);
   }
 }

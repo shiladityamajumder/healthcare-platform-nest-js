@@ -52,23 +52,9 @@ export class AuthWorkflowService {
     if (!authorization?.startsWith('Bearer ')) throw new AuthenticationError();
     const claims = this.tokens.decode(authorization.slice(7), 'access');
     if (!claims.sid) throw new AuthenticationError();
-    const session = await this.repository.findSession(claims.sid);
-    if (
-      !session ||
-      session.userId !== claims.sub ||
-      session.revokedAt ||
-      session.expiresAt <= new Date()
-    )
-      throw new AuthenticationError();
-    const user = await this.repository.findUserById(claims.sub);
-    if (!user || user.status !== 'active') throw new AuthenticationError();
-    const auth = await this.repository.authorization(user.id);
-    return {
-      userId: user.id,
-      sessionId: session.id,
-      roles: auth.roles,
-      permissions: auth.permissions,
-    };
+    const principal = await this.repository.findPrincipal(claims.sid, claims.sub);
+    if (!principal) throw new AuthenticationError();
+    return principal;
   }
 
   // * Function [issueOtp]: Creates or issues the requested authentication resource.
