@@ -37,6 +37,21 @@ const errorExample = {
   },
 };
 
+const responseHeaders = {
+  'X-Request-ID': {
+    description: 'Identifier assigned to this request for support and log correlation.',
+    schema: { type: 'string', example: 'request-id' },
+  },
+  'X-Correlation-ID': {
+    description: 'Identifier used to correlate this request across services.',
+    schema: { type: 'string', example: 'correlation-id' },
+  },
+  'X-API-Version': {
+    description: 'API version that handled the request.',
+    schema: { type: 'string', example: 'v1' },
+  },
+};
+
 /** Describe a protected endpoint and its required bearer header in one place. */
 // * Function [ApiProtected]: Handles the ApiProtected operation for this authentication component.
 export function ApiProtected(): MethodDecorator & ClassDecorator {
@@ -109,13 +124,18 @@ export function ApiAuthResponse(
         },
       },
     },
+    headers: responseHeaders,
   });
 }
 
 /** Document a request body while keeping the controller method's DTO type as the source of truth. */
 // * Function [ApiAuthBody]: Handles the ApiAuthBody operation for this authentication component.
 export function ApiAuthBody(type: Type<unknown>, description: string): MethodDecorator {
-  return ApiBody({ type, description });
+  return ApiBody({
+    type,
+    required: true,
+    description: `${description} Required fields and validation constraints are shown in the schema below.`,
+  });
 }
 
 /** Add common protected-resource failures for administrative endpoints. */
@@ -174,5 +194,35 @@ export function ApiAuthQuery(type: Type<unknown>, description: string): MethodDe
 /** Apply a concise operation summary and explanation. */
 // * Function [ApiAuthOperation]: Handles the ApiAuthOperation operation for this authentication component.
 export function ApiAuthOperation(summary: string, description: string): MethodDecorator {
-  return ApiOperation({ summary, description });
+  return applyDecorators(
+    ApiOperation({
+      summary,
+      description: [
+        '### Why use this endpoint?',
+        description,
+        '### Request',
+        'Provide the path parameters, headers, query parameters, and/or JSON request body shown below. Fields marked **required** must be supplied. Field descriptions include the accepted format, allowed values, and examples.',
+        '### What the API does',
+        'The API validates the request, applies the operation to the authenticated or supplied identity context, and returns the result in the documented response envelope.',
+        '### Successful result',
+        'A successful response returns `success: true`. The operation-specific result is in `data`; request identifiers and the handled API version are in `meta` and the response headers.',
+        '### Authentication and errors',
+        'Use the security lock and `Authorization: Bearer <access-token>` header when this operation is protected. Validation failures return HTTP 400; authentication and other operation-specific failures are listed under Responses.',
+      ].join('\n\n'),
+    }),
+    ApiHeader({
+      name: 'X-Request-ID',
+      required: false,
+      description:
+        'Optional client-generated request identifier. The API generates one when omitted.',
+      schema: { type: 'string', example: 'request-id' },
+    }),
+    ApiHeader({
+      name: 'X-Correlation-ID',
+      required: false,
+      description:
+        'Optional identifier for correlating this request with related client operations.',
+      schema: { type: 'string', example: 'correlation-id' },
+    }),
+  );
 }

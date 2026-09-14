@@ -83,6 +83,8 @@ pnpm test               # * unit and repository test suite
 pnpm test:e2e           # * API e2e suite
 pnpm architecture:check
 pnpm build
+pnpm seed:identity:check
+pnpm seed:identity
 pnpm check              # * architecture check, lint, tests, and build
 ```
 
@@ -110,6 +112,8 @@ The module READMEs under [`libs/modules`](libs/modules) list the current feature
 Copy `.env.example` to `.env` for local work. PostgreSQL is required by the default database configuration. MongoDB and Redis are opt-in integrations controlled by `MONGO_ENABLED` and `REDIS_ENABLED`.
 
 Never commit real credentials, signing keys, patient data, payment data, or provider secrets. See [security architecture](docs/15-SECURITY.md) before connecting external systems.
+
+The identity RBAC master-data command is documented in [Identity master-data seed](docs/17-IDENTITY-MASTER-DATA-SEED.md). Run it after the externally managed identity migrations and before registering users.
 
 ## Engineering contract
 

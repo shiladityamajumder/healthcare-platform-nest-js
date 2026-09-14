@@ -1,0 +1,2034 @@
+{
+  "permissions": [
+    {
+      "resource": "identity.users",
+      "action": "read",
+      "description": "View user accounts, contact identifiers, verification state, and status."
+    },
+    {
+      "resource": "identity.users",
+      "action": "manage",
+      "description": "Change account status, lock state, and administrative account lifecycle data."
+    },
+    {
+      "resource": "identity.profiles",
+      "action": "read",
+      "description": "View universal user profile names and presentation data."
+    },
+    {
+      "resource": "identity.profiles",
+      "action": "manage",
+      "description": "Create and maintain universal user profile names and presentation data."
+    },
+    {
+      "resource": "identity.roles",
+      "action": "read",
+      "description": "View role master definitions."
+    },
+    {
+      "resource": "identity.roles",
+      "action": "manage",
+      "description": "Create and maintain role master definitions."
+    },
+    {
+      "resource": "identity.permissions",
+      "action": "read",
+      "description": "View permission master definitions."
+    },
+    {
+      "resource": "identity.permissions",
+      "action": "manage",
+      "description": "Create permissions and maintain role-permission policies."
+    },
+    {
+      "resource": "identity.user_roles",
+      "action": "read",
+      "description": "View user-role assignments and their scopes."
+    },
+    {
+      "resource": "identity.user_roles",
+      "action": "manage",
+      "description": "Assign, activate, expire, or revoke user roles."
+    },
+    {
+      "resource": "identity.sessions",
+      "action": "read",
+      "description": "View active and revoked authentication sessions."
+    },
+    {
+      "resource": "identity.sessions",
+      "action": "revoke",
+      "description": "Revoke authentication sessions for permitted users."
+    },
+    {
+      "resource": "identity.api_clients",
+      "action": "read",
+      "description": "View machine-to-machine API client definitions."
+    },
+    {
+      "resource": "identity.api_clients",
+      "action": "manage",
+      "description": "Create, rotate, suspend, and maintain API client credentials."
+    },
+    {
+      "resource": "organization.organizations",
+      "action": "read",
+      "description": "View organizations and provider entities."
+    },
+    {
+      "resource": "organization.organizations",
+      "action": "manage",
+      "description": "Create and maintain organizations and provider entities."
+    },
+    {
+      "resource": "organization.locations",
+      "action": "read",
+      "description": "View pharmacies, labs, clinics, warehouses, and service locations."
+    },
+    {
+      "resource": "organization.locations",
+      "action": "manage",
+      "description": "Create and maintain pharmacies, labs, clinics, warehouses, and locations."
+    },
+    {
+      "resource": "organization.departments",
+      "action": "read",
+      "description": "View organization departments and reporting structures."
+    },
+    {
+      "resource": "organization.departments",
+      "action": "manage",
+      "description": "Maintain organization departments and reporting structures."
+    },
+    {
+      "resource": "organization.memberships",
+      "action": "read",
+      "description": "View workforce memberships, designations, and facility assignments."
+    },
+    {
+      "resource": "organization.memberships",
+      "action": "manage",
+      "description": "Create and maintain workforce memberships and facility assignments."
+    },
+    {
+      "resource": "organization.licenses",
+      "action": "read",
+      "description": "View organization, facility, and professional license records."
+    },
+    {
+      "resource": "organization.licenses",
+      "action": "manage",
+      "description": "Create, verify, suspend, and maintain license records."
+    },
+    {
+      "resource": "customer.profiles",
+      "action": "read",
+      "description": "View permitted customer profile information."
+    },
+    {
+      "resource": "customer.profiles",
+      "action": "manage",
+      "description": "Maintain permitted customer profile information."
+    },
+    {
+      "resource": "customer.addresses",
+      "action": "read",
+      "description": "View permitted customer addresses."
+    },
+    {
+      "resource": "customer.addresses",
+      "action": "manage",
+      "description": "Create and maintain permitted customer addresses."
+    },
+    {
+      "resource": "customer.family_members",
+      "action": "read",
+      "description": "View permitted family-member profiles."
+    },
+    {
+      "resource": "customer.family_members",
+      "action": "manage",
+      "description": "Create and maintain permitted family-member profiles."
+    },
+    {
+      "resource": "customer.preferences",
+      "action": "manage",
+      "description": "Maintain permitted customer preferences and communication choices."
+    },
+    {
+      "resource": "catalog.products",
+      "action": "read",
+      "description": "View medicines, diagnostics, devices, wellness items, and services."
+    },
+    {
+      "resource": "catalog.products",
+      "action": "manage",
+      "description": "Create and maintain product and service master records."
+    },
+    {
+      "resource": "catalog.categories",
+      "action": "read",
+      "description": "View product categories and hierarchy."
+    },
+    {
+      "resource": "catalog.categories",
+      "action": "manage",
+      "description": "Maintain product categories and hierarchy."
+    },
+    {
+      "resource": "catalog.brands",
+      "action": "read",
+      "description": "View product brands."
+    },
+    {
+      "resource": "catalog.brands",
+      "action": "manage",
+      "description": "Maintain product brands."
+    },
+    {
+      "resource": "catalog.manufacturers",
+      "action": "read",
+      "description": "View manufacturers."
+    },
+    {
+      "resource": "catalog.manufacturers",
+      "action": "manage",
+      "description": "Maintain manufacturers."
+    },
+    {
+      "resource": "catalog.regulatory",
+      "action": "read",
+      "description": "View product regulatory, recall, and compliance information."
+    },
+    {
+      "resource": "catalog.regulatory",
+      "action": "manage",
+      "description": "Maintain product regulatory, recall, and compliance information."
+    },
+    {
+      "resource": "pricing.prices",
+      "action": "read",
+      "description": "View product prices, price books, taxes, and pricing evaluations."
+    },
+    {
+      "resource": "pricing.prices",
+      "action": "manage",
+      "description": "Maintain price books, product prices, and tax rules."
+    },
+    {
+      "resource": "pricing.promotions",
+      "action": "read",
+      "description": "View promotions, coupon codes, and redemption rules."
+    },
+    {
+      "resource": "pricing.promotions",
+      "action": "manage",
+      "description": "Create and maintain promotions, coupons, and redemption rules."
+    },
+    {
+      "resource": "commerce.carts",
+      "action": "read",
+      "description": "View permitted carts and checkout state."
+    },
+    {
+      "resource": "commerce.carts",
+      "action": "manage",
+      "description": "Create and maintain permitted carts and checkout state."
+    },
+    {
+      "resource": "commerce.orders",
+      "action": "read",
+      "description": "View permitted orders, items, charges, discounts, and status history."
+    },
+    {
+      "resource": "commerce.orders",
+      "action": "create",
+      "description": "Create an order for a permitted customer or patient."
+    },
+    {
+      "resource": "commerce.orders",
+      "action": "manage",
+      "description": "Manage order lifecycle, allocation exceptions, and operational corrections."
+    },
+    {
+      "resource": "commerce.orders",
+      "action": "cancel",
+      "description": "Cancel an eligible permitted order."
+    },
+    {
+      "resource": "commerce.returns",
+      "action": "read",
+      "description": "View permitted return and cancellation records."
+    },
+    {
+      "resource": "commerce.returns",
+      "action": "manage",
+      "description": "Create, approve, reject, and process eligible returns and cancellations."
+    },
+    {
+      "resource": "payment.transactions",
+      "action": "read",
+      "description": "View permitted payment intents, attempts, and transactions."
+    },
+    {
+      "resource": "payment.transactions",
+      "action": "manage",
+      "description": "Manage payment intents, transactions, and payment exceptions."
+    },
+    {
+      "resource": "payment.refunds",
+      "action": "refund",
+      "description": "Initiate or approve eligible refunds."
+    },
+    {
+      "resource": "payment.chargebacks",
+      "action": "manage",
+      "description": "Review and manage payment chargebacks."
+    },
+    {
+      "resource": "finance.invoices",
+      "action": "read",
+      "description": "View invoices, credit notes, and accounting documents."
+    },
+    {
+      "resource": "finance.invoices",
+      "action": "manage",
+      "description": "Create and maintain invoices and credit notes."
+    },
+    {
+      "resource": "finance.reconciliation",
+      "action": "read",
+      "description": "View settlement and reconciliation runs."
+    },
+    {
+      "resource": "finance.reconciliation",
+      "action": "manage",
+      "description": "Run and resolve payment, COD, supplier, and seller reconciliation."
+    },
+    {
+      "resource": "finance.ledger",
+      "action": "read",
+      "description": "View permitted journal entries and ledger records."
+    },
+    {
+      "resource": "finance.ledger",
+      "action": "manage",
+      "description": "Create and post permitted journal entries."
+    },
+    {
+      "resource": "clinical.patients",
+      "action": "read",
+      "description": "View permitted patient clinical profiles, conditions, allergies, and medications."
+    },
+    {
+      "resource": "clinical.patients",
+      "action": "manage",
+      "description": "Maintain permitted patient clinical profiles and structured history."
+    },
+    {
+      "resource": "clinical.prescriptions",
+      "action": "read",
+      "description": "View permitted prescriptions and prescription documents."
+    },
+    {
+      "resource": "clinical.prescriptions",
+      "action": "upload",
+      "description": "Upload a prescription for a permitted patient or order."
+    },
+    {
+      "resource": "clinical.prescriptions",
+      "action": "issue",
+      "description": "Issue a clinical prescription within practitioner scope."
+    },
+    {
+      "resource": "clinical.prescriptions",
+      "action": "verify",
+      "description": "Verify a prescription for dispensing."
+    },
+    {
+      "resource": "clinical.prescriptions",
+      "action": "reject",
+      "description": "Reject a prescription that fails clinical or regulatory checks."
+    },
+    {
+      "resource": "clinical.consultations",
+      "action": "read",
+      "description": "View permitted consultations, diagnoses, observations, and care episodes."
+    },
+    {
+      "resource": "clinical.consultations",
+      "action": "manage",
+      "description": "Create and maintain assigned consultation clinical records."
+    },
+    {
+      "resource": "clinical.dispensing",
+      "action": "read",
+      "description": "View permitted medicine-dispensing records."
+    },
+    {
+      "resource": "clinical.dispensing",
+      "action": "manage",
+      "description": "Record medicine dispensing against approved prescriptions and orders."
+    },
+    {
+      "resource": "clinical.dispensing",
+      "action": "approve",
+      "description": "Approve controlled or exceptional dispensing actions."
+    },
+    {
+      "resource": "appointment.appointments",
+      "action": "read",
+      "description": "View permitted appointments, slots, and waiting-room events."
+    },
+    {
+      "resource": "appointment.appointments",
+      "action": "create",
+      "description": "Book an appointment for a permitted patient."
+    },
+    {
+      "resource": "appointment.appointments",
+      "action": "manage",
+      "description": "Confirm, reschedule, check in, and manage assigned appointments."
+    },
+    {
+      "resource": "appointment.appointments",
+      "action": "cancel",
+      "description": "Cancel an eligible permitted appointment."
+    },
+    {
+      "resource": "appointment.availability",
+      "action": "manage",
+      "description": "Maintain practitioner availability rules, slots, and exceptions."
+    },
+    {
+      "resource": "diagnostics.catalog",
+      "action": "read",
+      "description": "View diagnostic tests, packages, providers, and lab offerings."
+    },
+    {
+      "resource": "diagnostics.catalog",
+      "action": "manage",
+      "description": "Maintain diagnostic tests, packages, providers, and lab offerings."
+    },
+    {
+      "resource": "diagnostics.orders",
+      "action": "read",
+      "description": "View permitted diagnostic orders and items."
+    },
+    {
+      "resource": "diagnostics.orders",
+      "action": "create",
+      "description": "Create a diagnostic order for a permitted patient."
+    },
+    {
+      "resource": "diagnostics.orders",
+      "action": "manage",
+      "description": "Manage diagnostic-order lifecycle and exceptions."
+    },
+    {
+      "resource": "diagnostics.samples",
+      "action": "read",
+      "description": "View permitted sample collection, custody, and processing records."
+    },
+    {
+      "resource": "diagnostics.samples",
+      "action": "collect",
+      "description": "Record sample collection and chain of custody."
+    },
+    {
+      "resource": "diagnostics.samples",
+      "action": "process",
+      "description": "Receive, accept, reject, process, and dispose diagnostic samples."
+    },
+    {
+      "resource": "diagnostics.results",
+      "action": "read",
+      "description": "View permitted diagnostic observations, result values, and reports."
+    },
+    {
+      "resource": "diagnostics.results",
+      "action": "record",
+      "description": "Record diagnostic observations and result values."
+    },
+    {
+      "resource": "diagnostics.results",
+      "action": "verify",
+      "description": "Clinically verify and release diagnostic reports."
+    },
+    {
+      "resource": "warehouse.inventory",
+      "action": "read",
+      "description": "View stock balances, reservations, holds, ledger entries, lots, and expiry."
+    },
+    {
+      "resource": "warehouse.inventory",
+      "action": "adjust",
+      "description": "Record controlled inventory adjustments and quality dispositions."
+    },
+    {
+      "resource": "warehouse.receiving",
+      "action": "read",
+      "description": "View goods receipts and receiving quality checks."
+    },
+    {
+      "resource": "warehouse.receiving",
+      "action": "manage",
+      "description": "Receive goods and complete receiving quality checks."
+    },
+    {
+      "resource": "warehouse.transfers",
+      "action": "read",
+      "description": "View stock transfers and replenishment activity."
+    },
+    {
+      "resource": "warehouse.transfers",
+      "action": "manage",
+      "description": "Create and complete stock transfers and replenishment activity."
+    },
+    {
+      "resource": "warehouse.counts",
+      "action": "read",
+      "description": "View cycle counts and count variances."
+    },
+    {
+      "resource": "warehouse.counts",
+      "action": "manage",
+      "description": "Create, count, approve, and close cycle counts."
+    },
+    {
+      "resource": "warehouse.layout",
+      "action": "read",
+      "description": "View warehouses, zones, aisles, racks, and bins."
+    },
+    {
+      "resource": "warehouse.layout",
+      "action": "manage",
+      "description": "Maintain warehouses, zones, aisles, racks, bins, and replenishment rules."
+    },
+    {
+      "resource": "fulfillment.orders",
+      "action": "read",
+      "description": "View permitted fulfillment orders, allocations, and events."
+    },
+    {
+      "resource": "fulfillment.orders",
+      "action": "manage",
+      "description": "Create, allocate, and manage fulfillment orders."
+    },
+    {
+      "resource": "fulfillment.picking",
+      "action": "execute",
+      "description": "Execute assigned picking waves and pick tasks."
+    },
+    {
+      "resource": "fulfillment.packing",
+      "action": "execute",
+      "description": "Execute assigned packing tasks and package creation."
+    },
+    {
+      "resource": "logistics.shipments",
+      "action": "read",
+      "description": "View permitted shipments, packages, routes, assignments, and events."
+    },
+    {
+      "resource": "logistics.shipments",
+      "action": "manage",
+      "description": "Create and manage shipment lifecycle, carrier booking, and exceptions."
+    },
+    {
+      "resource": "logistics.shipments",
+      "action": "assign",
+      "description": "Assign shipments and delivery routes to delivery personnel."
+    },
+    {
+      "resource": "logistics.shipments",
+      "action": "deliver",
+      "description": "Record assigned delivery attempts, COD collection, and completion."
+    },
+    {
+      "resource": "procurement.suppliers",
+      "action": "read",
+      "description": "View suppliers, supplier products, licenses, and commercial terms."
+    },
+    {
+      "resource": "procurement.suppliers",
+      "action": "manage",
+      "description": "Create, verify, suspend, and maintain suppliers and supplier products."
+    },
+    {
+      "resource": "procurement.requisitions",
+      "action": "read",
+      "description": "View purchase requisitions and items."
+    },
+    {
+      "resource": "procurement.requisitions",
+      "action": "manage",
+      "description": "Create, approve, reject, and maintain purchase requisitions."
+    },
+    {
+      "resource": "procurement.purchase_orders",
+      "action": "read",
+      "description": "View purchase orders and supplier commitments."
+    },
+    {
+      "resource": "procurement.purchase_orders",
+      "action": "manage",
+      "description": "Create, approve, issue, amend, and close purchase orders."
+    },
+    {
+      "resource": "procurement.returns",
+      "action": "read",
+      "description": "View supplier returns and return items."
+    },
+    {
+      "resource": "procurement.returns",
+      "action": "manage",
+      "description": "Create, approve, and process supplier returns."
+    },
+    {
+      "resource": "procurement.invoices",
+      "action": "read",
+      "description": "View supplier invoices and three-way matching information."
+    },
+    {
+      "resource": "procurement.invoices",
+      "action": "manage",
+      "description": "Validate, match, dispute, and approve supplier invoices."
+    },
+    {
+      "resource": "marketplace.sellers",
+      "action": "read",
+      "description": "View sellers, locations, service levels, ratings, and commission plans."
+    },
+    {
+      "resource": "marketplace.sellers",
+      "action": "manage",
+      "description": "Onboard, verify, suspend, and maintain sellers and seller locations."
+    },
+    {
+      "resource": "marketplace.listings",
+      "action": "read",
+      "description": "View seller product listings and availability."
+    },
+    {
+      "resource": "marketplace.listings",
+      "action": "manage",
+      "description": "Create, approve, reject, and maintain seller product listings."
+    },
+    {
+      "resource": "marketplace.commissions",
+      "action": "read",
+      "description": "View seller commission plans and assignments."
+    },
+    {
+      "resource": "marketplace.commissions",
+      "action": "manage",
+      "description": "Create and assign seller commission plans."
+    },
+    {
+      "resource": "insurance.plans",
+      "action": "read",
+      "description": "View insurers, TPAs, plans, and plan benefits."
+    },
+    {
+      "resource": "insurance.plans",
+      "action": "manage",
+      "description": "Maintain insurers, TPAs, plans, and benefits."
+    },
+    {
+      "resource": "insurance.policies",
+      "action": "read",
+      "description": "View permitted policies, members, and eligibility checks."
+    },
+    {
+      "resource": "insurance.policies",
+      "action": "manage",
+      "description": "Create and maintain policies, members, and eligibility decisions."
+    },
+    {
+      "resource": "insurance.claims",
+      "action": "read",
+      "description": "View permitted claims, documents, and status history."
+    },
+    {
+      "resource": "insurance.claims",
+      "action": "manage",
+      "description": "Submit, assess, approve, reject, and settle permitted claims."
+    },
+    {
+      "resource": "membership.loyalty",
+      "action": "read",
+      "description": "View permitted loyalty accounts, subscriptions, and benefit usage."
+    },
+    {
+      "resource": "membership.loyalty",
+      "action": "manage",
+      "description": "Maintain loyalty accounts, subscriptions, benefits, and ledger adjustments."
+    },
+    {
+      "resource": "support.tickets",
+      "action": "read",
+      "description": "View permitted support cases, tickets, messages, and actions."
+    },
+    {
+      "resource": "support.tickets",
+      "action": "create",
+      "description": "Create a support case or ticket."
+    },
+    {
+      "resource": "support.tickets",
+      "action": "manage",
+      "description": "Assign, communicate on, escalate, resolve, and close support tickets."
+    },
+    {
+      "resource": "notification.messages",
+      "action": "read",
+      "description": "View permitted notification messages and delivery attempts."
+    },
+    {
+      "resource": "notification.messages",
+      "action": "send",
+      "description": "Queue and send transactional notifications."
+    },
+    {
+      "resource": "notification.templates",
+      "action": "manage",
+      "description": "Create and maintain notification templates and channel policies."
+    },
+    {
+      "resource": "compliance.audit",
+      "action": "read",
+      "description": "View security, access, prescription, consent, and compliance audit evidence."
+    },
+    {
+      "resource": "compliance.consents",
+      "action": "read",
+      "description": "View permitted consent records and consent events."
+    },
+    {
+      "resource": "compliance.consents",
+      "action": "manage",
+      "description": "Create, revoke, expire, and maintain permitted consent records."
+    },
+    {
+      "resource": "compliance.privacy",
+      "action": "read",
+      "description": "View privacy requests, legal holds, and retention policies."
+    },
+    {
+      "resource": "compliance.privacy",
+      "action": "manage",
+      "description": "Process privacy requests and maintain legal holds and retention policies."
+    },
+    {
+      "resource": "compliance.adverse_events",
+      "action": "read",
+      "description": "View adverse-event and product-safety reports."
+    },
+    {
+      "resource": "compliance.adverse_events",
+      "action": "manage",
+      "description": "Record, assess, escalate, and report adverse events."
+    },
+    {
+      "resource": "risk.signals",
+      "action": "read",
+      "description": "View fraud, abuse, payment, account, and operational risk signals."
+    },
+    {
+      "resource": "risk.signals",
+      "action": "manage",
+      "description": "Review and resolve risk signals and assessments."
+    },
+    {
+      "resource": "risk.rules",
+      "action": "read",
+      "description": "View risk rules, blocklists, and decision policies."
+    },
+    {
+      "resource": "risk.rules",
+      "action": "manage",
+      "description": "Create and maintain risk rules, blocklists, and decision policies."
+    },
+    {
+      "resource": "platform.settings",
+      "action": "read",
+      "description": "View application settings, service types, and feature flags."
+    },
+    {
+      "resource": "platform.settings",
+      "action": "manage",
+      "description": "Maintain application settings, service types, and feature flags."
+    },
+    {
+      "resource": "platform.files",
+      "action": "read",
+      "description": "View permitted file objects, scan events, and access grants."
+    },
+    {
+      "resource": "platform.files",
+      "action": "manage",
+      "description": "Maintain file objects, access grants, and scan dispositions."
+    },
+    {
+      "resource": "platform.jobs",
+      "action": "read",
+      "description": "View scheduled jobs, outbox events, and webhook delivery state."
+    },
+    {
+      "resource": "platform.jobs",
+      "action": "manage",
+      "description": "Operate scheduled jobs, event delivery, and webhook endpoints."
+    },
+    {
+      "resource": "search.configuration",
+      "action": "read",
+      "description": "View indexing jobs, synonyms, redirects, and search configuration."
+    },
+    {
+      "resource": "search.configuration",
+      "action": "manage",
+      "description": "Maintain indexing jobs, synonyms, redirects, and search configuration."
+    },
+    {
+      "resource": "reports.operations",
+      "action": "read",
+      "description": "View operational reports and dashboards."
+    },
+    {
+      "resource": "reports.finance",
+      "action": "read",
+      "description": "View financial reports and dashboards."
+    },
+    {
+      "resource": "reports.clinical",
+      "action": "read",
+      "description": "View permitted clinical and diagnostic reports."
+    }
+  ],
+  "roles": [
+    {
+      "code": "customer",
+      "name": "Customer",
+      "description": "Healthcare-commerce customer. Domain services must enforce ownership and family-member authorization for every record.",
+      "permissions": [
+        "appointment.appointments.cancel",
+        "appointment.appointments.create",
+        "appointment.appointments.read",
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "clinical.patients.manage",
+        "clinical.patients.read",
+        "clinical.prescriptions.read",
+        "clinical.prescriptions.upload",
+        "commerce.carts.manage",
+        "commerce.carts.read",
+        "commerce.orders.cancel",
+        "commerce.orders.create",
+        "commerce.orders.read",
+        "commerce.returns.read",
+        "compliance.consents.manage",
+        "compliance.consents.read",
+        "customer.addresses.manage",
+        "customer.addresses.read",
+        "customer.family_members.manage",
+        "customer.family_members.read",
+        "customer.preferences.manage",
+        "customer.profiles.manage",
+        "customer.profiles.read",
+        "diagnostics.catalog.read",
+        "diagnostics.orders.create",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "insurance.claims.read",
+        "insurance.plans.read",
+        "insurance.policies.read",
+        "logistics.shipments.read",
+        "membership.loyalty.read",
+        "payment.refunds.refund",
+        "payment.transactions.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "support.tickets.create",
+        "support.tickets.read"
+      ]
+    },
+    {
+      "code": "caregiver",
+      "name": "Caregiver",
+      "description": "Authorized caregiver acting for permitted family members or patients; consent and relationship checks remain mandatory.",
+      "permissions": [
+        "appointment.appointments.cancel",
+        "appointment.appointments.create",
+        "appointment.appointments.read",
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "clinical.patients.manage",
+        "clinical.patients.read",
+        "clinical.prescriptions.read",
+        "clinical.prescriptions.upload",
+        "commerce.carts.manage",
+        "commerce.carts.read",
+        "commerce.orders.cancel",
+        "commerce.orders.create",
+        "commerce.orders.read",
+        "commerce.returns.read",
+        "compliance.consents.manage",
+        "compliance.consents.read",
+        "customer.addresses.manage",
+        "customer.addresses.read",
+        "customer.family_members.manage",
+        "customer.family_members.read",
+        "customer.preferences.manage",
+        "customer.profiles.manage",
+        "customer.profiles.read",
+        "diagnostics.catalog.read",
+        "diagnostics.orders.create",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "insurance.claims.read",
+        "insurance.plans.read",
+        "insurance.policies.read",
+        "logistics.shipments.read",
+        "membership.loyalty.read",
+        "payment.refunds.refund",
+        "payment.transactions.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "support.tickets.create",
+        "support.tickets.read"
+      ]
+    },
+    {
+      "code": "doctor",
+      "name": "Doctor",
+      "description": "Practitioner managing assigned appointments, consultations, and prescriptions.",
+      "permissions": [
+        "appointment.appointments.manage",
+        "appointment.appointments.read",
+        "appointment.availability.manage",
+        "catalog.products.read",
+        "clinical.consultations.manage",
+        "clinical.consultations.read",
+        "clinical.patients.manage",
+        "clinical.patients.read",
+        "clinical.prescriptions.issue",
+        "clinical.prescriptions.read",
+        "diagnostics.catalog.read",
+        "diagnostics.orders.create",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "reports.clinical.read"
+      ]
+    },
+    {
+      "code": "pharmacist",
+      "name": "Pharmacist",
+      "description": "Pharmacist verifying prescriptions and recording medicine dispensing.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "clinical.dispensing.manage",
+        "clinical.dispensing.read",
+        "clinical.patients.read",
+        "clinical.prescriptions.read",
+        "clinical.prescriptions.reject",
+        "clinical.prescriptions.verify",
+        "commerce.orders.read",
+        "fulfillment.orders.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "warehouse.inventory.read"
+      ]
+    },
+    {
+      "code": "pharmacy_manager",
+      "name": "Pharmacy Manager",
+      "description": "Pharmacy supervisor responsible for stock, orders, and dispensing approvals.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "clinical.dispensing.approve",
+        "clinical.dispensing.manage",
+        "clinical.dispensing.read",
+        "clinical.patients.read",
+        "clinical.prescriptions.read",
+        "clinical.prescriptions.reject",
+        "clinical.prescriptions.verify",
+        "commerce.orders.manage",
+        "commerce.orders.read",
+        "fulfillment.orders.manage",
+        "fulfillment.orders.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "reports.operations.read",
+        "warehouse.inventory.adjust",
+        "warehouse.inventory.read",
+        "warehouse.receiving.read",
+        "warehouse.transfers.read"
+      ]
+    },
+    {
+      "code": "lab_technician",
+      "name": "Lab Technician",
+      "description": "Diagnostic technician collecting and processing samples and recording results.",
+      "permissions": [
+        "diagnostics.catalog.read",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "diagnostics.results.record",
+        "diagnostics.samples.collect",
+        "diagnostics.samples.process",
+        "diagnostics.samples.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read"
+      ]
+    },
+    {
+      "code": "pathologist",
+      "name": "Pathologist",
+      "description": "Authorized clinical reviewer verifying and releasing diagnostic reports.",
+      "permissions": [
+        "clinical.patients.read",
+        "diagnostics.catalog.read",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "diagnostics.results.record",
+        "diagnostics.results.verify",
+        "diagnostics.samples.collect",
+        "diagnostics.samples.process",
+        "diagnostics.samples.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "reports.clinical.read"
+      ]
+    },
+    {
+      "code": "lab_manager",
+      "name": "Lab Manager",
+      "description": "Diagnostic-lab supervisor maintaining offerings and operational workflows.",
+      "permissions": [
+        "clinical.patients.read",
+        "diagnostics.catalog.manage",
+        "diagnostics.catalog.read",
+        "diagnostics.orders.create",
+        "diagnostics.orders.manage",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "diagnostics.results.record",
+        "diagnostics.results.verify",
+        "diagnostics.samples.collect",
+        "diagnostics.samples.process",
+        "diagnostics.samples.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "reports.clinical.read",
+        "reports.operations.read"
+      ]
+    },
+    {
+      "code": "warehouse_receiver",
+      "name": "Warehouse Receiver",
+      "description": "Warehouse staff receiving goods and completing receiving quality checks.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "warehouse.inventory.read",
+        "warehouse.layout.read",
+        "warehouse.receiving.manage",
+        "warehouse.receiving.read"
+      ]
+    },
+    {
+      "code": "warehouse_picker",
+      "name": "Warehouse Picker",
+      "description": "Warehouse staff executing assigned picking work.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "fulfillment.orders.read",
+        "fulfillment.picking.execute",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "warehouse.inventory.read",
+        "warehouse.layout.read"
+      ]
+    },
+    {
+      "code": "warehouse_packer",
+      "name": "Warehouse Packer",
+      "description": "Warehouse staff executing assigned packing and package creation work.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "fulfillment.orders.read",
+        "fulfillment.packing.execute",
+        "logistics.shipments.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read"
+      ]
+    },
+    {
+      "code": "warehouse_operator",
+      "name": "Warehouse Operator",
+      "description": "Cross-functional warehouse operator handling receiving, picking, and packing.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "fulfillment.orders.read",
+        "fulfillment.packing.execute",
+        "fulfillment.picking.execute",
+        "logistics.shipments.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "warehouse.counts.read",
+        "warehouse.inventory.read",
+        "warehouse.layout.read",
+        "warehouse.receiving.manage",
+        "warehouse.receiving.read",
+        "warehouse.transfers.read"
+      ]
+    },
+    {
+      "code": "warehouse_manager",
+      "name": "Warehouse Manager",
+      "description": "Warehouse supervisor controlling inventory, layout, counts, and fulfillment.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "fulfillment.orders.manage",
+        "fulfillment.orders.read",
+        "fulfillment.packing.execute",
+        "fulfillment.picking.execute",
+        "logistics.shipments.assign",
+        "logistics.shipments.manage",
+        "logistics.shipments.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "reports.operations.read",
+        "warehouse.counts.manage",
+        "warehouse.counts.read",
+        "warehouse.inventory.adjust",
+        "warehouse.inventory.read",
+        "warehouse.layout.manage",
+        "warehouse.layout.read",
+        "warehouse.receiving.manage",
+        "warehouse.receiving.read",
+        "warehouse.transfers.manage",
+        "warehouse.transfers.read"
+      ]
+    },
+    {
+      "code": "delivery_agent",
+      "name": "Delivery Agent",
+      "description": "Delivery staff updating only assigned shipment and COD progress.",
+      "permissions": ["logistics.shipments.deliver", "logistics.shipments.read"]
+    },
+    {
+      "code": "delivery_dispatcher",
+      "name": "Delivery Dispatcher",
+      "description": "Dispatcher assigning shipments and coordinating delivery routes.",
+      "permissions": [
+        "logistics.shipments.assign",
+        "logistics.shipments.manage",
+        "logistics.shipments.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "reports.operations.read"
+      ]
+    },
+    {
+      "code": "logistics_manager",
+      "name": "Logistics Manager",
+      "description": "Logistics supervisor managing carriers, shipments, routes, and exceptions.",
+      "permissions": [
+        "commerce.orders.read",
+        "commerce.returns.read",
+        "fulfillment.orders.manage",
+        "fulfillment.orders.read",
+        "logistics.shipments.assign",
+        "logistics.shipments.manage",
+        "logistics.shipments.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "reports.operations.read"
+      ]
+    },
+    {
+      "code": "procurement_officer",
+      "name": "Procurement Officer",
+      "description": "Procurement staff managing suppliers, requisitions, orders, returns, and invoices.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "procurement.invoices.manage",
+        "procurement.invoices.read",
+        "procurement.purchase_orders.manage",
+        "procurement.purchase_orders.read",
+        "procurement.requisitions.manage",
+        "procurement.requisitions.read",
+        "procurement.returns.manage",
+        "procurement.returns.read",
+        "procurement.suppliers.manage",
+        "procurement.suppliers.read",
+        "warehouse.inventory.read",
+        "warehouse.receiving.read"
+      ]
+    },
+    {
+      "code": "procurement_manager",
+      "name": "Procurement Manager",
+      "description": "Procurement supervisor approving sourcing and supplier financial workflows.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "finance.invoices.read",
+        "finance.reconciliation.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "procurement.invoices.manage",
+        "procurement.invoices.read",
+        "procurement.purchase_orders.manage",
+        "procurement.purchase_orders.read",
+        "procurement.requisitions.manage",
+        "procurement.requisitions.read",
+        "procurement.returns.manage",
+        "procurement.returns.read",
+        "procurement.suppliers.manage",
+        "procurement.suppliers.read",
+        "reports.finance.read",
+        "reports.operations.read",
+        "warehouse.inventory.read",
+        "warehouse.receiving.read"
+      ]
+    },
+    {
+      "code": "seller_admin",
+      "name": "Seller Administrator",
+      "description": "Seller-side administrator maintaining own listings and operational visibility.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "commerce.orders.read",
+        "finance.reconciliation.read",
+        "fulfillment.orders.read",
+        "logistics.shipments.read",
+        "marketplace.commissions.read",
+        "marketplace.listings.manage",
+        "marketplace.listings.read",
+        "marketplace.sellers.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "reports.operations.read"
+      ]
+    },
+    {
+      "code": "marketplace_manager",
+      "name": "Marketplace Manager",
+      "description": "Platform staff onboarding sellers and managing listings and commissions.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.manage",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "commerce.orders.read",
+        "finance.reconciliation.read",
+        "fulfillment.orders.read",
+        "logistics.shipments.read",
+        "marketplace.commissions.manage",
+        "marketplace.commissions.read",
+        "marketplace.listings.manage",
+        "marketplace.listings.read",
+        "marketplace.sellers.manage",
+        "marketplace.sellers.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.manage",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "reports.finance.read",
+        "reports.operations.read"
+      ]
+    },
+    {
+      "code": "catalog_manager",
+      "name": "Catalog Manager",
+      "description": "Merchandising staff maintaining products, categories, content, and search metadata.",
+      "permissions": [
+        "catalog.brands.manage",
+        "catalog.brands.read",
+        "catalog.categories.manage",
+        "catalog.categories.read",
+        "catalog.manufacturers.manage",
+        "catalog.manufacturers.read",
+        "catalog.products.manage",
+        "catalog.products.read",
+        "catalog.regulatory.manage",
+        "catalog.regulatory.read",
+        "pricing.prices.read",
+        "pricing.promotions.manage",
+        "pricing.promotions.read",
+        "reports.operations.read",
+        "search.configuration.manage",
+        "search.configuration.read"
+      ]
+    },
+    {
+      "code": "pricing_manager",
+      "name": "Pricing Manager",
+      "description": "Commercial staff maintaining prices, promotions, coupons, and tax rules.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "pricing.prices.manage",
+        "pricing.prices.read",
+        "pricing.promotions.manage",
+        "pricing.promotions.read",
+        "reports.finance.read",
+        "reports.operations.read"
+      ]
+    },
+    {
+      "code": "support_agent",
+      "name": "Support Agent",
+      "description": "Customer-support staff handling permitted account, order, payment, and delivery queries.",
+      "permissions": [
+        "catalog.products.read",
+        "commerce.orders.read",
+        "commerce.returns.read",
+        "customer.addresses.read",
+        "customer.family_members.read",
+        "customer.profiles.read",
+        "identity.profiles.read",
+        "identity.users.read",
+        "logistics.shipments.read",
+        "notification.messages.read",
+        "payment.transactions.read",
+        "pricing.prices.read",
+        "support.tickets.create",
+        "support.tickets.manage",
+        "support.tickets.read"
+      ]
+    },
+    {
+      "code": "support_manager",
+      "name": "Support Manager",
+      "description": "Support supervisor handling escalations, returns, cancellations, and eligible refunds.",
+      "permissions": [
+        "catalog.products.read",
+        "commerce.orders.cancel",
+        "commerce.orders.manage",
+        "commerce.orders.read",
+        "commerce.returns.manage",
+        "commerce.returns.read",
+        "customer.addresses.read",
+        "customer.family_members.read",
+        "customer.profiles.read",
+        "identity.profiles.read",
+        "identity.users.read",
+        "logistics.shipments.read",
+        "notification.messages.read",
+        "notification.messages.send",
+        "payment.refunds.refund",
+        "payment.transactions.read",
+        "pricing.prices.read",
+        "reports.operations.read",
+        "support.tickets.create",
+        "support.tickets.manage",
+        "support.tickets.read"
+      ]
+    },
+    {
+      "code": "finance_analyst",
+      "name": "Finance Analyst",
+      "description": "Read-focused finance staff reviewing payments, invoices, settlements, and ledgers.",
+      "permissions": [
+        "commerce.orders.read",
+        "commerce.returns.read",
+        "finance.invoices.read",
+        "finance.ledger.read",
+        "finance.reconciliation.read",
+        "marketplace.commissions.read",
+        "payment.transactions.read",
+        "procurement.invoices.read",
+        "reports.finance.read"
+      ]
+    },
+    {
+      "code": "finance_manager",
+      "name": "Finance Manager",
+      "description": "Finance supervisor responsible for refunds, chargebacks, reconciliation, and ledger posting.",
+      "permissions": [
+        "commerce.orders.read",
+        "commerce.returns.read",
+        "finance.invoices.manage",
+        "finance.invoices.read",
+        "finance.ledger.manage",
+        "finance.ledger.read",
+        "finance.reconciliation.manage",
+        "finance.reconciliation.read",
+        "marketplace.commissions.read",
+        "payment.chargebacks.manage",
+        "payment.refunds.refund",
+        "payment.transactions.manage",
+        "payment.transactions.read",
+        "procurement.invoices.read",
+        "reports.finance.read"
+      ]
+    },
+    {
+      "code": "insurance_coordinator",
+      "name": "Insurance Coordinator",
+      "description": "Insurance operations staff managing eligibility, policies, and claims.",
+      "permissions": [
+        "clinical.patients.read",
+        "diagnostics.orders.read",
+        "insurance.claims.manage",
+        "insurance.claims.read",
+        "insurance.plans.read",
+        "insurance.policies.manage",
+        "insurance.policies.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read"
+      ]
+    },
+    {
+      "code": "insurance_manager",
+      "name": "Insurance Manager",
+      "description": "Insurance supervisor maintaining plans and overseeing claims operations.",
+      "permissions": [
+        "clinical.patients.read",
+        "compliance.audit.read",
+        "diagnostics.orders.read",
+        "insurance.claims.manage",
+        "insurance.claims.read",
+        "insurance.plans.manage",
+        "insurance.plans.read",
+        "insurance.policies.manage",
+        "insurance.policies.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "reports.finance.read"
+      ]
+    },
+    {
+      "code": "compliance_auditor",
+      "name": "Compliance Auditor",
+      "description": "Read-only compliance access to regulated records and audit evidence.",
+      "permissions": [
+        "catalog.regulatory.read",
+        "clinical.consultations.read",
+        "clinical.dispensing.read",
+        "clinical.patients.read",
+        "clinical.prescriptions.read",
+        "commerce.orders.read",
+        "commerce.returns.read",
+        "compliance.adverse_events.read",
+        "compliance.audit.read",
+        "compliance.consents.read",
+        "compliance.privacy.read",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "diagnostics.samples.read",
+        "finance.invoices.read",
+        "finance.reconciliation.read",
+        "identity.permissions.read",
+        "identity.profiles.read",
+        "identity.roles.read",
+        "identity.sessions.read",
+        "identity.user_roles.read",
+        "identity.users.read",
+        "insurance.claims.read",
+        "marketplace.sellers.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "payment.transactions.read",
+        "procurement.suppliers.read",
+        "reports.clinical.read",
+        "reports.finance.read",
+        "reports.operations.read",
+        "risk.rules.read",
+        "risk.signals.read"
+      ]
+    },
+    {
+      "code": "compliance_officer",
+      "name": "Compliance Officer",
+      "description": "Compliance staff managing consent, privacy, regulatory, and adverse-event workflows.",
+      "permissions": [
+        "catalog.regulatory.manage",
+        "catalog.regulatory.read",
+        "clinical.consultations.read",
+        "clinical.dispensing.read",
+        "clinical.patients.read",
+        "clinical.prescriptions.read",
+        "commerce.orders.read",
+        "commerce.returns.read",
+        "compliance.adverse_events.manage",
+        "compliance.adverse_events.read",
+        "compliance.audit.read",
+        "compliance.consents.manage",
+        "compliance.consents.read",
+        "compliance.privacy.manage",
+        "compliance.privacy.read",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "diagnostics.samples.read",
+        "finance.invoices.read",
+        "finance.reconciliation.read",
+        "identity.permissions.read",
+        "identity.profiles.read",
+        "identity.roles.read",
+        "identity.sessions.read",
+        "identity.user_roles.read",
+        "identity.users.read",
+        "insurance.claims.read",
+        "marketplace.sellers.read",
+        "organization.departments.read",
+        "organization.licenses.manage",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "payment.transactions.read",
+        "procurement.suppliers.read",
+        "reports.clinical.read",
+        "reports.finance.read",
+        "reports.operations.read",
+        "risk.rules.read",
+        "risk.signals.read"
+      ]
+    },
+    {
+      "code": "risk_analyst",
+      "name": "Risk Analyst",
+      "description": "Risk staff reviewing fraud, abuse, account, payment, and operational signals.",
+      "permissions": [
+        "commerce.orders.read",
+        "compliance.audit.read",
+        "identity.users.read",
+        "payment.chargebacks.manage",
+        "payment.transactions.read",
+        "risk.rules.read",
+        "risk.signals.manage",
+        "risk.signals.read",
+        "support.tickets.read"
+      ]
+    },
+    {
+      "code": "risk_manager",
+      "name": "Risk Manager",
+      "description": "Risk supervisor managing decision rules, blocklists, and escalations.",
+      "permissions": [
+        "commerce.orders.read",
+        "compliance.audit.read",
+        "identity.users.read",
+        "payment.chargebacks.manage",
+        "payment.transactions.read",
+        "reports.finance.read",
+        "reports.operations.read",
+        "risk.rules.manage",
+        "risk.rules.read",
+        "risk.signals.manage",
+        "risk.signals.read",
+        "support.tickets.read"
+      ]
+    },
+    {
+      "code": "organization_admin",
+      "name": "Organization Administrator",
+      "description": "Tenant or provider administrator managing workforce, facilities, and scoped role assignments.",
+      "permissions": [
+        "identity.permissions.read",
+        "identity.profiles.manage",
+        "identity.profiles.read",
+        "identity.roles.read",
+        "identity.sessions.read",
+        "identity.user_roles.manage",
+        "identity.user_roles.read",
+        "identity.users.read",
+        "organization.departments.manage",
+        "organization.departments.read",
+        "organization.licenses.manage",
+        "organization.licenses.read",
+        "organization.locations.manage",
+        "organization.locations.read",
+        "organization.memberships.manage",
+        "organization.memberships.read",
+        "organization.organizations.manage",
+        "organization.organizations.read"
+      ]
+    },
+    {
+      "code": "operations_manager",
+      "name": "Operations Manager",
+      "description": "Operations staff coordinating orders, fulfillment, warehouse, support, and delivery.",
+      "permissions": [
+        "catalog.brands.read",
+        "catalog.categories.read",
+        "catalog.manufacturers.read",
+        "catalog.products.read",
+        "catalog.regulatory.read",
+        "commerce.orders.cancel",
+        "commerce.orders.manage",
+        "commerce.orders.read",
+        "commerce.returns.manage",
+        "commerce.returns.read",
+        "fulfillment.orders.manage",
+        "fulfillment.orders.read",
+        "logistics.shipments.assign",
+        "logistics.shipments.manage",
+        "logistics.shipments.read",
+        "organization.departments.read",
+        "organization.licenses.read",
+        "organization.locations.read",
+        "organization.memberships.read",
+        "organization.organizations.read",
+        "pricing.prices.read",
+        "pricing.promotions.read",
+        "reports.operations.read",
+        "support.tickets.manage",
+        "support.tickets.read",
+        "warehouse.counts.read",
+        "warehouse.inventory.read",
+        "warehouse.layout.read",
+        "warehouse.receiving.read",
+        "warehouse.transfers.read"
+      ]
+    },
+    {
+      "code": "identity_admin",
+      "name": "Identity Administrator",
+      "description": "Security administrator managing accounts, profiles, sessions, roles, permissions, and API clients.",
+      "permissions": [
+        "compliance.audit.read",
+        "identity.api_clients.manage",
+        "identity.api_clients.read",
+        "identity.permissions.manage",
+        "identity.permissions.read",
+        "identity.profiles.manage",
+        "identity.profiles.read",
+        "identity.roles.manage",
+        "identity.roles.read",
+        "identity.sessions.read",
+        "identity.sessions.revoke",
+        "identity.user_roles.manage",
+        "identity.user_roles.read",
+        "identity.users.manage",
+        "identity.users.read"
+      ]
+    },
+    {
+      "code": "platform_admin",
+      "name": "Platform Administrator",
+      "description": "Broad non-clinical platform administrator. Clinical authoring, clinical verification, and permission-definition changes remain separated.",
+      "permissions": [
+        "catalog.brands.manage",
+        "catalog.brands.read",
+        "catalog.categories.manage",
+        "catalog.categories.read",
+        "catalog.manufacturers.manage",
+        "catalog.manufacturers.read",
+        "catalog.products.manage",
+        "catalog.products.read",
+        "catalog.regulatory.manage",
+        "catalog.regulatory.read",
+        "clinical.patients.read",
+        "commerce.orders.cancel",
+        "commerce.orders.manage",
+        "commerce.orders.read",
+        "commerce.returns.manage",
+        "commerce.returns.read",
+        "compliance.audit.read",
+        "customer.addresses.read",
+        "customer.family_members.read",
+        "customer.profiles.read",
+        "diagnostics.orders.read",
+        "finance.invoices.manage",
+        "finance.invoices.read",
+        "finance.ledger.manage",
+        "finance.ledger.read",
+        "finance.reconciliation.manage",
+        "finance.reconciliation.read",
+        "fulfillment.orders.manage",
+        "fulfillment.orders.read",
+        "fulfillment.packing.execute",
+        "fulfillment.picking.execute",
+        "identity.permissions.read",
+        "identity.profiles.manage",
+        "identity.profiles.read",
+        "identity.roles.read",
+        "identity.sessions.read",
+        "identity.user_roles.manage",
+        "identity.user_roles.read",
+        "identity.users.read",
+        "insurance.claims.manage",
+        "insurance.claims.read",
+        "insurance.plans.manage",
+        "insurance.plans.read",
+        "insurance.policies.manage",
+        "insurance.policies.read",
+        "logistics.shipments.assign",
+        "logistics.shipments.manage",
+        "logistics.shipments.read",
+        "marketplace.commissions.manage",
+        "marketplace.commissions.read",
+        "marketplace.listings.manage",
+        "marketplace.listings.read",
+        "marketplace.sellers.manage",
+        "marketplace.sellers.read",
+        "notification.messages.read",
+        "notification.messages.send",
+        "notification.templates.manage",
+        "organization.departments.manage",
+        "organization.departments.read",
+        "organization.licenses.manage",
+        "organization.licenses.read",
+        "organization.locations.manage",
+        "organization.locations.read",
+        "organization.memberships.manage",
+        "organization.memberships.read",
+        "organization.organizations.manage",
+        "organization.organizations.read",
+        "payment.chargebacks.manage",
+        "payment.refunds.refund",
+        "payment.transactions.manage",
+        "payment.transactions.read",
+        "platform.files.manage",
+        "platform.files.read",
+        "platform.jobs.manage",
+        "platform.jobs.read",
+        "platform.settings.manage",
+        "platform.settings.read",
+        "pricing.prices.manage",
+        "pricing.prices.read",
+        "pricing.promotions.manage",
+        "pricing.promotions.read",
+        "procurement.invoices.manage",
+        "procurement.invoices.read",
+        "procurement.purchase_orders.manage",
+        "procurement.purchase_orders.read",
+        "procurement.requisitions.manage",
+        "procurement.requisitions.read",
+        "procurement.returns.manage",
+        "procurement.returns.read",
+        "procurement.suppliers.manage",
+        "procurement.suppliers.read",
+        "reports.finance.read",
+        "reports.operations.read",
+        "risk.rules.manage",
+        "risk.rules.read",
+        "risk.signals.manage",
+        "risk.signals.read",
+        "search.configuration.manage",
+        "search.configuration.read",
+        "support.tickets.create",
+        "support.tickets.manage",
+        "support.tickets.read",
+        "warehouse.counts.manage",
+        "warehouse.counts.read",
+        "warehouse.inventory.adjust",
+        "warehouse.inventory.read",
+        "warehouse.layout.manage",
+        "warehouse.layout.read",
+        "warehouse.receiving.manage",
+        "warehouse.receiving.read",
+        "warehouse.transfers.manage",
+        "warehouse.transfers.read"
+      ]
+    },
+    {
+      "code": "super_admin",
+      "name": "Super Administrator",
+      "description": "Emergency platform owner with every permission managed by this manifest.",
+      "permissions": [
+        "appointment.appointments.cancel",
+        "appointment.appointments.create",
+        "appointment.appointments.manage",
+        "appointment.appointments.read",
+        "appointment.availability.manage",
+        "catalog.brands.manage",
+        "catalog.brands.read",
+        "catalog.categories.manage",
+        "catalog.categories.read",
+        "catalog.manufacturers.manage",
+        "catalog.manufacturers.read",
+        "catalog.products.manage",
+        "catalog.products.read",
+        "catalog.regulatory.manage",
+        "catalog.regulatory.read",
+        "clinical.consultations.manage",
+        "clinical.consultations.read",
+        "clinical.dispensing.approve",
+        "clinical.dispensing.manage",
+        "clinical.dispensing.read",
+        "clinical.patients.manage",
+        "clinical.patients.read",
+        "clinical.prescriptions.issue",
+        "clinical.prescriptions.read",
+        "clinical.prescriptions.reject",
+        "clinical.prescriptions.upload",
+        "clinical.prescriptions.verify",
+        "commerce.carts.manage",
+        "commerce.carts.read",
+        "commerce.orders.cancel",
+        "commerce.orders.create",
+        "commerce.orders.manage",
+        "commerce.orders.read",
+        "commerce.returns.manage",
+        "commerce.returns.read",
+        "compliance.adverse_events.manage",
+        "compliance.adverse_events.read",
+        "compliance.audit.read",
+        "compliance.consents.manage",
+        "compliance.consents.read",
+        "compliance.privacy.manage",
+        "compliance.privacy.read",
+        "customer.addresses.manage",
+        "customer.addresses.read",
+        "customer.family_members.manage",
+        "customer.family_members.read",
+        "customer.preferences.manage",
+        "customer.profiles.manage",
+        "customer.profiles.read",
+        "diagnostics.catalog.manage",
+        "diagnostics.catalog.read",
+        "diagnostics.orders.create",
+        "diagnostics.orders.manage",
+        "diagnostics.orders.read",
+        "diagnostics.results.read",
+        "diagnostics.results.record",
+        "diagnostics.results.verify",
+        "diagnostics.samples.collect",
+        "diagnostics.samples.process",
+        "diagnostics.samples.read",
+        "finance.invoices.manage",
+        "finance.invoices.read",
+        "finance.ledger.manage",
+        "finance.ledger.read",
+        "finance.reconciliation.manage",
+        "finance.reconciliation.read",
+        "fulfillment.orders.manage",
+        "fulfillment.orders.read",
+        "fulfillment.packing.execute",
+        "fulfillment.picking.execute",
+        "identity.api_clients.manage",
+        "identity.api_clients.read",
+        "identity.permissions.manage",
+        "identity.permissions.read",
+        "identity.profiles.manage",
+        "identity.profiles.read",
+        "identity.roles.manage",
+        "identity.roles.read",
+        "identity.sessions.read",
+        "identity.sessions.revoke",
+        "identity.user_roles.manage",
+        "identity.user_roles.read",
+        "identity.users.manage",
+        "identity.users.read",
+        "insurance.claims.manage",
+        "insurance.claims.read",
+        "insurance.plans.manage",
+        "insurance.plans.read",
+        "insurance.policies.manage",
+        "insurance.policies.read",
+        "logistics.shipments.assign",
+        "logistics.shipments.deliver",
+        "logistics.shipments.manage",
+        "logistics.shipments.read",
+        "marketplace.commissions.manage",
+        "marketplace.commissions.read",
+        "marketplace.listings.manage",
+        "marketplace.listings.read",
+        "marketplace.sellers.manage",
+        "marketplace.sellers.read",
+        "membership.loyalty.manage",
+        "membership.loyalty.read",
+        "notification.messages.read",
+        "notification.messages.send",
+        "notification.templates.manage",
+        "organization.departments.manage",
+        "organization.departments.read",
+        "organization.licenses.manage",
+        "organization.licenses.read",
+        "organization.locations.manage",
+        "organization.locations.read",
+        "organization.memberships.manage",
+        "organization.memberships.read",
+        "organization.organizations.manage",
+        "organization.organizations.read",
+        "payment.chargebacks.manage",
+        "payment.refunds.refund",
+        "payment.transactions.manage",
+        "payment.transactions.read",
+        "platform.files.manage",
+        "platform.files.read",
+        "platform.jobs.manage",
+        "platform.jobs.read",
+        "platform.settings.manage",
+        "platform.settings.read",
+        "pricing.prices.manage",
+        "pricing.prices.read",
+        "pricing.promotions.manage",
+        "pricing.promotions.read",
+        "procurement.invoices.manage",
+        "procurement.invoices.read",
+        "procurement.purchase_orders.manage",
+        "procurement.purchase_orders.read",
+        "procurement.requisitions.manage",
+        "procurement.requisitions.read",
+        "procurement.returns.manage",
+        "procurement.returns.read",
+        "procurement.suppliers.manage",
+        "procurement.suppliers.read",
+        "reports.clinical.read",
+        "reports.finance.read",
+        "reports.operations.read",
+        "risk.rules.manage",
+        "risk.rules.read",
+        "risk.signals.manage",
+        "risk.signals.read",
+        "search.configuration.manage",
+        "search.configuration.read",
+        "support.tickets.create",
+        "support.tickets.manage",
+        "support.tickets.read",
+        "warehouse.counts.manage",
+        "warehouse.counts.read",
+        "warehouse.inventory.adjust",
+        "warehouse.inventory.read",
+        "warehouse.layout.manage",
+        "warehouse.layout.read",
+        "warehouse.receiving.manage",
+        "warehouse.receiving.read",
+        "warehouse.transfers.manage",
+        "warehouse.transfers.read"
+      ]
+    }
+  ]
+}

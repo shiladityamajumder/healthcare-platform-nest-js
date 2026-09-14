@@ -27,6 +27,11 @@ is only a small DI facade and contains no SQL.
 - Never interpolate request data into SQL text, including identifiers.
 - This project does not create, alter, synchronize, migrate, or seed the database.
 
+The standalone [identity master-data seed](17-IDENTITY-MASTER-DATA-SEED.md) is the
+documented exception for operational RBAC bootstrap. It seeds only the managed
+identity roles, permissions, and role-permission mappings after the external
+identity migrations have created those tables.
+
 ## Execution and rollback
 
 HTTP handlers are automatically wrapped by `OperationExecutionInterceptor`. A normal business request therefore has this flow:

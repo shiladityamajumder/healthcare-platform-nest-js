@@ -29,9 +29,21 @@ export function configureApplication(app: NestFastifyApplication): void {
   if ((process.env.DOCS_ENABLED ?? 'true') === 'true') {
     const config = new DocumentBuilder()
       .setTitle('Healthcare Platform API')
-      .setDescription('Modular monolith HTTP API')
       .setVersion('1.0')
-      .addBearerAuth()
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'JWT access token returned by login, registration, or token refresh.',
+        },
+        'bearer',
+      )
+      .addTag('system', 'Service metadata and health checks.')
+      .addTag(
+        'auth',
+        'Registration, authentication, sessions, current-user data, and authorization administration.',
+      )
       .build();
     const document = SwaggerModule.createDocument(app, config, {
       include: [BaseModule, HealthModule, AuthModule],

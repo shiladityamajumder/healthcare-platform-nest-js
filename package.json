@@ -14,6 +14,8 @@
     "start:dev": "nest start api --watch",
     "start:debug": "nest start api --debug --watch",
     "start:prod": "node dist/apps/api/main.js",
+    "seed:identity": "ts-node -r tsconfig-paths/register tools/seed/seed-identity-master-data.ts",
+    "seed:identity:check": "ts-node -r tsconfig-paths/register tools/seed/seed-identity-master-data.ts --check-only",
     "lint": "eslint \"{apps,libs,tools}/**/*.{ts,mts,mjs}\"",
     "lint:fix": "eslint \"{apps,libs,tools}/**/*.{ts,mts,mjs}\" --fix",
     "format": "prettier --write .",

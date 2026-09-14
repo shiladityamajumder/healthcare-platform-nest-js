@@ -41,6 +41,7 @@ This directory is the maintained engineering handbook for the Healthcare Platfor
 1. [Deployment model](13-DEPLOYMENT.md)
 2. [Observability](14-OBSERVABILITY.md)
 3. [Security architecture](15-SECURITY.md)
+4. [Identity master-data seed](17-IDENTITY-MASTER-DATA-SEED.md)
 
 ### Architectural history
 
