@@ -1,3 +1,7 @@
+// * Auth module: Registers registration controllers and providers.
+// * File: src/features/registration/registration.module.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Registration feature composition and dependency-injection boundary.
  * Used backward by AuthModule; connects forward to registration controllers/services and repositories.

@@ -1,3 +1,7 @@
+// * Auth module: Defines the narrow integration seam exposed to other bounded contexts.
+// * File: src/contracts/auth.facade.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Public integration seam for consumers outside the auth bounded context.
  * Used backward by future consuming modules; connects forward to an explicit auth facade implementation.

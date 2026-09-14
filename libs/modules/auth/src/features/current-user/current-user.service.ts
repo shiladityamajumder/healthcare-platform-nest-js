@@ -1,3 +1,7 @@
+// * Auth module: Loads and updates the authenticated user context.
+// * File: src/features/current-user/current-user.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Authenticated profile read, update, and authorization use cases.
  * Used backward by CurrentUserController; connects forward to workflow and identity persistence.
@@ -12,11 +16,13 @@ type AuthInput = object;
 
 @Injectable()
 export class CurrentUserService {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(
     private readonly workflow: AuthWorkflowService,
     private readonly identity: IdentityRepository,
   ) {}
 
+  // * Function [get]: Retrieves and returns the requested authentication data.
   async get(authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     const user = await this.identity.findUserById(principal.userId);
@@ -24,6 +30,7 @@ export class CurrentUserService {
     return user;
   }
 
+  // * Function [update]: Updates the requested authentication state after validation.
   async update(input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     const values = toAuthInput(input);
@@ -46,6 +53,7 @@ export class CurrentUserService {
     return updated;
   }
 
+  // * Function [authorization]: Retrieves and returns the requested authentication data.
   async authorization(authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     return { roles: principal.roles.sort(), permissions: principal.permissions.sort() };

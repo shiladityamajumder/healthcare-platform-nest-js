@@ -1,3 +1,7 @@
+// * Auth module: Coordinates cross-feature authentication workflows and security checks.
+// * File: src/application/workflow/auth-workflow.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Coordinates cross-feature auth workflows such as OTPs, identities, tokens, and authorization.
  * Used backward by feature services; connects forward to the repository and token ports.
@@ -35,12 +39,14 @@ type Input = Record<string, any>;
 
 @Injectable()
 export class AuthWorkflowService {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(
     @Inject(AUTH_REPOSITORY) public readonly repository: AuthRepositoryPort,
     @Inject(AUTH_TOKEN_SERVICE) private readonly tokens: TokenServicePort,
     private readonly notificationMessages: AuthNotificationMessageService,
   ) {}
 
+  // * Function [requirePrincipal]: Validates the supplied authentication data and rejects unsafe input.
   public async requirePrincipal(authorization?: string): Promise<AuthPrincipal> {
     // Validate both the signed access token and its server-side session state.
     if (!authorization?.startsWith('Bearer ')) throw new AuthenticationError();
@@ -65,6 +71,7 @@ export class AuthWorkflowService {
     };
   }
 
+  // * Function [issueOtp]: Creates or issues the requested authentication resource.
   public async issueOtp(
     channel: AuthNotificationChannel,
     destination: string,
@@ -103,6 +110,7 @@ export class AuthWorkflowService {
     };
   }
 
+  // * Function [verifyOtp]: Validates the supplied authentication data and rejects unsafe input.
   public async verifyOtp(
     id: string,
     code: string,
@@ -136,6 +144,7 @@ export class AuthWorkflowService {
     await this.repository.consumeOtp(id, attempts, true, false);
   }
 
+  // * Function [issueTokens]: Creates or issues the requested authentication resource.
   public async issueTokens(
     user: AuthUser,
     context: Input,
@@ -160,6 +169,7 @@ export class AuthWorkflowService {
     return this.tokenResponse(user, access, refresh);
   }
 
+  // * Function [tokenResponse]: Handles the tokenResponse operation for this authentication component.
   public tokenResponse(
     user: AuthUser,
     access: { token: string; expiresAt: Date },
@@ -175,6 +185,7 @@ export class AuthWorkflowService {
     };
   }
 
+  // * Function [createIdentity]: Creates or issues the requested authentication resource.
   public async createIdentity(input: {
     email?: string;
     phoneCountryCode?: string;
@@ -213,17 +224,20 @@ export class AuthWorkflowService {
     }
   }
 
+  // * Function [hashPassword]: Transforms the supplied value into the format required by this authentication flow.
   public async hashPassword(password: string, identity?: string): Promise<string> {
     validatePassword(password, identity);
     return argonHash(password);
   }
 
+  // * Function [requirePermission]: Validates the supplied authentication data and rejects unsafe input.
   public requirePermission(principal: AuthPrincipal, permission: string): void {
     if (!principal.permissions.includes(permission))
       throw new AuthorizationError('You do not have permission to perform this operation.');
   }
 }
 
+// * Function [validatePassword]: Validates the supplied authentication data and rejects unsafe input.
 export function validatePassword(password: string, identity?: string): void {
   const minimum = Number(process.env.PASSWORD_MIN_LENGTH ?? 8);
   if (

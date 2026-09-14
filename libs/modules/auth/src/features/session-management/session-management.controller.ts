@@ -1,3 +1,7 @@
+// * Auth module: Exposes refresh, logout, session listing, and session revocation endpoints.
+// * File: src/features/session-management/session-management.controller.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * HTTP endpoints for refresh-token rotation, logout, and active-session management.
  * Used backward by Nest routing; connects forward to SessionManagementService.
@@ -20,6 +24,7 @@ import {
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
 export class SessionManagementController {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: SessionManagementService) {}
 
   @Post('token/refresh')
@@ -45,6 +50,7 @@ export class SessionManagementController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [refresh]: Handles the refresh operation for this authentication component.
   refresh(@Body() body: RefreshTokenSchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.refresh(body, headers);
   }
@@ -57,6 +63,7 @@ export class SessionManagementController {
   @ApiAuthBody(RefreshTokenSchema, 'Refresh token of the session to revoke.')
   @ApiAuthResponse('Session logged out.', { message: 'The session has been logged out.' }, 201)
   @ApiValidationError()
+  // * Function [logout]: Invalidates or removes the requested authentication state.
   logout(@Body() body: RefreshTokenSchema) {
     return this.service.logout(body);
   }
@@ -72,6 +79,7 @@ export class SessionManagementController {
     { message: 'Other sessions have been logged out.' },
     201,
   )
+  // * Function [logoutOthers]: Invalidates or removes the requested authentication state.
   logoutOthers(@Headers('authorization') authorization?: string) {
     return this.service.logoutOthers(authorization);
   }
@@ -87,6 +95,7 @@ export class SessionManagementController {
     { message: 'All sessions have been logged out.' },
     201,
   )
+  // * Function [logoutAll]: Invalidates or removes the requested authentication state.
   logoutAll(@Headers('authorization') authorization?: string) {
     return this.service.logoutAll(authorization);
   }
@@ -112,6 +121,7 @@ export class SessionManagementController {
       },
     ],
   })
+  // * Function [list]: Retrieves and returns the requested authentication data.
   list(@Headers('authorization') authorization?: string) {
     return this.service.list(authorization);
   }
@@ -125,6 +135,7 @@ export class SessionManagementController {
   @ApiAuthUuidParam('sessionId', 'UUID of the session to revoke.')
   @ApiAuthResponse('Session revoked.', { message: 'The session has been revoked.' })
   @ApiValidationError()
+  // * Function [revoke]: Invalidates or removes the requested authentication state.
   revoke(
     @Param('sessionId', new ParseUUIDPipe({ version: '4' })) sessionId: string,
     @Headers('authorization') authorization?: string,

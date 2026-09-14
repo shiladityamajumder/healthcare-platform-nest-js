@@ -1,3 +1,7 @@
+// * Auth module: Registers the current-user controller and service.
+// * File: src/features/current-user/current-user.module.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Current-user feature dependency-injection boundary.
  * Used backward by AuthModule; connects forward to profile controller/service and auth infrastructure.

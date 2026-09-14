@@ -1,3 +1,7 @@
+// * Auth module: Implements token creation, signature validation, hashing, and key discovery.
+// * File: src/infrastructure/token/auth-token.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Signs, validates, hashes, and describes auth tokens using the configured HMAC secrets.
  * Used backward by login, session, password, capabilities, and workflow services; connects forward to crypto primitives.
@@ -18,14 +22,17 @@ export class AuthTokenService implements TokenServicePort {
   private readonly accessTtl = Number(process.env.JWT_ACCESS_TTL_SECONDS ?? 900);
   private readonly refreshTtl = Number(process.env.JWT_REFRESH_TTL_SECONDS ?? 2_592_000);
 
+  // * Function [createAccess]: Creates or issues the requested authentication resource.
   public createAccess(userId: string, sessionId: string, methods: string[]): EncodedToken {
     return this.encode('access', userId, this.accessTtl, { sid: sessionId, amr: methods });
   }
 
+  // * Function [createRefresh]: Creates or issues the requested authentication resource.
   public createRefresh(userId: string, sessionId: string, familyId: string): EncodedToken {
     return this.encode('refresh', userId, this.refreshTtl, { sid: sessionId, fam: familyId });
   }
 
+  // * Function [createReset]: Creates or issues the requested authentication resource.
   public createReset(
     userId: string,
     challengeId: string,
@@ -44,6 +51,7 @@ export class AuthTokenService implements TokenServicePort {
     );
   }
 
+  // * Function [decode]: Validates the supplied authentication data and rejects unsafe input.
   public decode(token: string, expected: TokenClaims['token_type']): TokenClaims {
     // Verify structure, algorithm, signature, issuer/audience, type, and expiry before trusting claims.
     const parts = token.split('.');
@@ -86,18 +94,22 @@ export class AuthTokenService implements TokenServicePort {
     return payload as TokenClaims;
   }
 
+  // * Function [hash]: Transforms the supplied value into the format required by this authentication flow.
   public hash(value: string, namespace: string): string {
     return createHmac('sha256', this.pepper).update(`${namespace}:${value}`).digest('hex');
   }
 
+  // * Function [otpHash]: Transforms the supplied value into the format required by this authentication flow.
   public otpHash(challengeId: string, code: string): string {
     return this.hash(`${challengeId}:${code}`, 'otp-code');
   }
 
+  // * Function [jwks]: Retrieves and returns the requested authentication data.
   public jwks(): Array<Record<string, string>> {
     return [];
   }
 
+  // * Function [encode]: Transforms the supplied value into the format required by this authentication flow.
   private encode(
     type: TokenClaims['token_type'],
     subject: string,
@@ -127,11 +139,13 @@ export class AuthTokenService implements TokenServicePort {
     };
   }
 
+  // * Function [sign]: Transforms the supplied value into the format required by this authentication flow.
   private sign(value: string): string {
     return createHmac('sha256', this.secret).update(value).digest('base64url');
   }
 }
 
+// * Function [safeEqual]: Validates the supplied authentication data and rejects unsafe input.
 function safeEqual(left: string, right: string): boolean {
   const a = Buffer.from(left);
   const b = Buffer.from(right);

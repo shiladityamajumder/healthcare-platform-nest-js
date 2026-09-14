@@ -1,3 +1,7 @@
+// * Auth module: Builds consistent SMS and email messages for authentication events.
+// * File: src/application/notifications/auth-notification-message.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Builds provider-neutral SMS and email messages for auth verification flows.
  * Used backward by AuthWorkflowService; connects forward to the future notification provider
@@ -24,6 +28,7 @@ export interface AuthOtpNotificationMessage {
  */
 @Injectable()
 export class AuthNotificationMessageService {
+  // * Function [buildOtpMessage]: Creates or issues the requested authentication resource.
   public buildOtpMessage(input: {
     channel: AuthNotificationChannel;
     destination: string;
@@ -65,6 +70,7 @@ export class AuthNotificationMessageService {
     };
   }
 
+  // * Function [templateKey]: Transforms the supplied value into the format required by this authentication flow.
   private templateKey(channel: AuthNotificationChannel, purpose: string): string {
     const knownPurpose = [
       'login_phone',
@@ -76,6 +82,7 @@ export class AuthNotificationMessageService {
     return `${channel}.${knownPurpose ? purpose : 'generic_otp'}`;
   }
 
+  // * Function [smsText]: Transforms the supplied value into the format required by this authentication flow.
   private smsText(purpose: string, code: string, expiresInMinutes: number): string {
     const action =
       purpose === 'login_phone'
@@ -86,12 +93,14 @@ export class AuthNotificationMessageService {
     return `Healthcare Platform: Use ${code} to ${action}. This code expires in ${expiresInMinutes} minute${expiresInMinutes === 1 ? '' : 's'}. Do not share it with anyone.`;
   }
 
+  // * Function [emailSubject]: Transforms the supplied value into the format required by this authentication flow.
   private emailSubject(purpose: string): string {
     return purpose === 'verify_email'
       ? 'Verify your Healthcare Platform email address'
       : 'Reset your Healthcare Platform password';
   }
 
+  // * Function [emailText]: Transforms the supplied value into the format required by this authentication flow.
   private emailText(purpose: string, code: string, expiresInMinutes: number): string {
     const intro =
       purpose === 'verify_email'
@@ -100,6 +109,7 @@ export class AuthNotificationMessageService {
     return `Hello,\n\n${intro}\n\nVerification code: ${code}\n\nThis code expires in ${expiresInMinutes} minute${expiresInMinutes === 1 ? '' : 's'}. Do not share this code with anyone. If you did not request this, you can safely ignore this email.\n\nRegards,\nHealthcare Platform Security Team`;
   }
 
+  // * Function [emailHtml]: Transforms the supplied value into the format required by this authentication flow.
   private emailHtml(subject: string, code: string, expiresInMinutes: number): string {
     const safeSubject = this.escapeHtml(subject);
     const safeCode = this.escapeHtml(code);
@@ -107,6 +117,7 @@ export class AuthNotificationMessageService {
     return `<div style="font-family:Arial,sans-serif;line-height:1.5;color:#1f2937"><h2>${safeSubject}</h2><p>Use the verification code below to continue your request.</p><p style="font-size:28px;font-weight:700;letter-spacing:6px">${safeCode}</p><p>This code expires in ${expiresInMinutes} ${minuteLabel}. Do not share this code with anyone.</p><p>If you did not request this, you can safely ignore this email.</p><p>Regards,<br>Healthcare Platform Security Team</p></div>`;
   }
 
+  // * Function [escapeHtml]: Transforms the supplied value into the format required by this authentication flow.
   private escapeHtml(value: string): string {
     return value.replace(
       /[&<>'"]/g,

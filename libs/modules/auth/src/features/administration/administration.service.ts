@@ -1,3 +1,7 @@
+// * Auth module: Implements administrative use cases and enforces RBAC rules.
+// * File: src/features/administration/administration.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Administrative use cases and authorization rules for users and RBAC resources.
  * Used backward by administration controllers; connects forward to identity/RBAC repositories.
@@ -15,6 +19,7 @@ type AuthInput = object;
 
 @Injectable()
 export class AdministrationService {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(
     private readonly workflow: AuthWorkflowService,
     private readonly identity: IdentityRepository,
@@ -22,6 +27,7 @@ export class AdministrationService {
     private readonly administration: AdministrationRepository,
   ) {}
 
+  // * Function [listUsers]: Handles the listUsers operation for this authentication component.
   async listUsers(
     limit: number,
     offset: number,
@@ -49,6 +55,7 @@ export class AdministrationService {
     };
   }
 
+  // * Function [getUser]: Handles the getUser operation for this authentication component.
   async getUser(id: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.users.read');
@@ -58,6 +65,7 @@ export class AdministrationService {
     return { ...user, roles: auth.roles, permissions: auth.permissions };
   }
 
+  // * Function [updateStatus]: Handles the updateStatus operation for this authentication component.
   async updateStatus(id: string, input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.users.manage');
@@ -82,6 +90,7 @@ export class AdministrationService {
     return { ...user, roles: auth.roles, permissions: auth.permissions };
   }
 
+  // * Function [logoutAll]: Invalidates or removes the requested authentication state.
   async logoutAll(id: string, input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.users.manage');
@@ -90,12 +99,14 @@ export class AdministrationService {
     return { message: 'All user sessions have been revoked.' };
   }
 
+  // * Function [listRoles]: Handles the listRoles operation for this authentication component.
   async listRoles(authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.roles.read');
     return { roles: await this.administration.listRoles() };
   }
 
+  // * Function [createRole]: Creates or issues the requested authentication resource.
   async createRole(input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.roles.manage');
@@ -110,6 +121,7 @@ export class AdministrationService {
     });
   }
 
+  // * Function [getRole]: Handles the getRole operation for this authentication component.
   async getRole(id: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.roles.read');
@@ -118,6 +130,7 @@ export class AdministrationService {
     return role;
   }
 
+  // * Function [updateRole]: Handles the updateRole operation for this authentication component.
   async updateRole(id: string, input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.roles.manage');
@@ -142,6 +155,7 @@ export class AdministrationService {
     return this.administration.updateRole(id, values, principal.userId);
   }
 
+  // * Function [deleteRole]: Invalidates or removes the requested authentication state.
   async deleteRole(id: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.roles.manage');
@@ -149,12 +163,14 @@ export class AdministrationService {
     return { message: 'The role has been deleted.' };
   }
 
+  // * Function [listPermissions]: Handles the listPermissions operation for this authentication component.
   async listPermissions(authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.permissions.read');
     return { permissions: await this.administration.listPermissions() };
   }
 
+  // * Function [createPermission]: Creates or issues the requested authentication resource.
   async createPermission(input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.permissions.manage');
@@ -168,6 +184,7 @@ export class AdministrationService {
     return this.administration.createPermission({ ...values, actorUserId: principal.userId });
   }
 
+  // * Function [getPermission]: Handles the getPermission operation for this authentication component.
   async getPermission(id: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.permissions.read');
@@ -176,6 +193,7 @@ export class AdministrationService {
     return permission;
   }
 
+  // * Function [updatePermission]: Handles the updatePermission operation for this authentication component.
   async updatePermission(id: string, input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.permissions.manage');
@@ -198,6 +216,7 @@ export class AdministrationService {
     return this.administration.updatePermission(id, values, principal.userId);
   }
 
+  // * Function [deletePermission]: Invalidates or removes the requested authentication state.
   async deletePermission(id: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.permissions.manage');
@@ -205,6 +224,7 @@ export class AdministrationService {
     return { message: 'The permission has been deleted.' };
   }
 
+  // * Function [rolePermissions]: Handles the rolePermissions operation for this authentication component.
   async rolePermissions(id: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.permissions.read');
@@ -213,6 +233,7 @@ export class AdministrationService {
     return { roleId: id, permissions: await this.administration.rolePermissions(id) };
   }
 
+  // * Function [replaceRolePermissions]: Handles the replaceRolePermissions operation for this authentication component.
   async replaceRolePermissions(id: string, input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.permissions.manage');
@@ -239,6 +260,7 @@ export class AdministrationService {
     };
   }
 
+  // * Function [userRoles]: Handles the userRoles operation for this authentication component.
   async userRoles(id: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.user_roles.read');
@@ -246,6 +268,7 @@ export class AdministrationService {
     return { assignments: await this.administration.userRoles(id) };
   }
 
+  // * Function [assignUserRole]: Creates or issues the requested authentication resource.
   async assignUserRole(id: string, input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.user_roles.manage');
@@ -258,6 +281,7 @@ export class AdministrationService {
     return this.administration.assignUserRole(id, values, principal.userId);
   }
 
+  // * Function [updateUserRole]: Handles the updateUserRole operation for this authentication component.
   async updateUserRole(id: string, assignmentId: string, input: AuthInput, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.user_roles.manage');
@@ -290,6 +314,7 @@ export class AdministrationService {
     return this.administration.updateUserRole(id, assignmentId, updates, principal.userId);
   }
 
+  // * Function [deleteUserRole]: Invalidates or removes the requested authentication state.
   async deleteUserRole(id: string, assignmentId: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     this.workflow.requirePermission(principal, 'identity.user_roles.manage');
@@ -298,6 +323,7 @@ export class AdministrationService {
   }
 }
 
+// * Function [validateScope]: Validates the supplied authentication data and rejects unsafe input.
 function validateScope(input: Record<string, unknown>): void {
   if ((input.scopeType === undefined) !== (input.scopeId === undefined))
     throw new ValidationError('scopeType and scopeId must be supplied together.');
@@ -305,6 +331,7 @@ function validateScope(input: Record<string, unknown>): void {
     throw new ValidationError('scopeType and scopeId must be supplied together.');
 }
 
+// * Function [validateWindow]: Validates the supplied authentication data and rejects unsafe input.
 function validateWindow(validFrom: unknown, validUntil: unknown): void {
   const from = dateValue(validFrom);
   const until = dateValue(validUntil);
@@ -312,6 +339,7 @@ function validateWindow(validFrom: unknown, validUntil: unknown): void {
     throw new ValidationError('validUntil must be later than validFrom.');
 }
 
+// * Function [dateValue]: Transforms the supplied value into the format required by this authentication flow.
 function dateValue(value: unknown): number | undefined {
   if (value instanceof Date) return value.getTime();
   if (typeof value === 'string') {

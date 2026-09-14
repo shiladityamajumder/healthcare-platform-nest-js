@@ -1,3 +1,7 @@
+// * Auth module: Composes the authentication bounded context and its feature modules.
+// * File: src/auth.module.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Auth bounded-context composition root.
  * Used backward by the API AppModule; connects forward to every auth feature module.

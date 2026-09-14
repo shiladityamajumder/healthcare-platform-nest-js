@@ -1,3 +1,7 @@
+// * Auth module: Adapts shared persistence services to the authentication repository port.
+// * File: src/infrastructure/persistence/auth.repository.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Small compatibility facade that exposes feature-owned repositories through AuthRepositoryPort.
  * Used backward by AuthWorkflowService; connects forward to identity, OTP, session, and administration repositories.
@@ -50,6 +54,7 @@ export class AuthPostgresRepository implements AuthRepositoryPort {
   public readonly updateUserRole: AuthRepositoryPort['updateUserRole'];
   public readonly deleteUserRole: AuthRepositoryPort['deleteUserRole'];
 
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(
     private readonly identity: IdentityRepository,
     private readonly otp: OtpRepository,

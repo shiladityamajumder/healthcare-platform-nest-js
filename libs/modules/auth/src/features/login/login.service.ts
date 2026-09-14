@@ -1,3 +1,7 @@
+// * Auth module: Implements password login and phone OTP login use cases.
+// * File: src/features/login/login.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Authenticates users with passwords or phone OTPs and issues sessions/tokens.
  * Used backward by LoginController; connects forward to identity persistence and workflow orchestration.
@@ -14,11 +18,13 @@ type AuthInput = object;
 
 @Injectable()
 export class LoginService {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(
     private readonly workflow: AuthWorkflowService,
     private readonly identity: IdentityRepository,
   ) {}
 
+  // * Function [loginPassword]: Handles the loginPassword operation for this authentication component.
   async loginPassword(input: AuthInput, headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     // Normalize the selected identity before querying so email/phone lookups are consistent.
@@ -50,12 +56,14 @@ export class LoginService {
     return this.workflow.issueTokens(updated, authContext(headers), ['password']);
   }
 
+  // * Function [requestPhoneOtp]: Creates or issues the requested authentication resource.
   requestPhoneOtp(input: AuthInput) {
     const values = toAuthInput(input);
     const phone = normalizePhone(String(values.phoneCountryCode), String(values.phoneNumber));
     return this.workflow.issueOtp('sms', phone.join(''), 'login_phone');
   }
 
+  // * Function [verifyPhone]: Validates the supplied authentication data and rejects unsafe input.
   async verifyPhone(input: AuthInput, headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     const phone = normalizePhone(String(values.phoneCountryCode), String(values.phoneNumber));

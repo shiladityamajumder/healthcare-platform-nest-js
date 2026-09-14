@@ -1,3 +1,7 @@
+// * Auth module: Persists sessions and their revocation or rotation state.
+// * File: src/features/session-management/session.repository.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * PostgreSQL adapter for session creation, rotation, revocation, and listing.
  * Used backward by SessionManagementService and the composition facade; connects forward to PostgresDatabase.
@@ -12,8 +16,10 @@ type Row = Record<string, any>;
 
 @Injectable()
 export class SessionRepository {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly database: PostgresDatabase) {}
 
+  // * Function [createSession]: Creates or issues the requested authentication resource.
   public async createSession(input: {
     id: string;
     userId: string;
@@ -41,15 +47,18 @@ export class SessionRepository {
     );
   }
 
+  // * Function [findSession]: Handles the findSession operation for this authentication component.
   public async findSession(id: string): Promise<AuthSession | null> {
     return this.loadSession(id, false);
   }
 
   /** Lock the session row so refresh-token rotation is single-consumer under concurrency. */
+  // * Function [findSessionForUpdate]: Handles the findSessionForUpdate operation for this authentication component.
   public async findSessionForUpdate(id: string): Promise<AuthSession | null> {
     return this.loadSession(id, true);
   }
 
+  // * Function [loadSession]: Handles the loadSession operation for this authentication component.
   private async loadSession(id: string, forUpdate: boolean): Promise<AuthSession | null> {
     // Refresh uses FOR UPDATE; ordinary authentication reads remain non-locking.
     const result = await this.database.query<Row>(
@@ -70,6 +79,7 @@ export class SessionRepository {
       : null;
   }
 
+  // * Function [rotateSession]: Handles the rotateSession operation for this authentication component.
   public async rotateSession(id: string, refreshTokenHash: string, expiresAt: Date): Promise<void> {
     await this.database.query(
       `UPDATE identity.sessions SET refresh_token_hash = $2, expires_at = $3, last_seen_at = now(), updated_at = now(), row_version = row_version + 1 WHERE id = $1 AND revoked_at IS NULL`,
@@ -77,6 +87,7 @@ export class SessionRepository {
     );
   }
 
+  // * Function [revokeSession]: Invalidates or removes the requested authentication state.
   public async revokeSession(id: string, reason: string): Promise<void> {
     await this.database.query(
       `UPDATE identity.sessions SET revoked_at = COALESCE(revoked_at, now()), revoke_reason = $2, updated_at = now(), row_version = row_version + 1 WHERE id = $1`,
@@ -84,6 +95,7 @@ export class SessionRepository {
     );
   }
 
+  // * Function [revokeOtherSessions]: Invalidates or removes the requested authentication state.
   public async revokeOtherSessions(userId: string, currentSessionId: string): Promise<void> {
     await this.database.query(
       `UPDATE identity.sessions SET revoked_at = now(), revoke_reason = 'logout_others', updated_at = now(), row_version = row_version + 1 WHERE user_id = $1 AND id <> $2 AND revoked_at IS NULL`,
@@ -91,6 +103,7 @@ export class SessionRepository {
     );
   }
 
+  // * Function [revokeAllSessions]: Invalidates or removes the requested authentication state.
   public async revokeAllSessions(userId: string, reason: string): Promise<void> {
     await this.database.query(
       `UPDATE identity.sessions SET revoked_at = now(), revoke_reason = $2, updated_at = now(), row_version = row_version + 1 WHERE user_id = $1 AND revoked_at IS NULL`,
@@ -98,6 +111,7 @@ export class SessionRepository {
     );
   }
 
+  // * Function [listSessions]: Handles the listSessions operation for this authentication component.
   public async listSessions(userId: string): Promise<Array<Record<string, unknown>>> {
     const result = await this.database.query<Row>(
       `SELECT id, device_id, device_type, host(ip_address) AS ip_address, user_agent, created_at, last_seen_at, expires_at FROM identity.sessions WHERE user_id = $1 AND revoked_at IS NULL AND expires_at > now() ORDER BY last_seen_at DESC NULLS LAST, created_at DESC`,

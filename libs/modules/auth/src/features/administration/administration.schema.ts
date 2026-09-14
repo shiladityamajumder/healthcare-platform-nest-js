@@ -1,3 +1,7 @@
+// * Auth module: Defines validation and OpenAPI DTOs for administration requests.
+// * File: src/features/administration/administration.schema.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Validated request DTOs for administrative users, roles, permissions, and assignments.
  * Used backward by AdministrationController; connects forward to AdministrationService input.
@@ -22,6 +26,7 @@ import {
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+// * DTO [UpdateStatusSchema]: Validates and documents data crossing the HTTP boundary.
 export class UpdateStatusSchema {
   @ApiProperty({
     description: 'New lifecycle status for the target user.',
@@ -47,6 +52,7 @@ export class UpdateStatusSchema {
   revokeSessions = true;
 }
 
+// * DTO [AdminLogoutSchema]: Validates and documents data crossing the HTTP boundary.
 export class AdminLogoutSchema {
   @ApiProperty({
     description: 'Auditable reason for revoking all sessions.',
@@ -59,6 +65,7 @@ export class AdminLogoutSchema {
   reason = 'administrative_logout_all';
 }
 
+// * DTO [CreateRoleSchema]: Validates and documents data crossing the HTTP boundary.
 export class CreateRoleSchema {
   @ApiProperty({
     description: 'Stable role code used by authorization checks.',
@@ -81,6 +88,7 @@ export class CreateRoleSchema {
   description?: string;
 }
 
+// * DTO [UpdateRoleSchema]: Validates and documents data crossing the HTTP boundary.
 export class UpdateRoleSchema {
   @ApiPropertyOptional({ description: 'Replacement stable role code.', example: 'clinic_manager' })
   @IsOptional()
@@ -105,6 +113,7 @@ export class UpdateRoleSchema {
   description?: string;
 }
 
+// * DTO [CreatePermissionSchema]: Validates and documents data crossing the HTTP boundary.
 export class CreatePermissionSchema {
   @ApiProperty({ description: 'Stable permission code.', example: 'user.read' })
   @Matches(/^[a-z][a-z0-9_.:-]{1,127}$/)
@@ -125,6 +134,7 @@ export class CreatePermissionSchema {
   description?: string;
 }
 
+// * DTO [UpdatePermissionSchema]: Validates and documents data crossing the HTTP boundary.
 export class UpdatePermissionSchema {
   @ApiPropertyOptional({ description: 'Replacement permission code.', example: 'user.update' })
   @IsOptional()
@@ -148,6 +158,7 @@ export class UpdatePermissionSchema {
   description?: string;
 }
 
+// * DTO [ReplaceRolePermissionsSchema]: Validates and documents data crossing the HTTP boundary.
 export class ReplaceRolePermissionsSchema {
   @ApiProperty({
     description: 'Complete list of permission UUIDs that should belong to the role.',
@@ -161,6 +172,7 @@ export class ReplaceRolePermissionsSchema {
   permissionIds: string[] = [];
 }
 
+// * DTO [AssignUserRoleSchema]: Validates and documents data crossing the HTTP boundary.
 export class AssignUserRoleSchema {
   @ApiProperty({
     description: 'Role UUID to assign.',
@@ -213,6 +225,7 @@ export class AssignUserRoleSchema {
   isActive = true;
 }
 
+// * DTO [UpdateUserRoleSchema]: Validates and documents data crossing the HTTP boundary.
 export class UpdateUserRoleSchema {
   @ApiPropertyOptional({ description: 'Replacement scope category.', example: 'clinic' })
   @IsOptional()
@@ -252,6 +265,7 @@ export class UpdateUserRoleSchema {
   isActive?: boolean;
 }
 
+// * DTO [ListUsersQuerySchema]: Validates and documents data crossing the HTTP boundary.
 export class ListUsersQuerySchema {
   @ApiPropertyOptional({
     description: 'Maximum number of users to return.',

@@ -1,3 +1,7 @@
+// * Auth module: Exposes email registration and identity-verification endpoints.
+// * File: src/features/registration/registration.controller.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * HTTP endpoints for email registration, phone registration, and email verification.
  * Used backward by Nest routing; connects forward to RegistrationService with validated DTOs.
@@ -24,6 +28,7 @@ import {
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
 export class RegistrationController {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: RegistrationService) {}
 
   @Post('register/email')
@@ -54,6 +59,7 @@ export class RegistrationController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [registerEmail]: Creates or issues the requested authentication resource.
   registerEmail(@Body() body: EmailRegistrationSchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.registerEmail(body, headers);
   }
@@ -76,6 +82,7 @@ export class RegistrationController {
     201,
   )
   @ApiValidationError()
+  // * Function [requestPhoneOtp]: Creates or issues the requested authentication resource.
   requestPhoneOtp(@Body() body: PhoneSchema) {
     return this.service.requestPhoneOtp(body);
   }
@@ -104,6 +111,7 @@ export class RegistrationController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [verifyPhone]: Validates the supplied authentication data and rejects unsafe input.
   verifyPhone(@Body() body: PhoneRegistrationVerifySchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.verifyPhone(body, headers);
   }
@@ -126,6 +134,7 @@ export class RegistrationController {
     201,
   )
   @ApiValidationError()
+  // * Function [requestEmailVerification]: Creates or issues the requested authentication resource.
   requestEmailVerification(@Body() body: EmailSchema) {
     return this.service.requestEmailVerification(body);
   }
@@ -154,6 +163,7 @@ export class RegistrationController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [verifyEmail]: Validates the supplied authentication data and rejects unsafe input.
   verifyEmail(@Body() body: EmailVerifySchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.verifyEmail(body, headers);
   }

@@ -1,3 +1,7 @@
+// * Auth module: Exposes authenticated current-user profile and authorization endpoints.
+// * File: src/features/current-user/current-user.controller.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * HTTP routes for the authenticated user's profile and authorization view.
  * Used backward by Nest routing; connects forward to CurrentUserService.
@@ -18,6 +22,7 @@ import {
 @Controller({ version: '1' })
 @ApiProtected()
 export class CurrentUserController {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: CurrentUserService) {}
 
   @Get('users/me')
@@ -38,6 +43,7 @@ export class CurrentUserController {
     displayName: 'Aarav Sharma',
     profile: { firstName: 'Aarav', lastName: 'Sharma', preferredName: 'Aarav', avatar: null },
   })
+  // * Function [get]: Retrieves and returns the requested authentication data.
   get(@Headers('authorization') authorization?: string) {
     return this.service.get(authorization);
   }
@@ -57,6 +63,7 @@ export class CurrentUserController {
     displayName: 'Aarav Sharma',
   })
   @ApiValidationError()
+  // * Function [update]: Updates the requested authentication state after validation.
   update(@Body() body: UpdateCurrentUserSchema, @Headers('authorization') authorization?: string) {
     return this.service.update(body, authorization);
   }
@@ -70,6 +77,7 @@ export class CurrentUserController {
     roles: ['clinic_admin'],
     permissions: ['user.read', 'user.update'],
   })
+  // * Function [authorization]: Retrieves and returns the requested authentication data.
   authorization(@Headers('authorization') authorization?: string) {
     return this.service.authorization(authorization);
   }

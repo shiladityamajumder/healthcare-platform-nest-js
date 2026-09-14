@@ -1,3 +1,7 @@
+// * Auth module: Exposes password recovery, reset, change, and setup endpoints.
+// * File: src/features/password-management/password-management.controller.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * HTTP endpoints for password recovery, reset, change, and initial password setup.
  * Used backward by Nest routing; connects forward to PasswordManagementService.
@@ -25,6 +29,7 @@ import {
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
 export class PasswordManagementController {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: PasswordManagementService) {}
 
   @Post('password/forgot')
@@ -45,6 +50,7 @@ export class PasswordManagementController {
     201,
   )
   @ApiValidationError()
+  // * Function [forgot]: Handles the forgot operation for this authentication component.
   forgot(@Body() body: ForgotPasswordSchema) {
     return this.service.forgot(body);
   }
@@ -61,6 +67,7 @@ export class PasswordManagementController {
     201,
   )
   @ApiValidationError()
+  // * Function [verifyReset]: Validates the supplied authentication data and rejects unsafe input.
   verifyReset(@Body() body: ResetVerifySchema) {
     return this.service.verifyReset(body);
   }
@@ -85,6 +92,7 @@ export class PasswordManagementController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [reset]: Updates the requested authentication state after validation.
   reset(@Body() body: ResetPasswordSchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.reset(body, headers);
   }
@@ -106,6 +114,7 @@ export class PasswordManagementController {
   })
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [change]: Updates the requested authentication state after validation.
   change(
     @Body() body: ChangePasswordSchema,
     @Headers('authorization') authorization?: string,
@@ -135,6 +144,7 @@ export class PasswordManagementController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [set]: Creates or issues the requested authentication resource.
   set(
     @Body() body: SetPasswordSchema,
     @Headers('authorization') authorization?: string,

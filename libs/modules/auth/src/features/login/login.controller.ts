@@ -1,3 +1,7 @@
+// * Auth module: Exposes password and phone verification login endpoints.
+// * File: src/features/login/login.controller.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * HTTP endpoints for password and phone-OTP login.
  * Used backward by Nest routing; connects forward to LoginService with validated request DTOs.
@@ -19,6 +23,7 @@ import {
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
 export class LoginController {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: LoginService) {}
 
   @Post('login/password')
@@ -44,6 +49,7 @@ export class LoginController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [loginPassword]: Handles the loginPassword operation for this authentication component.
   loginPassword(@Body() body: PasswordLoginSchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.loginPassword(body, headers);
   }
@@ -66,6 +72,7 @@ export class LoginController {
     201,
   )
   @ApiValidationError()
+  // * Function [requestPhoneOtp]: Creates or issues the requested authentication resource.
   requestPhoneOtp(@Body() body: PhoneSchema) {
     return this.service.requestPhoneOtp(body);
   }
@@ -90,6 +97,7 @@ export class LoginController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
+  // * Function [verifyPhone]: Validates the supplied authentication data and rejects unsafe input.
   verifyPhone(@Body() body: PhoneLoginVerifySchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.verifyPhone(body, headers);
   }

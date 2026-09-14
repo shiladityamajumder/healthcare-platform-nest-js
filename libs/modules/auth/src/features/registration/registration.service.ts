@@ -1,3 +1,7 @@
+// * Auth module: Implements registration and identity-verification use cases.
+// * File: src/features/registration/registration.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Creates identities, issues registration OTPs, and verifies email/phone ownership.
  * Used backward by RegistrationController; connects forward to identity persistence and workflow orchestration.
@@ -14,11 +18,13 @@ type AuthInput = object;
 
 @Injectable()
 export class RegistrationService {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(
     private readonly workflow: AuthWorkflowService,
     private readonly identity: IdentityRepository,
   ) {}
 
+  // * Function [registerEmail]: Creates or issues the requested authentication resource.
   async registerEmail(input: AuthInput, headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     const email = normalizeEmail(String(values.email));
@@ -53,6 +59,7 @@ export class RegistrationService {
     };
   }
 
+  // * Function [requestPhoneOtp]: Creates or issues the requested authentication resource.
   requestPhoneOtp(input: AuthInput) {
     const values = toAuthInput(input);
     const phone = normalizePhone(String(values.phoneCountryCode), String(values.phoneNumber));
@@ -62,6 +69,7 @@ export class RegistrationService {
     });
   }
 
+  // * Function [verifyPhone]: Validates the supplied authentication data and rejects unsafe input.
   async verifyPhone(input: AuthInput, headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     const phone = normalizePhone(String(values.phoneCountryCode), String(values.phoneNumber));
@@ -92,11 +100,13 @@ export class RegistrationService {
     );
   }
 
+  // * Function [requestEmailVerification]: Creates or issues the requested authentication resource.
   requestEmailVerification(input: AuthInput) {
     const values = toAuthInput(input);
     return this.workflow.issueOtp('email', normalizeEmail(String(values.email)), 'verify_email');
   }
 
+  // * Function [verifyEmail]: Validates the supplied authentication data and rejects unsafe input.
   async verifyEmail(input: AuthInput, headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     const email = normalizeEmail(String(values.email));

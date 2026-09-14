@@ -1,3 +1,7 @@
+// * Auth module: Defines validation and OpenAPI DTOs for current-user updates.
+// * File: src/features/current-user/current-user.schema.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Validated patch DTO for the authenticated user's editable profile fields.
  * Used backward by CurrentUserController; connects forward to CurrentUserService.
@@ -5,6 +9,7 @@
 import { IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
+// * DTO [UpdateCurrentUserSchema]: Validates and documents data crossing the HTTP boundary.
 export class UpdateCurrentUserSchema {
   @ApiPropertyOptional({ description: 'Preferred language/locale.', example: 'en-IN' })
   @IsOptional()

@@ -1,3 +1,7 @@
+// * Auth module: Reports supported authentication capabilities and configured keys.
+// * File: src/features/capabilities/capabilities.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Builds the public auth capability document and exposes configured signing keys.
  * Used backward by CapabilitiesController; connects forward to AuthTokenService for JWKS data.
@@ -8,8 +12,10 @@ import { AuthTokenService } from '../../infrastructure/token/auth-token.service'
 
 @Injectable()
 export class CapabilitiesService {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly tokens: AuthTokenService) {}
 
+  // * Function [capabilities]: Retrieves and returns the requested authentication data.
   capabilities() {
     return {
       schema: 'auth-capabilities',
@@ -27,6 +33,7 @@ export class CapabilitiesService {
     };
   }
 
+  // * Function [jwks]: Retrieves and returns the requested authentication data.
   jwks() {
     const keys = this.tokens.jwks();
     if (!keys.length) throw new NotFoundError('JWKS is available only when RS256 is configured.');

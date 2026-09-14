@@ -1,3 +1,7 @@
+// * Auth module: Implements password recovery and password credential lifecycle use cases.
+// * File: src/features/password-management/password-management.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Handles password recovery, reset-token exchange, change, and initial password setup.
  * Used backward by PasswordManagementController; connects forward to identity, session, token, and OTP workflows.
@@ -25,6 +29,7 @@ type AuthInput = object;
 
 @Injectable()
 export class PasswordManagementService {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(
     private readonly workflow: AuthWorkflowService,
     private readonly identity: IdentityRepository,
@@ -32,6 +37,7 @@ export class PasswordManagementService {
     private readonly sessions: SessionRepository,
   ) {}
 
+  // * Function [forgot]: Handles the forgot operation for this authentication component.
   forgot(input: AuthInput) {
     const values = toAuthInput(input);
     const destination =
@@ -45,6 +51,7 @@ export class PasswordManagementService {
     );
   }
 
+  // * Function [verifyReset]: Validates the supplied authentication data and rejects unsafe input.
   async verifyReset(input: AuthInput) {
     const values = toAuthInput(input);
     const destination =
@@ -76,6 +83,7 @@ export class PasswordManagementService {
     return { resetToken: proof.token, expiresAt: proof.expiresAt };
   }
 
+  // * Function [reset]: Updates the requested authentication state after validation.
   async reset(input: AuthInput, headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     const claims = this.tokens.decode(String(values.resetToken), 'password_reset');
@@ -95,6 +103,7 @@ export class PasswordManagementService {
     return this.workflow.issueTokens(updated, authContext(headers), ['password_reset']);
   }
 
+  // * Function [change]: Updates the requested authentication state after validation.
   async change(input: AuthInput, authorization: string | undefined, headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     const principal = await this.workflow.requirePrincipal(authorization);
@@ -116,6 +125,7 @@ export class PasswordManagementService {
     return this.workflow.issueTokens(updated, authContext(headers), ['password']);
   }
 
+  // * Function [set]: Creates or issues the requested authentication resource.
   async set(input: AuthInput, authorization: string | undefined, headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     const principal = await this.workflow.requirePrincipal(authorization);

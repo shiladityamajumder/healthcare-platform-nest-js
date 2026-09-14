@@ -1,3 +1,7 @@
+// * Auth module: Defines validation and OpenAPI DTOs for password-management requests.
+// * File: src/features/password-management/password-management.schema.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Validated request DTOs for password recovery and password changes.
  * Used backward by PasswordManagementController; connects forward to PasswordManagementService input.
@@ -15,6 +19,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+// * DTO [ForgotPasswordSchema]: Validates and documents data crossing the HTTP boundary.
 export class ForgotPasswordSchema {
   @ApiProperty({ description: 'Recovery channel.', enum: ['email', 'sms'], example: 'email' })
   @IsIn(['email', 'sms'])
@@ -49,6 +54,7 @@ export class ForgotPasswordSchema {
   phoneNumber?: string;
 }
 
+// * DTO [ResetVerifySchema]: Validates and documents data crossing the HTTP boundary.
 export class ResetVerifySchema extends ForgotPasswordSchema {
   @ApiProperty({
     description: 'Password recovery challenge ID.',
@@ -62,6 +68,7 @@ export class ResetVerifySchema extends ForgotPasswordSchema {
   code!: string;
 }
 
+// * DTO [ResetPasswordSchema]: Validates and documents data crossing the HTTP boundary.
 export class ResetPasswordSchema {
   @ApiProperty({
     description: 'Short-lived reset token returned after OTP verification.',
@@ -83,6 +90,7 @@ export class ResetPasswordSchema {
   newPassword!: string;
 }
 
+// * DTO [ChangePasswordSchema]: Validates and documents data crossing the HTTP boundary.
 export class ChangePasswordSchema {
   @ApiProperty({
     description: 'Current account password.',
@@ -104,6 +112,7 @@ export class ChangePasswordSchema {
   newPassword!: string;
 }
 
+// * DTO [SetPasswordSchema]: Validates and documents data crossing the HTTP boundary.
 export class SetPasswordSchema {
   @ApiProperty({
     description: 'Password to configure for an account without one.',

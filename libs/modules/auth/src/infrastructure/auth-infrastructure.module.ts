@@ -1,3 +1,7 @@
+// * Auth module: Wires infrastructure implementations used by the authentication bounded context.
+// * File: src/infrastructure/auth-infrastructure.module.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Registers auth database adapters, token signing, and application workflow providers.
  * Used backward by each auth feature module; connects forward through DI to PostgresDatabase and feature repositories.

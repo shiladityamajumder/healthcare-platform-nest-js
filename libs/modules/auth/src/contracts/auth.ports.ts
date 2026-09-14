@@ -1,3 +1,7 @@
+// * Auth module: Defines token, identity, session, OTP, and authorization port contracts.
+// * File: src/contracts/auth.ports.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Type and DI contracts between auth application workflows and adapters.
  * Used backward by workflow/features; connects forward to PostgreSQL repositories and token services.
@@ -7,6 +11,7 @@ import type { QueryResultRow } from 'pg';
 export const AUTH_REPOSITORY = Symbol('AUTH_REPOSITORY');
 export const AUTH_TOKEN_SERVICE = Symbol('AUTH_TOKEN_SERVICE');
 
+// * Contract [AuthUser]: Defines the stable shape shared across auth layers.
 export interface AuthUser {
   id: string;
   email: string | null;
@@ -26,6 +31,7 @@ export interface AuthUser {
   } | null;
 }
 
+// * Contract [AuthPrincipal]: Defines the stable shape shared across auth layers.
 export interface AuthPrincipal {
   userId: string;
   sessionId: string;
@@ -33,12 +39,14 @@ export interface AuthPrincipal {
   permissions: string[];
 }
 
+// * Contract [AuthLoginUser]: Defines the stable shape shared across auth layers.
 export interface AuthLoginUser extends AuthUser {
   passwordHash: string | null;
   lockedUntil: Date | null;
   failedLoginCount: number;
 }
 
+// * Contract [AuthSession]: Defines the stable shape shared across auth layers.
 export interface AuthSession {
   id: string;
   userId: string;
@@ -49,6 +57,7 @@ export interface AuthSession {
   deviceId: string | null;
 }
 
+// * Contract [TokenClaims]: Defines the stable shape shared across auth layers.
 export interface TokenClaims {
   sub: string;
   token_type: 'access' | 'refresh' | 'password_reset';
@@ -64,6 +73,7 @@ export interface TokenClaims {
   aud?: string;
 }
 
+// * Contract [TokenServicePort]: Defines the stable shape shared across auth layers.
 export interface TokenServicePort {
   createAccess(userId: string, sessionId: string, methods: string[]): EncodedToken;
   createRefresh(userId: string, sessionId: string, familyId: string): EncodedToken;
@@ -79,12 +89,14 @@ export interface TokenServicePort {
   jwks(): Array<Record<string, string>>;
 }
 
+// * Contract [EncodedToken]: Defines the stable shape shared across auth layers.
 export interface EncodedToken {
   token: string;
   expiresAt: Date;
   jti: string;
 }
 
+// * Contract [UserWriteInput]: Defines the stable shape shared across auth layers.
 export interface UserWriteInput {
   email?: string | null;
   phoneCountryCode?: string | null;
@@ -98,6 +110,7 @@ export interface UserWriteInput {
   actorUserId?: string | null;
 }
 
+// * Contract [ProfileInput]: Defines the stable shape shared across auth layers.
 export interface ProfileInput {
   firstName?: string | null;
   lastName?: string | null;
@@ -105,6 +118,7 @@ export interface ProfileInput {
   avatarFileId?: string | null;
 }
 
+// * Contract [OtpRecord]: Defines the stable shape shared across auth layers.
 export interface OtpRecord {
   id: string;
   channel: string;
@@ -118,6 +132,7 @@ export interface OtpRecord {
   blockedAt: Date | null;
 }
 
+// * Contract [AuthRepositoryPort]: Defines the stable shape shared across auth layers.
 export interface AuthRepositoryPort {
   findUserById(id: string): Promise<AuthUser | null>;
   findUserForLogin(identity: {
@@ -211,4 +226,5 @@ export interface AuthRepositoryPort {
   deleteUserRole(userId: string, assignmentId: string, actorUserId: string): Promise<void>;
 }
 
+// * Contract [RawRow]: Defines a shared authentication type alias.
 export type RawRow = QueryResultRow & Record<string, unknown>;

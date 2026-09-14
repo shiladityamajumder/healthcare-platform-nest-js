@@ -1,3 +1,7 @@
+// * Auth module: Implements refresh-token rotation and session lifecycle use cases.
+// * File: src/features/session-management/session-management.service.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Rotates refresh tokens and manages current, other, and all user sessions.
  * Used backward by SessionManagementController; connects forward to token and session persistence adapters.
@@ -19,12 +23,14 @@ type AuthInput = object;
 
 @Injectable()
 export class SessionManagementService {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(
     private readonly workflow: AuthWorkflowService,
     private readonly tokens: AuthTokenService,
     private readonly sessions: SessionRepository,
   ) {}
 
+  // * Function [refresh]: Handles the refresh operation for this authentication component.
   async refresh(input: AuthInput, _headers: AuthRequestHeaders) {
     const values = toAuthInput(input);
     const refreshToken = String(values.refreshToken);
@@ -59,6 +65,7 @@ export class SessionManagementService {
     return this.workflow.tokenResponse(user, access, refresh);
   }
 
+  // * Function [logout]: Invalidates or removes the requested authentication state.
   async logout(input: AuthInput) {
     const refreshToken = String(toAuthInput(input).refreshToken);
     const claims = this.tokens.decode(refreshToken, 'refresh');
@@ -66,18 +73,21 @@ export class SessionManagementService {
     return { message: 'The session has been logged out.' };
   }
 
+  // * Function [logoutOthers]: Invalidates or removes the requested authentication state.
   async logoutOthers(authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     await this.sessions.revokeOtherSessions(principal.userId, principal.sessionId);
     return { message: 'All other sessions have been logged out.' };
   }
 
+  // * Function [logoutAll]: Invalidates or removes the requested authentication state.
   async logoutAll(authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     await this.sessions.revokeAllSessions(principal.userId, 'logout_all');
     return { message: 'All sessions have been logged out.' };
   }
 
+  // * Function [list]: Retrieves and returns the requested authentication data.
   async list(authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     const sessions = await this.sessions.listSessions(principal.userId);
@@ -89,6 +99,7 @@ export class SessionManagementService {
     };
   }
 
+  // * Function [revoke]: Invalidates or removes the requested authentication state.
   async revoke(sessionId: string, authorization?: string) {
     const principal = await this.workflow.requirePrincipal(authorization);
     const session = await this.sessions.findSession(sessionId);

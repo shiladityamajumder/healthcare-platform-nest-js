@@ -1,3 +1,7 @@
+// * Auth module: Defines validation and OpenAPI DTOs for login requests.
+// * File: src/features/login/login.schema.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Validated request DTOs for password and phone-OTP login.
  * Used backward by LoginController; connects forward to LoginService input.
@@ -16,6 +20,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PhoneSchema } from '../../contracts/phone.schema';
 
+// * DTO [PasswordLoginSchema]: Validates and documents data crossing the HTTP boundary.
 export class PasswordLoginSchema {
   @ApiProperty({
     description: 'Identity channel used for login.',
@@ -59,6 +64,7 @@ export class PasswordLoginSchema {
   password!: string;
 }
 
+// * DTO [PhoneLoginVerifySchema]: Validates and documents data crossing the HTTP boundary.
 export class PhoneLoginVerifySchema extends PhoneSchema {
   @ApiProperty({
     description: 'Challenge ID returned by the phone login OTP request.',

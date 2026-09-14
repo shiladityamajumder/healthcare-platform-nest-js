@@ -1,3 +1,7 @@
+// * Auth module: Defines validation and OpenAPI DTOs for registration requests.
+// * File: src/features/registration/registration.schema.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Validated request DTOs for email/phone registration and email verification.
  * Used backward by RegistrationController; connects forward to RegistrationService input.
@@ -14,6 +18,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PhoneSchema } from '../../contracts/phone.schema';
 
+// * DTO [EmailRegistrationSchema]: Validates and documents data crossing the HTTP boundary.
 export class EmailRegistrationSchema {
   @ApiProperty({ description: 'Email address for the new account.', example: 'user@example.com' })
   @IsEmail()
@@ -80,6 +85,7 @@ export class EmailRegistrationSchema {
   privacyVersion?: string;
 }
 
+// * DTO [EmailSchema]: Validates and documents data crossing the HTTP boundary.
 export class EmailSchema {
   @ApiProperty({
     description: 'Email address associated with the account.',
@@ -89,6 +95,7 @@ export class EmailSchema {
   email!: string;
 }
 
+// * DTO [EmailVerifySchema]: Validates and documents data crossing the HTTP boundary.
 export class EmailVerifySchema extends EmailSchema {
   @ApiProperty({
     description: 'Email verification challenge ID.',
@@ -102,6 +109,7 @@ export class EmailVerifySchema extends EmailSchema {
   code!: string;
 }
 
+// * DTO [PhoneRegistrationVerifySchema]: Validates and documents data crossing the HTTP boundary.
 export class PhoneRegistrationVerifySchema extends PhoneSchema {
   @ApiProperty({
     description: 'Phone registration challenge ID.',

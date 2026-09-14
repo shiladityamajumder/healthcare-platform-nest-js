@@ -1,3 +1,7 @@
+// * Auth module: Exposes authentication capability and public key discovery endpoints.
+// * File: src/features/capabilities/capabilities.controller.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Public capability and JWKS discovery routes.
  * Used backward by external clients through Nest routing; connects forward to CapabilitiesService.
@@ -12,6 +16,7 @@ import { ApiAuthOperation, ApiAuthResponse } from '../../contracts/swagger';
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
 export class CapabilitiesController {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: CapabilitiesService) {}
 
   @Get('capabilities')
@@ -28,6 +33,7 @@ export class CapabilitiesController {
     passwordPolicy: { minimumLength: 8, minimumCharacterClasses: 3 },
     supportedPlatforms: ['android', 'ios', 'web'],
   })
+  // * Function [capabilities]: Retrieves and returns the requested authentication data.
   capabilities() {
     return this.service.capabilities();
   }
@@ -41,6 +47,7 @@ export class CapabilitiesController {
   @ApiAuthResponse('Signing-key metadata returned.', {
     keys: [{ kty: 'RSA', kid: 'auth-key-1', use: 'sig', alg: 'RS256' }],
   })
+  // * Function [jwks]: Retrieves and returns the requested authentication data.
   jwks() {
     return this.service.jwks();
   }

@@ -1,3 +1,7 @@
+// * Auth module: Registers administration controllers and application providers.
+// * File: src/features/administration/administration.module.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * Administration feature composition and dependency-injection boundary.
  * Used backward by AuthModule; connects forward to its controller, service, and auth infrastructure.

@@ -1,3 +1,7 @@
+// * Auth module: Persists identities, profiles, OTP challenges, and role assignments.
+// * File: src/features/registration/identity.repository.ts
+// ? Keep this boundary focused on authentication concerns and its declared dependencies.
+// ! Do not weaken validation, authorization, token, or transaction guarantees in this file.
 /**
  * PostgreSQL adapter for users, profiles, roles, and authorization lookup.
  * Used backward by registration/login/current-user/administration services; connects forward to PostgresDatabase.
@@ -28,13 +32,16 @@ type Row = Record<string, any>;
 
 @Injectable()
 export class IdentityRepository {
+  // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly database: PostgresDatabase) {}
 
+  // * Function [findUserById]: Handles the findUserById operation for this authentication component.
   public async findUserById(id: string): Promise<AuthUser | null> {
     const result = await this.database.query<Row>(`${AUTH_USER_SELECT} WHERE u.id = $1`, [id]);
     return result.rows[0] ? mapUser(result.rows[0]) : null;
   }
 
+  // * Function [findUserByEmail]: Handles the findUserByEmail operation for this authentication component.
   public async findUserByEmail(email: string): Promise<AuthUser | null> {
     const result = await this.database.query<Row>(
       `${AUTH_USER_SELECT} WHERE u.email_normalized = $1`,
@@ -43,6 +50,7 @@ export class IdentityRepository {
     return result.rows[0] ? mapUser(result.rows[0]) : null;
   }
 
+  // * Function [findUserByPhone]: Handles the findUserByPhone operation for this authentication component.
   public async findUserByPhone(countryCode: string, phoneNumber: string): Promise<AuthUser | null> {
     const result = await this.database.query<Row>(
       `${AUTH_USER_SELECT} WHERE u.phone_country_code = $1 AND u.phone_number = $2`,
@@ -51,6 +59,7 @@ export class IdentityRepository {
     return result.rows[0] ? mapUser(result.rows[0]) : null;
   }
 
+  // * Function [findUserForLogin]: Handles the findUserForLogin operation for this authentication component.
   public async findUserForLogin(identity: {
     email?: string;
     phoneCountryCode?: string;
@@ -76,6 +85,7 @@ export class IdentityRepository {
     };
   }
 
+  // * Function [createUser]: Creates or issues the requested authentication resource.
   public async createUser(input: UserWriteInput): Promise<AuthUser> {
     const result = await this.database.query<Row>(
       `INSERT INTO identity.users
@@ -101,6 +111,7 @@ export class IdentityRepository {
     return user;
   }
 
+  // * Function [updateUser]: Handles the updateUser operation for this authentication component.
   public async updateUser(id: string, values: Record<string, unknown>): Promise<AuthUser> {
     // Whitelist column names because values are parameterized but SQL identifiers are interpolated.
     const allowed = [
@@ -128,6 +139,7 @@ export class IdentityRepository {
     return user;
   }
 
+  // * Function [createProfile]: Creates or issues the requested authentication resource.
   public async createProfile(userId: string, input: ProfileInput): Promise<void> {
     // Undefined means "leave unchanged"; null intentionally clears a profile field.
     const fields: Record<string, unknown> = {
@@ -159,6 +171,7 @@ export class IdentityRepository {
       );
   }
 
+  // * Function [findRoleByCode]: Handles the findRoleByCode operation for this authentication component.
   public async findRoleByCode(code: string): Promise<{ id: string } | null> {
     const result = await this.database.query<Row>(
       `SELECT id FROM identity.roles WHERE code = $1 AND is_deleted = false`,
@@ -167,6 +180,7 @@ export class IdentityRepository {
     return result.rows[0] ? { id: result.rows[0].id } : null;
   }
 
+  // * Function [assignRole]: Creates or issues the requested authentication resource.
   public async assignRole(userId: string, roleId: string, actorUserId?: string): Promise<void> {
     await this.database.query(
       `INSERT INTO identity.user_roles (user_id, role_id, created_by, updated_by) VALUES ($1,$2,$3,$3) ON CONFLICT (user_id, role_id, scope_type, scope_id) DO UPDATE SET is_active = true, updated_at = now(), row_version = identity.user_roles.row_version + 1`,
@@ -174,6 +188,7 @@ export class IdentityRepository {
     );
   }
 
+  // * Function [authorization]: Retrieves and returns the requested authentication data.
   public async authorization(userId: string): Promise<{ roles: string[]; permissions: string[] }> {
     const result = await this.database.query<Row>(
       `SELECT DISTINCT r.code AS role_code, p.code AS permission_code FROM identity.user_roles ur JOIN identity.roles r ON r.id = ur.role_id AND r.is_deleted = false LEFT JOIN identity.role_permissions rp ON rp.role_id = r.id LEFT JOIN identity.permissions p ON p.id = rp.permission_id AND p.is_deleted = false WHERE ur.user_id = $1 AND ur.is_active = true AND (ur.valid_from IS NULL OR ur.valid_from <= now()) AND (ur.valid_until IS NULL OR ur.valid_until > now())`,
@@ -195,6 +210,7 @@ export class IdentityRepository {
     };
   }
 
+  // * Function [listUsers]: Handles the listUsers operation for this authentication component.
   public async listUsers(
     limit: number,
     offset: number,
@@ -230,6 +246,7 @@ export class IdentityRepository {
   }
 }
 
+// * Function [mapUser]: Transforms the supplied value into the format required by this authentication flow.
 export function mapUser(row: Row): AuthUser {
   const firstName = row.first_name ?? null;
   const lastName = row.last_name ?? null;
