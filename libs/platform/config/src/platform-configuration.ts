@@ -1,6 +1,4 @@
-// * Provides environment configuration for the application.
-// * Used by modules and application bootstrap code through the platform public API.
-// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
+// * Provides normalized platform configuration, including the Python-compatible logging settings.
 export interface PlatformConfiguration {
   app: {
     environment: string;
@@ -17,11 +15,7 @@ export interface PlatformConfiguration {
       ssl: boolean;
       poolSize: number;
     };
-    mongo: {
-      enabled: boolean;
-      uri?: string;
-      database?: string;
-    };
+    mongo: { enabled: boolean; uri?: string; database?: string };
   };
   cache: {
     redis: {
@@ -33,11 +27,12 @@ export interface PlatformConfiguration {
   };
   logging: {
     level: string;
+    json: boolean;
+    sensitiveDataRedactionEnabled: boolean;
+    slowRequestThresholdMs: number;
   };
 }
 
-// * Builds the normalized platform configuration object from environment variables.
-// ? Defaults keep local development usable while deployment-specific values come from the environment.
 export function platformConfiguration(): PlatformConfiguration {
   return {
     app: {
@@ -71,11 +66,13 @@ export function platformConfiguration(): PlatformConfiguration {
     },
     logging: {
       level: process.env.LOG_LEVEL ?? 'info',
+      json: booleanFromEnv('LOG_JSON', false),
+      sensitiveDataRedactionEnabled: booleanFromEnv('SENSITIVE_DATA_REDACTION_ENABLED', true),
+      slowRequestThresholdMs: numberFromEnv('SLOW_REQUEST_THRESHOLD_MS', 1000),
     },
   };
 }
 
-// * Parses a numeric environment variable and returns the fallback for missing or invalid values.
 function numberFromEnv(name: string, fallback: number): number {
   const value = process.env[name];
   if (!value) return fallback;
@@ -83,7 +80,6 @@ function numberFromEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-// * Converts common boolean environment values into a typed boolean configuration value.
 function booleanFromEnv(name: string, fallback: boolean): boolean {
   const value = process.env[name]?.toLowerCase();
   if (!value) return fallback;
