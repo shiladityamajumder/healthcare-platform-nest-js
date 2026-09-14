@@ -1,11 +1,13 @@
-// * Linked with: the surrounding package and its exported types.
-// * Used by: the feature module/controller and the domain or infrastructure ports it coordinates.
-// * Other linkup: This layer keeps transport concerns separate from domain rules and persistence details.
+// * Shared kernel: Defines framework-neutral pagination request and result contracts.
+// * File: src/application/page.ts
+// ? Keep this primitive stable, domain-neutral, and independent of platform or business modules.
+// ! Pagination stays transport-agnostic so modules can reuse it across APIs and handlers.
+// * Contract [PageRequest]: Defines a stable shared-kernel data shape.
 export interface PageRequest {
   page: number;
   pageSize: number;
 }
-// * Coordinate the use case while keeping transport and persistence concerns outside this class.
+// * Contract [PageResult]: Carries paginated items together with the page metadata.
 export interface PageResult<T> {
   items: T[];
   totalItems: number;

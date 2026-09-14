@@ -1,6 +1,8 @@
-// * Linked with: the module implementation and consuming bounded contexts.
-// * Used by: other modules that need this capability without depending on internals.
-// * Other linkup: The contract is the intended seam for cross-module integration.
+// * Shared kernel: Defines the versioned envelope used for cross-context integration events.
+// * File: src/contracts/integration-event.ts
+// ? Keep this primitive stable, domain-neutral, and independent of platform or business modules.
+// ! Keep the payload generic; business-specific event contracts belong to their owning module.
+// * Contract [IntegrationEvent]: Defines a stable shared-kernel data shape.
 export interface IntegrationEvent<TPayload = unknown> {
   readonly eventId: string;
   readonly name: string;
