@@ -1,8 +1,7 @@
-// * Linked with: ./accounts, ./journal_entries, ./journal_lines.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Re-exports the typed PostgreSQL row shapes for the finance schema.
+// * Used by repositories that need compile-time row types without ORM entities.
+// ! These exports describe an existing database; they do not create or modify tables.
 /** Row shapes for the finance PostgreSQL schema. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export type { FinanceAccountsRow } from './accounts';
 export type { FinanceJournalEntriesRow } from './journal_entries';
 export type { FinanceJournalLinesRow } from './journal_lines';

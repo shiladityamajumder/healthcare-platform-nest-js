@@ -1,8 +1,7 @@
-// * Linked with: ./tax_rules, ./promotions, ./pricing_evaluations.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Re-exports the typed PostgreSQL row shapes for the pricing schema.
+// * Used by repositories that need compile-time row types without ORM entities.
+// ! These exports describe an existing database; they do not create or modify tables.
 /** Row shapes for the pricing PostgreSQL schema. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export type { PricingTaxRulesRow } from './tax_rules';
 export type { PricingPromotionsRow } from './promotions';
 export type { PricingPricingEvaluationsRow } from './pricing_evaluations';

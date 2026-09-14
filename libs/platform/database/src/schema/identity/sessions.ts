@@ -1,8 +1,7 @@
-// * Linked with: database repositories, migrations, and transaction code.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Describes the raw PostgreSQL row shape for the identity.sessions table.
+// * Used by SQL repositories to type query results from the externally managed database.
+// ! Keep property names and types synchronized with the corresponding database table.
 /** Raw PostgreSQL row shape for `identity.sessions`. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export interface IdentitySessionsRow {
   user_id: string; // UUID
   refresh_token_hash: string; // VARCHAR(255)

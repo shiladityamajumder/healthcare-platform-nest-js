@@ -1,13 +1,12 @@
-// * Linked with: @nestjs/common, @platform/database, @platform/database.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides operation execution, logging, timeout, and transaction boundaries for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import { Injectable, Optional } from '@nestjs/common';
 import type { SqlExecutor } from '@platform/database';
 import { PostgresDatabase } from '@platform/database';
 import { AppLogger } from '@platform/logging';
 import { AppError, InfrastructureUnavailableError, OperationTimeoutError } from '@shared/errors';
 
-// * Define the shared types or behavior used by the surrounding package.
 export interface ExecutionOptions {
   operation: string;
   layer?: string;
@@ -21,11 +20,14 @@ export type Operation<T> = (executor: SqlExecutor | undefined) => Promise<T>;
 /** Owns operation logging, failure reporting, deadlines, and DB transactions. */
 @Injectable()
 export class ExecutionService {
+  // * Receives the optional database adapter and logger used by the execution boundary.
   public constructor(
     @Optional() private readonly database: PostgresDatabase | null,
     private readonly logger: AppLogger,
   ) {}
 
+  // * Executes one application operation with logging, timeout handling, and an optional transaction.
+  // ! Errors are logged and rethrown so the HTTP or worker boundary can produce the final response.
   public async execute<T>(options: ExecutionOptions, operation: Operation<T>): Promise<T> {
     const operationName = requireText(options.operation, 'operation');
     const layer = requireText(options.layer ?? 'application', 'layer');
@@ -91,6 +93,7 @@ export class ExecutionService {
 
 class TimeoutMarker extends Error {}
 
+// * Rejects when an operation exceeds its deadline while clearing the timer on success or failure.
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => reject(new TimeoutMarker()), timeoutMs);
@@ -107,12 +110,14 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   });
 }
 
+// * Trims and validates required operation metadata before it is written to logs.
 function requireText(value: string, field: string): string {
   const normalized = value.trim();
   if (!normalized) throw new Error(`${field} must be a non-empty string.`);
   return normalized;
 }
 
+// * Validates an optional timeout and preserves undefined when no deadline was requested.
 function validateTimeout(timeoutMs: number | undefined): number | undefined {
   if (timeoutMs === undefined) return undefined;
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
@@ -121,10 +126,12 @@ function validateTimeout(timeoutMs: number | undefined): number | undefined {
   return timeoutMs;
 }
 
+// * Converts the high-resolution elapsed time into a compact millisecond value for event metadata.
 function elapsedMilliseconds(startedAt: number): number {
   return Math.round((performance.now() - startedAt) * 100) / 100;
 }
 
+// * Provides a functional wrapper for callers that prefer not to inject and call the service directly.
 export const executeServiceOperation = <T>(
   execution: ExecutionService,
   options: ExecutionOptions,

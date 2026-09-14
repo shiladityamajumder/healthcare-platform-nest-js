@@ -1,6 +1,6 @@
-// * Linked with: @nestjs/common, fastify, node:http.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides HTTP request context, response formatting, and exception handling for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import { Injectable, type NestMiddleware } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { ServerResponse } from 'node:http';
@@ -11,7 +11,7 @@ import { runWithRequestContext } from './request-context';
 type Next = (error?: Error) => void;
 type MiddlewareReply = FastifyReply | ServerResponse;
 
-// * Define the shared types or behavior used by the surrounding package.
+// * Normalizes a possibly repeated HTTP header into one trimmed, non-empty value.
 function headerValue(value: string | string[] | undefined): string | undefined {
   const normalized = Array.isArray(value) ? value[0] : value;
   return normalized?.trim() || undefined;
@@ -19,8 +19,10 @@ function headerValue(value: string | string[] | undefined): string | undefined {
 
 @Injectable()
 export class RequestContextMiddleware implements NestMiddleware {
+  // * Receives the logger used to record completion details after each HTTP response finishes.
   public constructor(private readonly logger: AppLogger) {}
 
+  // * Establishes request identifiers, response headers, completion logging, and async context.
   public use(request: FastifyRequest, reply: MiddlewareReply, next: Next): void {
     const requestId = headerValue(request.headers['x-request-id']) ?? randomUUID();
     const correlationId = headerValue(request.headers['x-correlation-id']) ?? requestId;
@@ -44,6 +46,7 @@ export class RequestContextMiddleware implements NestMiddleware {
   }
 }
 
+// * Writes a response header through Fastify when available, with a Node response fallback.
 function setHeader(reply: MiddlewareReply, name: string, value: string): void {
   if ('header' in reply && typeof reply.header === 'function') {
     reply.header(name, value);
@@ -53,6 +56,7 @@ function setHeader(reply: MiddlewareReply, name: string, value: string): void {
   (reply as ServerResponse).setHeader(name, value);
 }
 
+// * Extracts the underlying Node response from either a Fastify reply or a native response.
 function rawResponse(reply: MiddlewareReply): ServerResponse {
   return 'raw' in reply ? reply.raw : reply;
 }

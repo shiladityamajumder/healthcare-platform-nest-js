@@ -1,9 +1,8 @@
-// * Linked with: ../context/request-context.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides HTTP request context, response formatting, and exception handling for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import { getApiVersion, getCorrelationId, getRequestId } from '../context/request-context';
 
-// * Define the shared types or behavior used by the surrounding package.
 export interface ApiResponse<T> {
   success: true;
   message: string;
@@ -39,6 +38,7 @@ export interface ApiErrorResponse {
 }
 
 export class ApiResponseFactory {
+  // * Builds the standard successful response envelope, including optional pagination metadata.
   public static success<T>(
     data: T,
     message = 'Operation completed successfully.',
@@ -53,6 +53,7 @@ export class ApiResponseFactory {
     };
   }
 
+  // * Builds the standard failed response envelope with a stable error code and details payload.
   public static error(code: string, message: string, details: unknown = null): ApiErrorResponse {
     return {
       success: false,
@@ -64,6 +65,7 @@ export class ApiResponseFactory {
   }
 }
 
+// * Collects request metadata and timestamps for a consistent API response envelope.
 function buildMeta(pagination?: PaginationMeta): ResponseMeta {
   return {
     requestId: getRequestId(),

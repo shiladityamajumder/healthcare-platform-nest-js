@@ -1,13 +1,13 @@
-// * Linked with: @nestjs/common, rxjs, ./api-response.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides HTTP request context, response formatting, and exception handling for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
 import { ApiResponseFactory } from './api-response';
 
-// * Define the shared types or behavior used by the surrounding package.
 @Injectable()
 export class ApiResponseInterceptor<T> implements NestInterceptor<T, unknown> {
+  // * Converts controller return values into the standard successful API envelope.
   intercept(_context: ExecutionContext, next: CallHandler<T>): Observable<unknown> {
     return next.handle().pipe(
       map((data) => {
@@ -19,6 +19,7 @@ export class ApiResponseInterceptor<T> implements NestInterceptor<T, unknown> {
   }
 }
 
+// * Detects the pagination shape so its data can be placed in the response envelope correctly.
 function isPaginatedResult(
   value: unknown,
 ): value is { data: unknown; pagination: import('./api-response').PaginationMeta } {

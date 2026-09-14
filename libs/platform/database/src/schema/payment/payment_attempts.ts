@@ -1,8 +1,7 @@
-// * Linked with: database repositories, migrations, and transaction code.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Describes the raw PostgreSQL row shape for the payment.payment_attempts table.
+// * Used by SQL repositories to type query results from the externally managed database.
+// ! Keep property names and types synchronized with the corresponding database table.
 /** Raw PostgreSQL row shape for `payment.payment_attempts`. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export interface PaymentPaymentAttemptsRow {
   payment_intent_id: string; // UUID
   attempt_number: number; // INTEGER

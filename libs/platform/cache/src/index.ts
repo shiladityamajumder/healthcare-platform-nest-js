@@ -1,4 +1,3 @@
-// * Linked with: ./cache.module.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Exports the Redis client wrapper and cache module for application-wide caching.
+// ? Redis remains optional; consumers should check availability before using the connection.
 export * from './cache.module';

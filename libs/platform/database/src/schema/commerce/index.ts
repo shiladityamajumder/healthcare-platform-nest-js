@@ -1,8 +1,7 @@
-// * Linked with: ./carts, ./checkouts, ./orders.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Re-exports the typed PostgreSQL row shapes for the commerce schema.
+// * Used by repositories that need compile-time row types without ORM entities.
+// ! These exports describe an existing database; they do not create or modify tables.
 /** Row shapes for the commerce PostgreSQL schema. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export type { CommerceCartsRow } from './carts';
 export type { CommerceCheckoutsRow } from './checkouts';
 export type { CommerceOrdersRow } from './orders';

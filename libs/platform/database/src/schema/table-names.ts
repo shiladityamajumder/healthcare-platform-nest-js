@@ -1,14 +1,14 @@
-// * Linked with: database repositories, migrations, and transaction code.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Defines canonical PostgreSQL table identifiers used by parameterized SQL repositories.
+// ? These constants reference an externally managed database and are not DDL commands.
+// ! Never interpolate user-provided values into table identifiers or SQL statements.
 /**
  * Canonical PostgreSQL table names for the externally managed healthcare database.
  *
  * These constants do not create or alter database objects. They are safe to use
  * as fixed SQL identifiers; user data must always be passed as parameters.
  */
-// * Describe the database row shape consumed by repositories and transaction code.
 export const TABLES = {
+  // * Identity, authentication, session, and authorization tables.
   identity: {
     users: 'identity.users',
     roles: 'identity.roles',
@@ -25,6 +25,7 @@ export const TABLES = {
     api_client_secrets: 'identity.api_client_secrets',
     user_profiles: 'identity.user_profiles',
   },
+  // * Organization structure, locations, memberships, and organization licenses.
   organization: {
     organizations: 'organization.organizations',
     locations: 'organization.locations',
@@ -33,6 +34,7 @@ export const TABLES = {
     memberships: 'organization.memberships',
     licenses: 'organization.licenses',
   },
+  // * Customer profiles, preferences, consent, family, address, and wishlist tables.
   customer: {
     family_members: 'customer.family_members',
     addresses: 'customer.addresses',
@@ -43,6 +45,7 @@ export const TABLES = {
     consent_events: 'customer.consent_events',
     wishlist_items: 'customer.wishlist_items',
   },
+  // * Product catalog, classification, dosage, and product relationship tables.
   catalog: {
     categories: 'catalog.categories',
     salts: 'catalog.salts',
@@ -62,6 +65,7 @@ export const TABLES = {
     product_identifiers: 'catalog.product_identifiers',
     product_media: 'catalog.product_media',
   },
+  // * Clinical profiles, consultations, diagnoses, prescriptions, and care records.
   clinical: {
     practitioner_profiles: 'clinical.practitioner_profiles',
     practitioner_organizations: 'clinical.practitioner_organizations',
@@ -78,6 +82,7 @@ export const TABLES = {
     prescription_items: 'clinical.prescription_items',
     prescription_access_logs: 'clinical.prescription_access_logs',
   },
+  // * Appointment scheduling, availability, teleconsultation, and waiting-room tables.
   appointment: {
     service_types: 'appointment.service_types',
     practitioner_services: 'appointment.practitioner_services',
@@ -89,6 +94,7 @@ export const TABLES = {
     teleconsultation_sessions: 'appointment.teleconsultation_sessions',
     waiting_room_events: 'appointment.waiting_room_events',
   },
+  // * Diagnostic test definitions, orders, samples, laboratories, and reports.
   diagnostics: {
     test_definitions: 'diagnostics.test_definitions',
     test_packages: 'diagnostics.test_packages',
@@ -104,6 +110,7 @@ export const TABLES = {
     diagnostic_result_values: 'diagnostics.diagnostic_result_values',
     sample_events: 'diagnostics.sample_events',
   },
+  // * Price books, product prices, tax rules, promotions, and coupons.
   pricing: {
     tax_rules: 'pricing.tax_rules',
     promotions: 'pricing.promotions',
@@ -114,6 +121,7 @@ export const TABLES = {
     price_books: 'pricing.price_books',
     product_prices: 'pricing.product_prices',
   },
+  // * Sellers, listings, locations, commissions, ratings, and service levels.
   marketplace: {
     commission_plans: 'marketplace.commission_plans',
     sellers: 'marketplace.sellers',
@@ -123,6 +131,7 @@ export const TABLES = {
     seller_locations: 'marketplace.seller_locations',
     seller_product_listings: 'marketplace.seller_product_listings',
   },
+  // * Carts, checkouts, orders, charges, cancellations, returns, and allocations.
   commerce: {
     carts: 'commerce.carts',
     checkouts: 'commerce.checkouts',
@@ -139,6 +148,7 @@ export const TABLES = {
     return_items: 'commerce.return_items',
     order_allocations: 'commerce.order_allocations',
   },
+  // * Payment methods, intents, attempts, transactions, refunds, and chargebacks.
   payment: {
     provider_accounts: 'payment.provider_accounts',
     payment_webhooks: 'payment.payment_webhooks',
@@ -152,6 +162,7 @@ export const TABLES = {
     chargebacks: 'payment.chargebacks',
     cod_collections: 'payment.cod_collections',
   },
+  // * Accounts, journal entries, invoices, credits, and settlement records.
   finance: {
     accounts: 'finance.accounts',
     journal_entries: 'finance.journal_entries',
@@ -162,6 +173,7 @@ export const TABLES = {
     invoice_items: 'finance.invoice_items',
     credit_notes: 'finance.credit_notes',
   },
+  // * Insurers, policies, eligibility checks, claims, and claim documents.
   insurance: {
     insurers: 'insurance.insurers',
     tpas: 'insurance.tpas',
@@ -172,6 +184,7 @@ export const TABLES = {
     claim_documents: 'insurance.claim_documents',
     claim_status_history: 'insurance.claim_status_history',
   },
+  // * Membership plans, benefits, subscriptions, loyalty accounts, and usage.
   membership: {
     plans: 'membership.plans',
     plan_benefits: 'membership.plan_benefits',
@@ -180,6 +193,7 @@ export const TABLES = {
     loyalty_ledger: 'membership.loyalty_ledger',
     benefit_usage: 'membership.benefit_usage',
   },
+  // * Suppliers, requisitions, purchase orders, receipts, returns, and invoices.
   procurement: {
     suppliers: 'procurement.suppliers',
     supplier_licenses: 'procurement.supplier_licenses',
@@ -195,6 +209,7 @@ export const TABLES = {
     goods_receipt_quality_checks: 'procurement.goods_receipt_quality_checks',
     purchase_return_items: 'procurement.purchase_return_items',
   },
+  // * Warehouses, bins, stock balances, reservations, transfers, and cycle counts.
   warehouse: {
     warehouses: 'warehouse.warehouses',
     zones: 'warehouse.zones',
@@ -214,6 +229,7 @@ export const TABLES = {
     stock_transfer_items: 'warehouse.stock_transfer_items',
     cycle_count_items: 'warehouse.cycle_count_items',
   },
+  // * Picking, packing, fulfillment orders, packages, and fulfillment events.
   fulfillment: {
     picking_waves: 'fulfillment.picking_waves',
     fulfillment_orders: 'fulfillment.fulfillment_orders',
@@ -226,6 +242,7 @@ export const TABLES = {
     pick_task_items: 'fulfillment.pick_task_items',
     package_items: 'fulfillment.package_items',
   },
+  // * Carriers, delivery routes, slots, shipments, attempts, and exceptions.
   logistics: {
     carriers: 'logistics.carriers',
     carrier_accounts: 'logistics.carrier_accounts',
@@ -239,6 +256,7 @@ export const TABLES = {
     delivery_attempts: 'logistics.delivery_attempts',
     ndr_cases: 'logistics.ndr_cases',
   },
+  // * Notification templates, messages, provider delivery, endpoints, and preferences.
   notification: {
     templates: 'notification.templates',
     provider_configurations: 'notification.provider_configurations',
@@ -251,6 +269,7 @@ export const TABLES = {
     message_attempts: 'notification.message_attempts',
     in_app_notifications: 'notification.in_app_notifications',
   },
+  // * Support tickets, messages, actions, tags, attachments, and SLA policies.
   support: {
     sla_policies: 'support.sla_policies',
     ticket_tags: 'support.ticket_tags',
@@ -261,6 +280,7 @@ export const TABLES = {
     ticket_tag_assignments: 'support.ticket_tag_assignments',
     ticket_attachments: 'support.ticket_attachments',
   },
+  // * Regulatory registrations, recalls, privacy requests, evidence, and legal holds.
   compliance: {
     regulatory_authorities: 'compliance.regulatory_authorities',
     legal_holds: 'compliance.legal_holds',
@@ -271,6 +291,7 @@ export const TABLES = {
     adverse_event_reports: 'compliance.adverse_event_reports',
     recall_lots: 'compliance.recall_lots',
   },
+  // * Risk rules, assessments, signals, cases, and blocklists.
   risk: {
     rules: 'risk.rules',
     assessments: 'risk.assessments',
@@ -278,6 +299,7 @@ export const TABLES = {
     cases: 'risk.cases',
     blocklists: 'risk.blocklists',
   },
+  // * Platform concerns such as outbox, inbox, files, jobs, flags, and audit logs.
   platform: {
     outbox_events: 'platform.outbox_events',
     inbox_messages: 'platform.inbox_messages',
@@ -296,6 +318,7 @@ export const TABLES = {
     file_scan_events: 'platform.file_scan_events',
     file_access_events: 'platform.file_access_events',
   },
+  // * Search documents, redirects, synonyms, query events, and indexing jobs.
   search: {
     synonyms: 'search.synonyms',
     redirects: 'search.redirects',

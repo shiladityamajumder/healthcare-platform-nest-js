@@ -1,9 +1,7 @@
-// * Linked with: pg.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides database connectivity and transaction support for the application.
+// * Used by modules and application bootstrap code through the platform public API.
 import type { PoolClient, QueryResult, QueryResultRow } from 'pg';
 
-// * Define the shared types or behavior used by the surrounding package.
 export const TRANSACTION_MANAGER = Symbol('TRANSACTION_MANAGER');
 
 export interface SqlExecutor {

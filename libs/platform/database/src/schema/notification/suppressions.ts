@@ -1,8 +1,7 @@
-// * Linked with: database repositories, migrations, and transaction code.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Describes the raw PostgreSQL row shape for the notification.suppressions table.
+// * Used by SQL repositories to type query results from the externally managed database.
+// ! Keep property names and types synchronized with the corresponding database table.
 /** Raw PostgreSQL row shape for `notification.suppressions`. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export interface NotificationSuppressionsRow {
   channel: string; // VARCHAR(32)
   destination_hash: string; // VARCHAR(128)

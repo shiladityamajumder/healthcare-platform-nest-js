@@ -1,9 +1,8 @@
-// * Linked with: @nestjs/common.
-// * Used by: the application module or feature root during NestJS startup.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides messaging platform integration for the application.
+// * Used by modules and application bootstrap code through the platform public API.
 import { Module } from '@nestjs/common';
 
 /** Platform-level messaging primitives. Keep business rules out of this library. */
-// * Register the feature components and their dependencies with NestJS.
+// TODO: Register provider-neutral message buses and delivery adapters when messaging workflows are implemented.
 @Module({})
 export class MessagingModule {}

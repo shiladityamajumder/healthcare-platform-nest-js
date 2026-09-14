@@ -1,4 +1,3 @@
-// * Linked with: ./security.module.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Exports the security module as the public composition boundary for shared security providers.
+// TODO: Expand this public API when guards and cryptographic contracts are introduced.
 export * from './security.module';

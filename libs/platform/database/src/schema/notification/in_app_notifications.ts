@@ -1,8 +1,7 @@
-// * Linked with: database repositories, migrations, and transaction code.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Describes the raw PostgreSQL row shape for the notification.in_app_notifications table.
+// * Used by SQL repositories to type query results from the externally managed database.
+// ! Keep property names and types synchronized with the corresponding database table.
 /** Raw PostgreSQL row shape for `notification.in_app_notifications`. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export interface NotificationInAppNotificationsRow {
   user_id: string; // UUID
   notification_type: string; // VARCHAR(64)

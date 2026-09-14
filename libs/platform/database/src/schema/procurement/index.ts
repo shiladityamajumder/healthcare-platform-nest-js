@@ -1,8 +1,7 @@
-// * Linked with: ./suppliers, ./supplier_licenses, ./purchase_requisitions.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Re-exports the typed PostgreSQL row shapes for the procurement schema.
+// * Used by repositories that need compile-time row types without ORM entities.
+// ! These exports describe an existing database; they do not create or modify tables.
 /** Row shapes for the procurement PostgreSQL schema. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export type { ProcurementSuppliersRow } from './suppliers';
 export type { ProcurementSupplierLicensesRow } from './supplier_licenses';
 export type { ProcurementPurchaseRequisitionsRow } from './purchase_requisitions';

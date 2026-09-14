@@ -1,8 +1,7 @@
-// * Linked with: ./regulatory_authorities, ./legal_holds, ./privacy_requests.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Re-exports the typed PostgreSQL row shapes for the compliance schema.
+// * Used by repositories that need compile-time row types without ORM entities.
+// ! These exports describe an existing database; they do not create or modify tables.
 /** Row shapes for the compliance PostgreSQL schema. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export type { ComplianceRegulatoryAuthoritiesRow } from './regulatory_authorities';
 export type { ComplianceLegalHoldsRow } from './legal_holds';
 export type { CompliancePrivacyRequestsRow } from './privacy_requests';

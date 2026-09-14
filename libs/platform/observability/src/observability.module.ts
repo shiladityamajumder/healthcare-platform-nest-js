@@ -1,9 +1,8 @@
-// * Linked with: @nestjs/common.
-// * Used by: the application module or feature root during NestJS startup.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides observability platform integration for the application.
+// * Used by modules and application bootstrap code through the platform public API.
 import { Module } from '@nestjs/common';
 
 /** Platform-level observability primitives. Keep business rules out of this library. */
-// * Register the feature components and their dependencies with NestJS.
+// TODO: Register tracing, metrics, and health instrumentation providers as observability requirements grow.
 @Module({})
 export class ObservabilityModule {}

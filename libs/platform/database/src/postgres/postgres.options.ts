@@ -1,10 +1,11 @@
-// * Linked with: @nestjs/config, pg.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides database connectivity and transaction support for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import type { ConfigService } from '@nestjs/config';
 import type { PoolConfig } from 'pg';
 
-// * Define the shared types or behavior used by the surrounding package.
+// * Builds the pg connection-pool options from either DATABASE_URL or discrete settings.
+// ? SSL, pool size, channel binding, and endpoint options remain deployment-configurable.
 export function postgresOptions(config: ConfigService): PoolConfig {
   const databaseUrl = config
     .get<string>('DATABASE_URL')

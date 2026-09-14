@@ -1,8 +1,7 @@
-// * Linked with: database repositories, migrations, and transaction code.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Describes the raw PostgreSQL row shape for the platform.file_upload_sessions table.
+// * Used by SQL repositories to type query results from the externally managed database.
+// ! Keep property names and types synchronized with the corresponding database table.
 /** Raw PostgreSQL row shape for `platform.file_upload_sessions`. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export interface PlatformFileUploadSessionsRow {
   file_object_id: string; // UUID
   requested_by_user_id: string | null; // UUID

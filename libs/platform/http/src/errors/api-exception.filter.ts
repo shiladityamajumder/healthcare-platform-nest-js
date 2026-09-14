@@ -1,6 +1,6 @@
-// * Linked with: @nestjs/common, fastify, @shared/errors.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides HTTP request context, response formatting, and exception handling for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
 import {
@@ -18,11 +18,12 @@ import {
 import { AppLogger } from '@platform/logging';
 import { ApiResponseFactory } from '../response/api-response';
 
-// * Define the shared types or behavior used by the surrounding package.
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
+  // * Receives the logger used for unexpected exceptions that have no application-level mapping.
   public constructor(private readonly logger: AppLogger) {}
 
+  // * Translates application and framework exceptions into the standard HTTP error envelope.
   catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<FastifyReply>();
 
@@ -57,10 +58,12 @@ export class ApiExceptionFilter implements ExceptionFilter {
   }
 }
 
+// * Sends a prepared error envelope with the selected HTTP status code.
 function sendError(response: FastifyReply, status: HttpStatus, body: unknown): void {
   response.code(status).send(body);
 }
 
+// * Maps known application error types to their corresponding HTTP status codes.
 function statusFor(exception: AppError): HttpStatus {
   if (exception instanceof ValidationError) return HttpStatus.BAD_REQUEST;
   if (exception instanceof AuthenticationError) return HttpStatus.UNAUTHORIZED;
@@ -75,6 +78,7 @@ function statusFor(exception: AppError): HttpStatus {
   return HttpStatus.BAD_REQUEST;
 }
 
+// * Extracts a safe human-readable message from a NestJS HTTP exception response.
 function messageForHttpException(exception: HttpException): string {
   const body = exception.getResponse();
   if (typeof body === 'string') return body;

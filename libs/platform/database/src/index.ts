@@ -1,8 +1,6 @@
-// * Linked with: ./database.module, ./transaction/transaction-manager, ./transaction/postgres-transaction-manager.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Exports database adapters, transaction helpers, table identifiers, and row-shape types.
+// ! Consumers should use these exports instead of reaching into private database implementation paths.
 export * from './database.module';
-// * Define the shared types or behavior used by the surrounding package.
 export * from './transaction/transaction-manager';
 export * from './transaction/postgres-transaction-manager';
 export * from './mongo/mongo.database';

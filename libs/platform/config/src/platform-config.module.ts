@@ -1,11 +1,12 @@
-// * Linked with: @nestjs/common, @nestjs/config, ./platform-configuration.
-// * Used by: the application module or feature root during NestJS startup.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides environment configuration for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { platformConfiguration } from './platform-configuration';
 
-// * Register the feature components and their dependencies with NestJS.
+// * Validates that PostgreSQL is configured either through a connection URL or discrete settings.
+// ! Fail fast during startup so the application does not run with an unusable database configuration.
 function validateEnvironment(config: Record<string, unknown>): Record<string, unknown> {
   if (config.DATABASE_URL) return config;
 

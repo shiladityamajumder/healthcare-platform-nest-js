@@ -1,20 +1,22 @@
-// * Linked with: @nestjs/common, pg, @platform/logging.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides database connectivity and transaction support for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import { Inject, Injectable, OnApplicationShutdown, Optional } from '@nestjs/common';
 import type { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
 import { AppLogger } from '@platform/logging';
 import { POSTGRES_POOL } from './postgres.tokens';
 import { getTransactionClient, runWithTransactionClient } from './transaction-context';
 
-// * Define the shared types or behavior used by the surrounding package.
 @Injectable()
 export class PostgresDatabase implements OnApplicationShutdown {
+  // * Receives the shared pool and optional logger used by query and transaction operations.
   constructor(
     @Inject(POSTGRES_POOL) private readonly pool: Pool,
     @Optional() private readonly logger?: AppLogger,
   ) {}
 
+  // * Executes a parameterized query using the active transaction client when one exists.
+  // ! Callers must pass values separately; never interpolate user input into SQL text.
   query<Row extends QueryResultRow = QueryResultRow>(
     text: string,
     values: readonly unknown[] = [],
@@ -23,6 +25,8 @@ export class PostgresDatabase implements OnApplicationShutdown {
     return executor.query<Row>(text, values as unknown[]);
   }
 
+  // * Runs work inside one PostgreSQL transaction, reusing an outer transaction when present.
+  // ! Any failure triggers rollback before the original error is rethrown.
   async transaction<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
     const activeClient = getTransactionClient();
     if (activeClient) return work(activeClient);
@@ -51,6 +55,7 @@ export class PostgresDatabase implements OnApplicationShutdown {
     });
   }
 
+  // * Drains and closes the PostgreSQL pool during application shutdown.
   onApplicationShutdown(): Promise<void> {
     return this.pool.end();
   }

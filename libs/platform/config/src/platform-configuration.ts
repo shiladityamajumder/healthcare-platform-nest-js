@@ -1,6 +1,6 @@
-// * Linked with: the surrounding package and its exported types.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides environment configuration for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 export interface PlatformConfiguration {
   app: {
     environment: string;
@@ -36,7 +36,8 @@ export interface PlatformConfiguration {
   };
 }
 
-// * Define the shared types or behavior used by the surrounding package.
+// * Builds the normalized platform configuration object from environment variables.
+// ? Defaults keep local development usable while deployment-specific values come from the environment.
 export function platformConfiguration(): PlatformConfiguration {
   return {
     app: {
@@ -74,6 +75,7 @@ export function platformConfiguration(): PlatformConfiguration {
   };
 }
 
+// * Parses a numeric environment variable and returns the fallback for missing or invalid values.
 function numberFromEnv(name: string, fallback: number): number {
   const value = process.env[name];
   if (!value) return fallback;
@@ -81,6 +83,7 @@ function numberFromEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+// * Converts common boolean environment values into a typed boolean configuration value.
 function booleanFromEnv(name: string, fallback: boolean): boolean {
   const value = process.env[name]?.toLowerCase();
   if (!value) return fallback;

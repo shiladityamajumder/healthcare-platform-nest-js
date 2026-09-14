@@ -1,6 +1,6 @@
-// * Linked with: @nestjs/common, @nestjs/config, pg.
-// * Used by: the application module or feature root during NestJS startup.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Provides database connectivity and transaction support for the application.
+// * Used by modules and application bootstrap code through the platform public API.
+// ! Keep business rules in module code; this layer supplies reusable technical capabilities.
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
@@ -13,7 +13,6 @@ import { MongoClient } from 'mongodb';
 import { MONGO_CLIENT } from './mongo/mongo.tokens';
 import { MongoDatabase } from './mongo/mongo.database';
 
-// * Register the feature components and their dependencies with NestJS.
 const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
 
 @Global()
@@ -23,6 +22,7 @@ const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
     {
       provide: MONGO_CLIENT,
       inject: [ConfigService],
+      // * Creates the optional MongoDB client after validating the required Mongo settings.
       useFactory: (config: ConfigService): MongoClient | null => {
         if (!isEnabled(config.get<string>('MONGO_ENABLED'))) return null;
 
@@ -46,6 +46,7 @@ const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
           {
             provide: POSTGRES_POOL,
             inject: [ConfigService],
+            // * Creates the PostgreSQL connection pool from the centralized platform configuration.
             useFactory: (config: ConfigService) => new Pool(postgresOptions(config)),
           },
           PostgresDatabase,
@@ -67,6 +68,7 @@ const databaseEnabled = process.env.DATABASE_ENABLED !== 'false';
 })
 export class DatabaseModule {}
 
+// * Interprets the supported environment representations for an optional platform dependency.
 function isEnabled(value: string | undefined): boolean {
   return value === 'true' || value === '1';
 }

@@ -1,8 +1,7 @@
-// * Linked with: database repositories, migrations, and transaction code.
-// * Used by: the package code that imports this component.
-// * Other linkup: Column names and types must remain aligned with the PostgreSQL migration definitions.
+// * Describes the raw PostgreSQL row shape for the catalog.dosage_forms table.
+// * Used by SQL repositories to type query results from the externally managed database.
+// ! Keep property names and types synchronized with the corresponding database table.
 /** Raw PostgreSQL row shape for `catalog.dosage_forms`. */
-// * Describe the database row shape consumed by repositories and transaction code.
 export interface CatalogDosageFormsRow {
   code: string; // VARCHAR(64)
   name: string; // VARCHAR(128)
