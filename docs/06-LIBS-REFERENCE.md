@@ -4,23 +4,23 @@ This catalog is the current navigation index for libs/. Most scaffolded feature 
 
 ## Business contexts and feature slices
 
-| Context         | Feature folders                                                                                                 |
-| --------------- | --------------------------------------------------------------------------------------------------------------- |
-| appointments    | availability, book-appointment, cancel-appointment, reschedule-appointment                                      |
-| audit           | get-audit-entry, search-audit-log                                                                               |
+| Context         | Feature folders                                                                                          |
+| --------------- | -------------------------------------------------------------------------------------------------------- |
+| appointments    | availability, book-appointment, cancel-appointment, reschedule-appointment                               |
+| audit           | get-audit-entry, search-audit-log                                                                        |
 | auth            | capabilities, registration, login, session-management, password-management, current-user, administration |
-| catalog         | brands, categories, create-product, get-product, list-products, update-product                                  |
-| file-management | complete-upload, delete-file, generate-download-url, get-file, initiate-upload                                  |
-| inventory       | adjust-stock, get-stock, release-reservation, reserve-stock, transfer-stock, warehouses                         |
-| notifications   | delivery-status, preferences, send-notification, templates                                                      |
-| orders          | cancel-order, create-order, get-order, list-orders, returns, update-status                                      |
-| organizations   | create-organization, facilities, get-organization, update-organization                                          |
-| patients        | addresses, consents, create-profile, get-profile, update-profile                                                |
-| payments        | capture-payment, create-payment, refund-payment, webhook                                                        |
-| practitioners   | create-profile, get-profile, licenses, update-profile                                                           |
-| prescriptions   | attach-document, create-prescription, get-prescription, review-prescription                                     |
-| pricing         | get-effective-price, price-books, set-price, tax-rules                                                          |
-| user-management | activate-user, create-user, get-user, list-users, roles, update-user                                            |
+| catalog         | brands, categories, create-product, get-product, list-products, update-product                           |
+| file-management | complete-upload, delete-file, generate-download-url, get-file, initiate-upload                           |
+| inventory       | adjust-stock, get-stock, release-reservation, reserve-stock, transfer-stock, warehouses                  |
+| notifications   | delivery-status, preferences, send-notification, templates                                               |
+| orders          | cancel-order, create-order, get-order, list-orders, returns, update-status                               |
+| organizations   | create-organization, facilities, get-organization, update-organization                                   |
+| patients        | addresses, consents, create-profile, get-profile, update-profile                                         |
+| payments        | capture-payment, create-payment, refund-payment, webhook                                                 |
+| practitioners   | create-profile, get-profile, licenses, update-profile                                                    |
+| prescriptions   | attach-document, create-prescription, get-prescription, review-prescription                              |
+| pricing         | get-effective-price, price-books, set-price, tax-rules                                                   |
+| user-management | activate-user, create-user, get-user, list-users, roles, update-user                                     |
 
 Every context also contains a root module, public API entry point, contract facade, and README. Most scaffolded feature folders contain the repeated command/handler pattern described in 05-LIBS-GUIDE.md. Auth instead keeps each feature's controller, schema, service, and feature-owned repository together, with cross-feature contracts under `src/contracts`, orchestration under `src/application/workflow`, and adapters under `src/infrastructure`.
 

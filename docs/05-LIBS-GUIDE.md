@@ -22,16 +22,16 @@ The root <context>.module.ts registers the context. public-api.ts is the only su
 
 Every feature folder is a vertical slice. The repeated file names are deliberate: learn one slice and you can navigate all of them.
 
-| File                              | Job                                              | Write here when                                       |
-| --------------------------------- | ------------------------------------------------ | ----------------------------------------------------- |
-| <feature>.module.ts               | Registers the controller, service/handler, and providers | You add a provider or feature-level import       |
-| <feature>.controller.ts           | Route, schema/DTO binding, HTTP status                  | You expose a use case through HTTP                 |
-| <feature>.schema.ts or DTO        | Validated input contract                                | The client can send new input                      |
-| <feature>.service.ts              | Coordinates feature business behavior                   | You add workflow decisions                         |
-| <feature>.repository.ts           | Owns feature persistence                                | The feature reads or writes its data               |
-| application/*.command.ts          | Input object for a scaffolded use case                  | A handler needs explicit structured input          |
-| application/*.handler.ts          | Coordinates a scaffolded use case                       | You add handler-based workflow decisions           |
-| feature tests                      | Focused behavior proof                                  | You change rules or collaboration expectations     |
+| File                       | Job                                                      | Write here when                                |
+| -------------------------- | -------------------------------------------------------- | ---------------------------------------------- |
+| <feature>.module.ts        | Registers the controller, service/handler, and providers | You add a provider or feature-level import     |
+| <feature>.controller.ts    | Route, schema/DTO binding, HTTP status                   | You expose a use case through HTTP             |
+| <feature>.schema.ts or DTO | Validated input contract                                 | The client can send new input                  |
+| <feature>.service.ts       | Coordinates feature business behavior                    | You add workflow decisions                     |
+| <feature>.repository.ts    | Owns feature persistence                                 | The feature reads or writes its data           |
+| application/*.command.ts   | Input object for a scaffolded use case                   | A handler needs explicit structured input      |
+| application/*.handler.ts   | Coordinates a scaffolded use case                        | You add handler-based workflow decisions       |
+| feature tests              | Focused behavior proof                                   | You change rules or collaboration expectations |
 
 Controllers do not contain SQL or complex business branching. Services and handlers do not know raw HTTP request objects. Schemas/DTOs do not double as database rows. This separation is the main reason the files are useful rather than redundant.
 

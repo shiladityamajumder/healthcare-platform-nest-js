@@ -9,16 +9,16 @@ The project is a modular monolith: one Node.js process and deployment, with sepa
 
 NestJS is TypeScript server-side application structure built on top of an HTTP adapter. Here the adapter is Fastify. NestJS gives the project modules, dependency injection, decorators, validation hooks, interceptors, exception filters, and testing helpers.
 
-| If you know                     | The closest idea here                                 | Where to look                                |
-| ------------------------------- | ----------------------------------------------------- | -------------------------------------------- |
-| Express/Fastify route handler   | Controller method                                     | libs/modules/.../features/*/*.controller.ts |
+| If you know                     | The closest idea here                                 | Where to look                               |
+| ------------------------------- | ----------------------------------------------------- | ------------------------------------------- |
+| Express/Fastify route handler   | Controller method                                     | libs/modules/.../features/_/_.controller.ts |
 | FastAPI router + Pydantic model | Controller + request schema                           | Auth `features/<feature>` folders           |
-| Django view + form/serializer   | Controller + schema/DTO                              | features/<feature>                           |
-| Spring controller/service       | Nest controller + application service                  | Auth `features/<feature>` folders           |
+| Django view + form/serializer   | Controller + schema/DTO                               | features/<feature>                          |
+| Spring controller/service       | Nest controller + application service                 | Auth `features/<feature>` folders           |
 | Rails controller/service object | Controller + service                                  | Auth `features/<feature>` folders           |
-| Dependency-injection container  | Nest module providers/imports/exports                 | *.module.ts                                  |
-| Middleware                      | Nest middleware, guards, interceptors, filters, pipes | libs/platform/http                           |
-| ORM model/entity                | Not used here; raw PostgreSQL row interfaces are used | libs/platform/database/src/schema            |
+| Dependency-injection container  | Nest module providers/imports/exports                 | *.module.ts                                 |
+| Middleware                      | Nest middleware, guards, interceptors, filters, pipes | libs/platform/http                          |
+| ORM model/entity                | Not used here; raw PostgreSQL row interfaces are used | libs/platform/database/src/schema           |
 
 ## Core NestJS concepts
 
