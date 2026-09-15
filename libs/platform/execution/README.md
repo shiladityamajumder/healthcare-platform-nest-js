@@ -1,8 +1,8 @@
 # Execution platform
 
-`ExecutionService` is the single application-operation boundary. It logs start, success, expected rejection, timeout, and unexpected failure events. By default it also opens a PostgreSQL transaction; any exception is rethrown after the transaction has been rolled back.
+`ExecutionService` is the single application-operation boundary. It automatically logs start, success, expected rejection, timeout, and unexpected failure events through the shared operation logger. By default it also opens a PostgreSQL transaction; any exception is rethrown after the transaction has been rolled back.
 
-HTTP controllers are wrapped automatically by `OperationExecutionInterceptor`. Therefore feature handlers can call repositories normally without local `try/catch` or logger boilerplate. Health and metadata endpoints use `@NonTransactional()` because they must work when PostgreSQL is unavailable.
+HTTP controllers are wrapped automatically by `OperationExecutionInterceptor`. Therefore feature handlers can call repositories normally without local `try/catch`, transaction, or logger boilerplate. Health and metadata endpoints use `@NonTransactional()` because they must work when PostgreSQL is unavailable.
 
 For non-HTTP workflows, use the same boundary explicitly:
 

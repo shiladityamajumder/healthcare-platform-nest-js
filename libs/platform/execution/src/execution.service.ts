@@ -4,7 +4,7 @@
 import { Injectable, Optional } from '@nestjs/common';
 import type { SqlExecutor } from '@platform/database';
 import { PostgresDatabase } from '@platform/database';
-import { AppLogger } from '@platform/logging';
+import { AppLogger, type OperationLogScope } from '@platform/logging';
 import { AppError, InfrastructureUnavailableError, OperationTimeoutError } from '@shared/errors';
 
 export interface ExecutionOptions {
@@ -20,7 +20,7 @@ export type Operation<T> = (executor: SqlExecutor | undefined) => Promise<T>;
 /** Owns operation logging, failure reporting, deadlines, and DB transactions. */
 @Injectable()
 export class ExecutionService {
-  // * Receives the optional database adapter and logger used by the execution boundary.
+  // * Receives the optional database adapter and shared logger used by the execution boundary.
   public constructor(
     @Optional() private readonly database: PostgresDatabase | null,
     private readonly logger: AppLogger,
@@ -33,12 +33,12 @@ export class ExecutionService {
     const layer = requireText(options.layer ?? 'application', 'layer');
     const timeoutMs = validateTimeout(options.timeoutMs);
     const startedAt = performance.now();
-    const metadata = { ...options.context, operation: operationName, layer };
-
-    this.logger.debugEvent('Operation started', {
-      ...metadata,
-      timeout_ms: timeoutMs,
-      transactional: options.transactional !== false,
+    const operationLog: OperationLogScope = this.logger.operation({
+      operation: operationName,
+      layer,
+      context: options.context,
+      timeoutMs,
+      transactional: options.transactional,
     });
 
     try {
@@ -50,8 +50,7 @@ export class ExecutionService {
           ? operation(this.database ?? undefined)
           : this.database!.transaction((client) => operation(client));
       const result = timeoutMs === undefined ? await work() : await withTimeout(work(), timeoutMs);
-      this.logger.debugEvent('Operation completed', {
-        ...metadata,
+      operationLog.completed({
         duration_ms: elapsedMilliseconds(startedAt),
       });
       return result;
@@ -60,8 +59,7 @@ export class ExecutionService {
         const timeoutError = new OperationTimeoutError(
           `Operation '${operationName}' exceeded its ${timeoutMs}ms deadline.`,
         );
-        this.logger.warnEvent('Operation timed out', {
-          ...metadata,
+        operationLog.timedOut({
           duration_ms: elapsedMilliseconds(startedAt),
           timeout_ms: timeoutMs,
         });
@@ -69,17 +67,14 @@ export class ExecutionService {
       }
 
       if (error instanceof AppError) {
-        this.logger.debugEvent('Operation rejected', {
-          ...metadata,
+        operationLog.rejected({
           duration_ms: elapsedMilliseconds(startedAt),
           error_code: error.code,
           exception_type: error.name,
         });
       } else {
-        this.logger.errorEvent(
-          'Operation failed',
+        operationLog.failed(
           {
-            ...metadata,
             duration_ms: elapsedMilliseconds(startedAt),
             exception_type: error instanceof Error ? error.name : 'UnknownError',
           },

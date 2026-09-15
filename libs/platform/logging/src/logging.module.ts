@@ -6,6 +6,21 @@ import { getRequestContext } from '../../http/src/context/request-context';
 export type LogMetadata = Readonly<Record<string, unknown>>;
 type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'verbose';
 
+export interface OperationLogOptions {
+  operation: string;
+  layer: string;
+  context?: LogMetadata;
+  timeoutMs?: number;
+  transactional?: boolean;
+}
+
+export interface OperationLogScope {
+  completed(metadata?: LogMetadata): void;
+  rejected(metadata?: LogMetadata): void;
+  timedOut(metadata?: LogMetadata): void;
+  failed(metadata: LogMetadata | undefined, error: unknown): void;
+}
+
 const PRIORITY: Record<LogLevel, number> = {
   fatal: 0,
   error: 1,
@@ -200,6 +215,37 @@ export class AppLogger extends Logger {
 
   public errorEvent(message: string, metadata: LogMetadata = {}, error?: unknown): void {
     this.write('error', message, metadata, error);
+  }
+
+  /**
+   * Creates the lifecycle logger for one operation.
+   *
+   * Callers only need to create a scope once; the scope owns the standard
+   * operation event names and keeps their metadata consistent.
+   */
+  public operation(options: OperationLogOptions): OperationLogScope {
+    const metadata = {
+      ...options.context,
+      operation: options.operation,
+      layer: options.layer,
+    };
+
+    this.debugEvent('Operation started', {
+      ...metadata,
+      timeout_ms: options.timeoutMs,
+      transactional: options.transactional !== false,
+    });
+
+    return {
+      completed: (eventMetadata = {}) =>
+        this.debugEvent('Operation completed', { ...metadata, ...eventMetadata }),
+      rejected: (eventMetadata = {}) =>
+        this.debugEvent('Operation rejected', { ...metadata, ...eventMetadata }),
+      timedOut: (eventMetadata = {}) =>
+        this.warnEvent('Operation timed out', { ...metadata, ...eventMetadata }),
+      failed: (eventMetadata = {}, error) =>
+        this.errorEvent('Operation failed', { ...metadata, ...eventMetadata }, error),
+    };
   }
 
   public flush(): void {
