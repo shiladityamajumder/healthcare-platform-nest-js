@@ -1,23 +1,22 @@
-# 📅 Appointments bounded context
+# Appointments bounded context
 
-Scheduling and appointment lifecycle coordination.
+<p><img src="https://img.shields.io/badge/Domain-Appointments-2563EB?logo=googlecalendar&logoColor=white" alt="Appointments bounded context" /></p>
 
-## Ownership
+Scheduling, availability, booking, and appointment lifecycle coordination.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/appointments`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Every current feature handler returns `not-implemented`; it does not expose live API behavior or persistence yet.
 
 ## Feature inventory
 
-- `availability`
-- `book-appointment`
-- `cancel-appointment`
-- `reschedule-appointment`
+- `availability` — availability rules and slot discovery
+- `book-appointment` — appointment booking
+- `cancel-appointment` — appointment cancellation
+- `reschedule-appointment` — appointment rescheduling
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains its module, controller, command, request/response DTOs, handler, and focused handler test. Implement domain rules, authorization, persistence, audit, concurrency/slot locking, and integration tests before composing this context into the API.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+The supported cross-context surface is `src/public-api.ts` through `@modules/appointments`. Keep feature internals and future scheduling persistence private. Use platform database/execution contracts and documented facades or events for collaboration; do not import another context's implementation paths.

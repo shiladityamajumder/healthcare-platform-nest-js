@@ -1,21 +1,20 @@
-# 🧾 Audit bounded context
+# Audit bounded context
 
-Immutable security and operational audit trail access.
+<p><img src="https://img.shields.io/badge/Domain-Audit-7C3AED?logo=logstash&logoColor=white" alt="Audit bounded context" /></p>
 
-## Ownership
+Immutable security and operational audit-trail access.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/audit`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Its handlers currently return `not-implemented`; no audit API or persistence workflow is live.
 
 ## Feature inventory
 
-- `get-audit-entry`
-- `search-audit-log`
+- `get-audit-entry` — retrieve one audit entry
+- `search-audit-log` — search and page through audit entries
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+The feature folders contain the intended module, controller, command, request/response DTOs, handler, and focused test shape. Before activation, implement immutable-write integration, actor/tenant context, authorization, filtering/pagination, retention behavior, redaction, and integration tests.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Consumers may use only `src/public-api.ts` through `@modules/audit`. Keep storage adapters and audit event details private. Audit records must not be treated as mutable business data, and sensitive values must remain redacted in both records and logs.

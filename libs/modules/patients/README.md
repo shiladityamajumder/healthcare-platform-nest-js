@@ -1,24 +1,23 @@
-# 🧑‍⚕️ Patients bounded context
+# Patients bounded context
+
+<p><img src="https://img.shields.io/badge/Domain-Patients-0F766E?logo=healthcare&logoColor=white" alt="Patients bounded context" /></p>
 
 Patient profiles, addresses, and consent records.
 
-## Ownership
+## Current status
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/patients`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Every current feature handler returns `not-implemented`; no patient route or persistence workflow is live.
 
 ## Feature inventory
 
-- `addresses`
-- `consents`
-- `create-profile`
-- `get-profile`
-- `update-profile`
+- `create-profile` — create a patient profile
+- `get-profile` — retrieve a patient profile
+- `update-profile` — update a patient profile
+- `addresses` — manage patient addresses
+- `consents` — manage consent records
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement privacy/tenant authorization, consent history, validation, audit, data retention, persistence, and integration tests before activation.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Use only `src/public-api.ts` through `@modules/patients` for cross-context imports. Keep patient data and persistence adapters private. Do not place protected health information in logs, errors, test fixtures, or shared-kernel types.

@@ -1,25 +1,24 @@
-# 👥 User management bounded context
+# User management bounded context
 
-User lifecycle, roles, and administrative access.
+<p><img src="https://img.shields.io/badge/Domain-User%20Management-334155?logo=linux&logoColor=white" alt="User management bounded context" /></p>
 
-## Ownership
+User lifecycle and administrative user access outside the authentication implementation.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/user-management`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. All current feature handlers return `not-implemented`; the live auth administration endpoints currently own identity/RBAC administration.
 
 ## Feature inventory
 
-- `activate-user`
-- `create-user`
-- `get-user`
-- `list-users`
-- `roles`
-- `update-user`
+- `create-user` — create a user
+- `get-user` — retrieve a user
+- `list-users` — list users
+- `update-user` — update a user
+- `activate-user` — activate a user
+- `roles` — manage user-management role workflows
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Resolve the ownership boundary with auth before activation, then implement authorization, tenant scope, audit, persistence, and integration tests.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Consumers may import only `src/public-api.ts` through `@modules/user-management`. Do not duplicate auth repositories or import `@modules/auth` internals. Cross-context identity operations must use the narrow auth facade once that contract has a real operation.

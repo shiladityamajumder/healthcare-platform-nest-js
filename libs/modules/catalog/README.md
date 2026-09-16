@@ -1,25 +1,24 @@
-# 🗂️ Catalog bounded context
+# Catalog bounded context
 
-Products and supporting product taxonomy.
+<p><img src="https://img.shields.io/badge/Domain-Catalog-0891B2?logo=databricks&logoColor=white" alt="Catalog bounded context" /></p>
 
-## Ownership
+Products, brands, categories, and supporting product taxonomy.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/catalog`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. All current handlers return `not-implemented`; the database schema interfaces exist in the platform library, but this context has no live repository workflow.
 
 ## Feature inventory
 
-- `brands`
-- `categories`
-- `create-product`
-- `get-product`
-- `list-products`
-- `update-product`
+- `brands` — brand management
+- `categories` — category management
+- `create-product` — product creation
+- `get-product` — product retrieval
+- `list-products` — product listing
+- `update-product` — product updates
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement product identifiers, taxonomy relationships, validation, authorization, persistence, search/list pagination, audit, and integration tests before activation.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Use only `src/public-api.ts` through `@modules/catalog` from outside the context. Keep product persistence and provider adapters private. Database row shapes under `@platform/database` describe the externally managed schema; they do not create or synchronize catalog tables.

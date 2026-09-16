@@ -1,25 +1,24 @@
-# 🛒 Orders bounded context
+# Orders bounded context
 
-Order lifecycle, status transitions, and returns.
+<p><img src="https://img.shields.io/badge/Domain-Orders-16A34A?logo=shopify&logoColor=white" alt="Orders bounded context" /></p>
 
-## Ownership
+Order creation, lifecycle/status transitions, cancellation, and returns.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/orders`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Every current feature handler returns `not-implemented`; no order route or persistence workflow is live.
 
 ## Feature inventory
 
-- `cancel-order`
-- `create-order`
-- `get-order`
-- `list-orders`
-- `returns`
-- `update-status`
+- `create-order` — create an order
+- `get-order` — retrieve an order
+- `list-orders` — list orders with pagination/filtering
+- `update-status` — transition order status
+- `cancel-order` — cancel an order
+- `returns` — manage returns
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement order invariants, pricing/inventory coordination, idempotency, status transition rules, authorization, payment/refund integration, audit, and integration tests before activation.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Use only `src/public-api.ts` through `@modules/orders` from outside the context. Keep order persistence and external provider adapters private. Cross-context calls must use a documented facade or integration event and must preserve the shared transaction policy.

@@ -1,24 +1,23 @@
-# 📁 File management bounded context
+# File management bounded context
 
-File lifecycle orchestration and controlled access URLs.
+<p><img src="https://img.shields.io/badge/Domain-File%20Management-475569?logo=files&logoColor=white" alt="File management bounded context" /></p>
 
-## Ownership
+File upload lifecycle, metadata, deletion, and controlled access URLs.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/file-management`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Its handlers return `not-implemented`; no storage provider, file scan, or file API is live.
 
 ## Feature inventory
 
-- `complete-upload`
-- `delete-file`
-- `generate-download-url`
-- `get-file`
-- `initiate-upload`
+- `initiate-upload` — create an upload session
+- `complete-upload` — finalize an upload
+- `get-file` — read file metadata
+- `generate-download-url` — issue a controlled download URL
+- `delete-file` — delete or tombstone a file
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+The feature folders contain the intended module, controller, command, request/response DTOs, handler, and focused test shape. Before activation, implement object-storage adapters, ownership/tenant authorization, content validation and scanning, expiry, audit logging, metadata persistence, and integration tests.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Consumers may import only `src/public-api.ts` through `@modules/file-management`. Keep storage credentials, provider clients, signed URL logic, and SQL private. Do not place file bytes or secrets in the shared kernel or application logs.

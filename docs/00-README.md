@@ -12,6 +12,8 @@ This directory is the maintained engineering handbook for the Healthcare Platfor
   <img src="https://img.shields.io/badge/Data-PostgreSQL-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL data platform" />
 </p>
 
+> **Implementation snapshot:** `AuthModule` is currently the only business context composed into the API. Its authentication, session, OTP, current-user, and RBAC administration flows are implemented; the other bounded contexts remain command/handler scaffolds until their handlers and persistence workflows are completed.
+
 ## Reading paths
 
 ### New to NestJS or this codebase

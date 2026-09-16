@@ -1,23 +1,24 @@
-# 🔔 Notifications bounded context
+# Notifications bounded context
 
-Notification delivery, preferences, templates, and delivery tracking.
+<p><img src="https://img.shields.io/badge/Domain-Notifications-DB2777?logo=maildotru&logoColor=white" alt="Notifications bounded context" /></p>
 
-## Ownership
+Notification requests, templates, user preferences, and delivery status.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/notifications`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. All current handlers return `not-implemented`; provider dispatch and notification persistence are not live.
 
 ## Feature inventory
 
-- `delivery-status`
-- `preferences`
-- `send-notification`
-- `templates`
+- `send-notification` — submit a notification for delivery
+- `templates` — manage notification templates
+- `preferences` — manage user channel preferences
+- `delivery-status` — inspect delivery state
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement provider adapters, retries, idempotency, template rendering, preference enforcement, delivery callbacks, redaction, audit, and integration tests before activation.
 
-## Boundary notes
+Auth currently builds provider-neutral OTP messages in its own application layer, but it does not dispatch them through this context yet.
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+## Boundary rules
+
+Consumers may import only `src/public-api.ts` through `@modules/notifications`. Keep provider credentials, message payloads, queues, and delivery persistence private. Never log OTPs, access tokens, or notification secrets.

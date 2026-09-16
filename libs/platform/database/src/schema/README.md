@@ -1,7 +1,9 @@
 # PostgreSQL row shapes
 
-This directory contains plain TypeScript interfaces describing rows returned by the externally managed PostgreSQL database. They are generated from the authoritative database definitions and are compile-time types only.
+<p><img src="https://img.shields.io/badge/Contract-Row%20Shapes-4169E1?logo=typescript&logoColor=white" alt="PostgreSQL row shape contracts" /></p>
 
-They do not create tables, alter the schema, run migrations, synchronize metadata, or perform validation at runtime. Use them as the generic type parameter for `PostgresDatabase.query()` in module-owned raw SQL repositories.
+This directory contains plain TypeScript interfaces for rows returned by the externally managed PostgreSQL database. The root export groups shapes by schema, including identity, organization, customer, catalog, clinical, appointment, diagnostics, pricing, commerce, payment, finance, insurance, membership, procurement, warehouse, fulfillment, logistics, notification, support, compliance, risk, platform, and search.
 
-PostgreSQL values are represented according to the `pg` driver defaults used by this project: `BIGINT` and `NUMERIC` are strings to avoid precision loss, `TIMESTAMP WITH TIME ZONE` is `Date`, `DATE` is an ISO date string, `JSONB` is `unknown`, and `BYTEA` is `Buffer`.
+Use these interfaces as the generic row type for `PostgresDatabase.query<Row>()`. Use the fixed `TABLES` constants for known schema-qualified table names; never interpolate user input into SQL identifiers or SQL text.
+
+These files are compile-time contracts only. They do not create tables, alter schemas, run migrations, synchronize metadata, validate runtime input, or replace request DTOs. Keep their property names and PostgreSQL representations synchronized with the authoritative database definitions. With the `pg` defaults used here, `BIGINT` and `NUMERIC` are strings, timestamps with time zone are `Date`, dates are ISO strings, `JSONB` is `unknown`, and `BYTEA` is `Buffer`.

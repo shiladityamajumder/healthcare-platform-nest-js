@@ -1,25 +1,24 @@
-# 📦 Inventory bounded context
+# Inventory bounded context
 
-Stock availability, reservations, transfers, and warehouses.
+<p><img src="https://img.shields.io/badge/Domain-Inventory-D97706?logo=box&logoColor=white" alt="Inventory bounded context" /></p>
 
-## Ownership
+Stock balances, reservations, transfers, adjustments, and warehouses.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/inventory`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Every feature handler returns `not-implemented`; no inventory route or persistence workflow is live.
 
 ## Feature inventory
 
-- `adjust-stock`
-- `get-stock`
-- `release-reservation`
-- `reserve-stock`
-- `transfer-stock`
-- `warehouses`
+- `warehouses` — warehouse management
+- `get-stock` — stock lookup
+- `reserve-stock` — reserve available stock
+- `release-reservation` — release a reservation
+- `adjust-stock` — record an adjustment
+- `transfer-stock` — transfer stock between locations
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement atomic stock-ledger behavior, reservation expiry, idempotency, concurrency locking, authorization, audit, and integration tests before activation.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Use only `src/public-api.ts` through `@modules/inventory` for cross-context imports. Keep stock SQL and warehouse provider details private. Inventory operations must use the shared execution/transaction boundary rather than opening local transactions.

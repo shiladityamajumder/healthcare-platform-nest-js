@@ -1,23 +1,22 @@
-# 🏢 Organizations bounded context
+# Organizations bounded context
 
-Organizations and facility structure.
+<p><img src="https://img.shields.io/badge/Domain-Organizations-4F46E5?logo=workplace&logoColor=white" alt="Organizations bounded context" /></p>
 
-## Ownership
+Organizations, facilities, and the structure used to scope healthcare operations.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/organizations`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Its handlers return `not-implemented`; no organization route or persistence workflow is live.
 
 ## Feature inventory
 
-- `create-organization`
-- `facilities`
-- `get-organization`
-- `update-organization`
+- `create-organization` — create an organization
+- `get-organization` — retrieve an organization
+- `update-organization` — update organization data
+- `facilities` — manage facilities within an organization
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement tenant boundaries, membership/ownership rules, validation, persistence, authorization, audit, and integration tests before activation.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Consumers may import only `src/public-api.ts` through `@modules/organizations`. Keep organization persistence and facility rules private. Request context provides the technical place for tenant/organization identifiers; business authorization belongs in this context.

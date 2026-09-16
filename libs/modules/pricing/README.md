@@ -1,23 +1,22 @@
-# 💰 Pricing bounded context
+# Pricing bounded context
 
-Price books, effective pricing, and tax rules.
+<p><img src="https://img.shields.io/badge/Domain-Pricing-9333EA?logo=moneygram&logoColor=white" alt="Pricing bounded context" /></p>
 
-## Ownership
+Price books, effective prices, promotions/tax inputs, and tax rules.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/pricing`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Its handlers return `not-implemented`; no pricing route or persistence workflow is live.
 
 ## Feature inventory
 
-- `get-effective-price`
-- `price-books`
-- `set-price`
-- `tax-rules`
+- `price-books` — manage price books
+- `set-price` — set product prices
+- `get-effective-price` — resolve an effective price
+- `tax-rules` — manage tax rules
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement effective-date and currency rules, deterministic tax behavior, authorization, caching strategy, audit, persistence, and integration tests before activation.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Use only `src/public-api.ts` through `@modules/pricing` for cross-context imports. Keep pricing SQL and provider adapters private. Pricing results consumed by orders must cross a documented facade or event contract.

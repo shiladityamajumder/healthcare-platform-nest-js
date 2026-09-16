@@ -1,23 +1,22 @@
-# 💊 Prescriptions bounded context
+# Prescriptions bounded context
 
-Prescription lifecycle, review, and document association.
+<p><img src="https://img.shields.io/badge/Domain-Prescriptions-B91C1C?logo=healthicons&logoColor=white" alt="Prescriptions bounded context" /></p>
 
-## Ownership
+Prescription creation, review, document association, and access control.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/prescriptions`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Current status
+
+This context is a command/handler-oriented scaffold and is not imported by the API composition root. Every current feature handler returns `not-implemented`; no prescription route or persistence workflow is live.
 
 ## Feature inventory
 
-- `attach-document`
-- `create-prescription`
-- `get-prescription`
-- `review-prescription`
+- `create-prescription` — create a prescription
+- `get-prescription` — retrieve a prescription
+- `review-prescription` — review or change prescription state
+- `attach-document` — associate a controlled document
 
-These directories describe the current scaffolded capability surface. A feature is not considered production-ready until its handler, persistence behavior, authorization, audit requirements, and relevant tests are implemented.
+Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement practitioner/patient authorization, clinical invariants, document access rules, audit, retention, persistence, and integration tests before activation.
 
-## Boundary notes
+## Boundary rules
 
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Consumers may import only `src/public-api.ts` through `@modules/prescriptions`. Keep protected health information, prescription documents, SQL, and storage adapters private. Coordinate file access through a documented file-management contract rather than importing its internals.

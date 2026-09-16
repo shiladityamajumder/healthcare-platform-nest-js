@@ -1,110 +1,98 @@
-# 🔐 Authentication bounded context
+# Authentication bounded context
 
-Identity entry points, credentials, sessions, and verification workflows.
+<p><img src="https://img.shields.io/badge/Status-Implemented-16A34A?logo=auth0&logoColor=white" alt="Authentication context implemented" /></p>
 
-## Ownership
+Identity registration, credentials, verification, sessions, JWTs, current-user access, and RBAC administration. This is the only business bounded context currently imported by `apps/api/src/app.module.ts`.
 
-This context owns its HTTP endpoints, application use cases, domain rules, persistence adapters, tests, and cross-module contract. Consumers outside the context may import only `@modules/auth`; implementation paths under `src/features`, `src/domain`, and `src/infrastructure` are private.
+## Implemented feature areas
 
-## Feature inventory
+- `capabilities` — auth capability flags and `/.well-known/jwks.json` metadata; explicitly non-transactional.
+- `registration` — email registration, phone OTP registration, email-verification request, and email verification.
+- `login` — password login, phone OTP request, and phone OTP verification.
+- `session-management` — refresh rotation, logout, logout-other-sessions, logout-all, list sessions, and revoke one session.
+- `password-management` — forgot-password OTP, reset verification, reset, authenticated password change, and password creation.
+- `current-user` — get/update `users/me` and read current-user authorization.
+- `administration` — user status/session administration, user-role assignments, roles, permissions, and role-permission replacement.
+- `identity` — internal identity normalization and persistence helpers used by registration and login; it is not a separate controller.
 
-- `capabilities`
-- `registration`
-- `login`
-- `session-management`
-- `password-management`
-- `current-user`
-- `administration`
+The controllers, services, repositories, SQL loader, token service, validation schemas, and focused workflow helpers in this context are implemented. The external PostgreSQL schema and identity/RBAC master data must exist before database-backed routes can succeed.
 
-Each active workflow is a Nest feature module with its controller and service under
-`src/features/<workflow>`. Auth infrastructure is registered once by
-`src/infrastructure/auth-infrastructure.module.ts`. Workflow services provide the HTTP-facing
-entry points, while repositories live beside the feature that owns the data.
+## HTTP surface
 
-Cross-feature orchestration lives under `src/application/workflow`, contracts live
-under `src/contracts`, and infrastructure adapters live under `src/infrastructure`.
+The global prefix is `/api` and URI versioning defaults to `v1`, so the normal base is `/api/v1`.
 
-The intended feature shape is deliberately flat:
+| Area                      | Routes                                                                                                                                                                                        |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Capabilities              | `GET /auth/capabilities`, `GET /auth/.well-known/jwks.json`                                                                                                                                   |
+| Registration              | `POST /auth/register/email`, `POST /auth/register/phone/request-otp`, `POST /auth/register/phone/verify-otp`, `POST /auth/email-verification/request`, `POST /auth/email-verification/verify` |
+| Login                     | `POST /auth/login/password`, `POST /auth/login/phone/request-otp`, `POST /auth/login/phone/verify-otp`                                                                                        |
+| Sessions                  | `POST /auth/token/refresh`, `POST /auth/logout`, `POST /auth/logout/others`, `POST /auth/logout/all`, `GET /auth/sessions`, `DELETE /auth/sessions/:sessionId`                                |
+| Current user              | `GET /users/me`, `PATCH /users/me`, `GET /auth/users/me/authorization`                                                                                                                        |
+| Password                  | `POST /auth/password/forgot`, `POST /auth/password/reset/verify-otp`, `POST /auth/password/reset`, `PUT /auth/password`, `POST /auth/password`                                                |
+| User administration       | `GET/PATCH/POST /admin/users...` for user lookup, status, logout-all, and role assignments                                                                                                    |
+| Role administration       | `GET/POST/PATCH/DELETE /admin/roles...`, including `PUT /admin/roles/:roleId/permissions`                                                                                                     |
+| Permission administration | `GET/POST/PATCH/DELETE /admin/permissions...`                                                                                                                                                 |
+
+See the generated Swagger document at `/api/docs` for request schemas, examples, status codes, bearer security, and the exact nested administration routes.
+
+## Internal structure
 
 ```text
-features/<workflow>/
-├── <workflow>.module.ts
-├── <workflow>.controller.ts
-├── <workflow>.service.ts
-├── <workflow>.schema.ts
-└── <workflow>.repository.ts   # when the feature owns persistence
+src/
+├── application/
+│   ├── notifications/       provider-neutral OTP message construction
+│   └── workflow/            cross-feature identity, OTP, token, and permission workflows
+├── contracts/               ports, context helpers, phone validation, Swagger decorators
+├── features/
+│   ├── administration/      protected RBAC and user administration
+│   ├── capabilities/        public capability/JWKS discovery
+│   ├── current-user/        authenticated self-service endpoints
+│   ├── identity/            identity validation and persistence helpers
+│   ├── login/               password and phone login
+│   ├── password-management/ password recovery and change
+│   ├── registration/        email/phone registration and verification
+│   └── session-management/  refresh and session lifecycle
+└── infrastructure/
+    ├── persistence/         parameterized SQL, SQL loader, and repository adapters
+    └── token/               JWT creation, verification, and hashing
 ```
 
-Identity and OTP persistence are in `features/registration`, session persistence
-is in `features/session-management`, and role/permission persistence is in
-`features/administration`. `src/infrastructure/persistence/auth.repository.ts`
-is only a small DI composition facade used by reusable workflow helpers; it
-contains no SQL.
-Repositories use parameterized SQL through the shared transaction-aware
-`PostgresDatabase`. No ORM, entities, schema
-synchronization, migration execution, or database table changes are used by this
-context.
+The public boundary is `src/public-api.ts`, which exports only `AuthModule` and the intentionally narrow `AuthFacade` contract. Consumers must use `@modules/auth`; they must not import feature services, repositories, token adapters, or SQL.
 
-SQL statements are kept in `src/infrastructure/persistence/sql/auth.sql` and
-loaded by the auth persistence adapter. Services contain no SQL and repositories
-bind request values separately from SQL text. Repository operations that need a
-read-after-write, such as user creation, user updates, RBAC replacement, and
-paginated user listing, use one SQL statement with CTEs or window functions.
-Argon2 password verification and application token generation remain outside SQL
-because they are application responsibilities; those flows may therefore need
-more than one database round trip.
+## Persistence and transaction behavior
 
-The initial port preserves the FastAPI endpoint paths and camel-case request/response fields. Authentication/session operations run inside the existing operation-execution transaction boundary, which supplies unified execution logging and rollback behavior. Public capability and JWKS discovery endpoints are explicitly marked non-transactional.
+Auth uses parameterized raw SQL through the shared `PostgresDatabase`; it does not use an ORM, entity metadata, schema synchronization, migrations, or DDL. SQL files are under `src/infrastructure/persistence/sql` and are loaded by the auth persistence adapter. The loader first checks for a compiled SQL asset and then falls back to the source-tree file; verify SQL asset packaging when producing a deployment artifact because the current Nest build reports that this asset pattern is not matched.
 
-## Request, logging, and transaction flow
+The global `OperationExecutionInterceptor` opens one PostgreSQL transaction for normal HTTP handlers. Auth repositories automatically reuse the active transaction client through `AsyncLocalStorage`. Identity creation, OTP consumption, password reset, RBAC changes, and session rotation therefore commit or roll back as one operation. Refresh-token rotation locks the current session row so concurrent reuse cannot rotate the same session twice.
 
-For the API application, auth requests pass through this platform flow:
+The capabilities and JWKS routes use `@NonTransactional()` so discovery remains available when PostgreSQL is unavailable. All other auth handlers are transactional by default.
+
+## Authentication and authorization behavior
+
+- Passwords are hashed with Argon2; password policy is controlled by `PASSWORD_MIN_LENGTH` and requires three of four character classes.
+- Access and refresh tokens are signed separately and include a server-side session identifier.
+- Refresh tokens are stored as hashes and rotated on use.
+- Protected routes validate both the bearer access token and its active server-side session.
+- Administration routes enforce explicit permissions such as `identity.users.read`, `identity.roles.manage`, and `identity.permissions.manage`.
+- Registration assigns `DEFAULT_ROLE_CODE` and requires that role to exist in the database.
+- OTPs are stored as hashes, expire, are single-use, track attempts, and enforce resend/attempt limits from environment configuration.
+- `OTP_DEV_EXPOSE_CODE=true` returns a development OTP in responses. Keep it false outside local development.
+
+`AuthNotificationMessageService` builds provider-neutral SMS/email payloads for login, registration, email verification, and password recovery. Provider dispatch is still a TODO: no SMS/email is sent and no notification row is written by the current auth implementation.
+
+## Request and response flow
 
 ```text
 RequestContextMiddleware
-  -> assigns request/correlation IDs and logs response completion
+  -> request/correlation/trace IDs and completion logging
 OperationExecutionInterceptor
-  -> logs operation start/failure/completion and opens one PostgreSQL transaction
-Auth controller -> feature service -> feature repository
-  -> every PostgresDatabase.query reuses the active transaction client
+  -> operation logging and one PostgreSQL transaction
+Auth controller
+  -> DTO validation -> feature service -> workflow/repository
+PostgresDatabase
+  -> active transaction client -> parameterized SQL
 ApiResponseInterceptor / ApiExceptionFilter
-  -> emits the unified success or error response structure
+  -> standard success or error envelope
 ```
 
-All auth routes are transactional by default. The only exceptions are the two
-read-only capabilities/JWKS routes, which use `@NonTransactional()`. Multi-step
-flows such as identity creation, OTP consumption, password reset, RBAC
-permission replacement, and session rotation therefore commit together or roll
-back together. Refresh rotation additionally locks the session row so concurrent
-use of one refresh token cannot succeed twice.
-
-The auth module itself does not inject a second logger or open nested
-transactions. It uses the platform middleware/interceptor/database layers so
-there is one request ID, one operation log, and one transaction boundary per
-HTTP operation.
-
-## Swagger
-
-Auth controllers use the reusable decorators in `src/contracts/swagger.ts`. Request schemas
-describe required/optional fields and examples; route decorators explain the use case and show
-the unified success envelope. Protected routes also expose the required bearer authorization
-header and security scheme in `/api/docs`. Session-creation flows document optional
-`X-Device-Id` and `X-Device-Type` headers. These decorators change documentation only; they do
-not change routes, authentication behavior, or database tables.
-
-## Notification messages
-
-`src/application/notifications/auth-notification-message.service.ts` builds the provider-neutral
-SMS/email payload for every OTP flow. It currently covers phone login, phone registration, email
-verification, and password recovery. It produces a template key, destination, expiry, plain-text
-content, and HTML content for email. `AuthWorkflowService.issueOtp()` stores the challenge first,
-then builds the message. The provider dispatch is intentionally left as a commented `TODO` until
-the notification service is implemented; no SMS or email is sent yet, and no notification tables
-are written.
-
-## Boundary notes
-
-- Keep business rules inside this context.
-- Expose only narrow, real contracts through `src/public-api.ts`.
-- Keep SQL repositories, query files, and provider adapters private.
-- Use integration events or a documented facade for cross-context collaboration.
+Use the shared Swagger decorators in `src/contracts/swagger.ts` when adding routes. Keep request schemas separate from database row shapes and preserve the public response envelope.
