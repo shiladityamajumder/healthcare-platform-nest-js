@@ -14,6 +14,7 @@ import { BaseModule } from './base/base.module';
 import { AuthModule } from '@modules/auth';
 import { CatalogModule } from '@modules/catalog';
 import { PricingModule } from '@modules/pricing';
+import { InventoryModule } from '@modules/inventory';
 
 // * Register the feature components and their dependencies with NestJS.
 @Module({
@@ -30,6 +31,7 @@ import { PricingModule } from '@modules/pricing';
     AuthModule,
     CatalogModule,
     PricingModule,
+    InventoryModule,
   ],
 })
 export class AppModule {}

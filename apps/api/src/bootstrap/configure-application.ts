@@ -9,6 +9,7 @@ import { HealthModule } from '../health/health.module';
 import { AuthModule } from '@modules/auth';
 import { CatalogModule } from '@modules/catalog';
 import { PricingModule } from '@modules/pricing';
+import { InventoryModule } from '@modules/inventory';
 
 // * Define the shared types or behavior used by the surrounding package.
 export function configureApplication(app: NestFastifyApplication): void {
@@ -56,9 +57,17 @@ export function configureApplication(app: NestFastifyApplication): void {
       .addTag('price-books', 'Effective-dated price-book operations.')
       .addTag('product-prices', 'Effective-dated product price operations.')
       .addTag('tax-rules', 'Effective-dated tax-rule operations.')
+      .addTag('inventory', 'Inventory, warehouse, transfer, and replenishment operations.')
       .build();
     const document = SwaggerModule.createDocument(app, config, {
-      include: [BaseModule, HealthModule, AuthModule, CatalogModule, PricingModule],
+      include: [
+        BaseModule,
+        HealthModule,
+        AuthModule,
+        CatalogModule,
+        PricingModule,
+        InventoryModule,
+      ],
       deepScanRoutes: true,
     });
     SwaggerModule.setup('docs', app, document, {

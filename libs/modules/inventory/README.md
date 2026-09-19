@@ -6,7 +6,7 @@ Stock balances, reservations, transfers, adjustments, and warehouses.
 
 ## Current status
 
-This context is a command/handler-oriented scaffold and is not imported by the API composition root. Every feature handler returns `not-implemented`; no inventory route or persistence workflow is live.
+The API composition root now mounts the inventory context and exposes the legacy inventory, transfer, warehouse, bin, and replenishment routes. The handlers remain a command/handler-oriented scaffold and return `not-implemented` until the inventory repositories and workflows are connected.
 
 ## Feature inventory
 

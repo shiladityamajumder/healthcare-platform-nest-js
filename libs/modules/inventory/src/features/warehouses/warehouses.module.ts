@@ -4,10 +4,11 @@
 import { Module } from '@nestjs/common';
 import { WarehousesController } from './warehouses.controller';
 import { WarehousesHandler } from './warehouses.handler';
+import { ReplenishmentRulesController } from './replenishment-rules.controller';
 
 // * Define the shared types or behavior used by the surrounding package.
 @Module({
-  controllers: [WarehousesController],
+  controllers: [WarehousesController, ReplenishmentRulesController],
   providers: [WarehousesHandler],
 })
 export class WarehousesModule {}

@@ -6,8 +6,18 @@ import { Injectable } from '@nestjs/common';
 // * Coordinate the use case while keeping transport and persistence concerns outside this class.
 @Injectable()
 export class WarehousesHandler {
-  async execute(_input: unknown): Promise<Record<string, unknown>> {
+  async execute(
+    operation: string,
+    input?: unknown,
+    actor?: string,
+  ): Promise<Record<string, unknown>> {
     // ! TODO: orchestrate domain rules through ports. No SQL/ORM code belongs here.
-    return { feature: 'warehouses', status: 'not-implemented' };
+    return {
+      feature: 'warehouses',
+      operation,
+      status: 'not-implemented',
+      received: input !== undefined,
+      actorProvided: Boolean(actor),
+    };
   }
 }
