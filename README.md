@@ -11,9 +11,9 @@
   <img src="https://img.shields.io/badge/Data-PostgreSQL-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
 </p>
 
-NestJS 12 modular monolith for a healthcare platform. The repository contains one Fastify API, a PostgreSQL-backed authentication context, reusable platform infrastructure, and scaffolded business contexts that are ready for vertical-slice implementation.
+NestJS 12 modular monolith for a healthcare platform. The repository contains one Fastify API, PostgreSQL-backed authentication, catalog, and pricing contexts, reusable platform infrastructure, and scaffolded business contexts that are ready for vertical-slice implementation.
 
-> **Current status:** `AuthModule` is the only business context composed into the running API. Its registration, login, OTP, session, password, current-user, and authorization-administration flows are implemented. The other bounded contexts expose module/public-api scaffolding, but their feature handlers currently return `not-implemented`; they are not production endpoints yet. This repository is not a compliance certification or a production-ready healthcare system by itself.
+> **Current status:** `AuthModule`, `CatalogModule`, and `PricingModule` are composed into the running API. Auth provides identity/session/RBAC workflows; Catalog and Pricing provide the product, reference-master, price-book, product-price, and tax-rule APIs. The remaining bounded contexts are scaffolds and are not production endpoints yet. This repository is not a compliance certification or a production-ready healthcare system by itself.
 
 ## At a glance
 
@@ -46,7 +46,7 @@ NestJS 12 modular monolith for a healthcare platform. The repository contains on
 - [Security](docs/15-SECURITY.md)
 - [Identity master-data seed](docs/17-IDENTITY-MASTER-DATA-SEED.md)
 
-The README in each bounded context is the local feature inventory. The auth README documents the implemented authentication contract; the other context READMEs document scaffold scope and limitations.
+The README in each bounded context is the local feature inventory. Auth, Catalog, and Pricing document implemented contracts; the remaining context READMEs document scaffold scope and limitations.
 
 ## Local development
 
@@ -123,9 +123,9 @@ Each business context has a root module and `src/public-api.ts`. Cross-context c
 
 The current contexts are `auth`, `user-management`, `organizations`, `patients`, `practitioners`, `file-management`, `catalog`, `pricing`, `inventory`, `orders`, `payments`, `notifications`, `prescriptions`, `appointments`, and `audit`.
 
-Auth is composed by `apps/api/src/app.module.ts` and uses flat feature folders with controllers, schemas, services, repositories, and shared workflow/notification helpers. Its SQL assets live under `libs/modules/auth/src/infrastructure/persistence/sql` and are copied into the build by `nest-cli.json`.
+Auth, Catalog, and Pricing are composed by `apps/api/src/app.module.ts`. Auth uses flat feature folders with controllers, schemas, services, repositories, and shared workflow/notification helpers. Catalog and Pricing use HTTP feature slices over application services, repository ports, and private PostgreSQL adapters.
 
-All other contexts currently use command/handler-oriented vertical slices. Their controllers, DTOs, commands, handlers, modules, tests, and facade contracts describe intended ownership, but the handlers are placeholders and the context modules are not imported by the API composition root.
+The remaining contexts currently use command/handler-oriented vertical slices. Their controllers, DTOs, commands, handlers, modules, tests, and facade contracts describe intended ownership, but the handlers are placeholders and the context modules are not imported by the API composition root.
 
 ## Configuration and persistence
 

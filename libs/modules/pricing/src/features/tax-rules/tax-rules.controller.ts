@@ -1,19 +1,65 @@
-// * Linked with: @nestjs/common, @nestjs/swagger, ./tax-rules.handler.
-// * Used by: API clients through the versioned HTTP route.
-// * Other linkup: The request flows from the controller to the application handler and back through the response DTO.
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { TaxRulesHandler } from './tax-rules.handler';
-import { TaxRulesRequestDto } from './tax-rules.request.dto';
+import { TaxRuleCreateDto, TaxRuleListQueryDto, TaxRuleUpdateDto } from './tax-rules.schema';
+import { auditActor } from '../../contracts/pricing-context';
+import { TaxRulesService } from './tax-rules.service';
 
-// * Expose the use case through a versioned HTTP endpoint and delegate business work.
-@ApiTags('pricing')
-@Controller({ path: 'pricing/tax-rules', version: '1' })
+@ApiTags('tax-rules')
+@Controller({ path: 'tax-rules', version: '1' })
 export class TaxRulesController {
-  constructor(private readonly handler: TaxRulesHandler) {}
+  constructor(private readonly service: TaxRulesService) {}
+
+  @Get()
+  list(@Query() query: TaxRuleListQueryDto) {
+    return this.service.listTaxRules(query);
+  }
 
   @Post()
-  execute(@Body() request: TaxRulesRequestDto) {
-    return this.handler.execute(request);
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() body: TaxRuleCreateDto, @Headers('x-user-id') user?: string) {
+    return this.service.createTaxRule(body, auditActor(user));
+  }
+
+  @Get(':taxRuleId')
+  get(
+    @Param('taxRuleId', new ParseUUIDPipe()) id: string,
+    @Query('includeDeleted') deleted?: string,
+  ) {
+    return this.service.getTaxRule(id, deleted === 'true');
+  }
+
+  @Patch(':taxRuleId')
+  update(
+    @Param('taxRuleId', new ParseUUIDPipe()) id: string,
+    @Body() body: TaxRuleUpdateDto,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.updateTaxRule(id, body, auditActor(user));
+  }
+
+  @Delete(':taxRuleId')
+  remove(@Param('taxRuleId', new ParseUUIDPipe()) id: string, @Headers('x-user-id') user?: string) {
+    return this.service.deactivateTaxRule(id, auditActor(user));
+  }
+
+  @Post(':taxRuleId/reactivate')
+  reactivate(
+    @Param('taxRuleId', new ParseUUIDPipe()) id: string,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.reactivateTaxRule(id, auditActor(user));
   }
 }

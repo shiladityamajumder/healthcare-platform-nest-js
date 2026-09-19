@@ -6,16 +6,15 @@ Price books, effective prices, promotions/tax inputs, and tax rules.
 
 ## Current status
 
-This context is a command/handler-oriented scaffold and is not imported by the API composition root. Its handlers return `not-implemented`; no pricing route or persistence workflow is live.
+This context is implemented and composed into the API. It uses validated transport DTOs, an application service behind a repository port, and parameterized PostgreSQL persistence against the externally managed `pricing` schema.
 
 ## Feature inventory
 
-- `price-books` — manage price books
-- `set-price` — set product prices
-- `get-effective-price` — resolve an effective price
-- `tax-rules` — manage tax rules
+- `price-books` — list, create, retrieve, version-check, deactivate, and reactivate effective-dated books
+- `product-prices` — list and create non-overlapping effective-dated product prices
+- `tax-rules` — list, create, retrieve, version-check, deactivate, and reactivate tax rules
 
-Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement effective-date and currency rules, deterministic tax behavior, authorization, caching strategy, audit, persistence, and integration tests before activation.
+The HTTP paths mirror the former product service under `/api/v1`: `/price-books`, `/product-prices`, and `/tax-rules`. Inventory, order, checkout, payment, promotion-redemption, and effective-price evaluation workflows are not part of this implementation.
 
 ## Boundary rules
 

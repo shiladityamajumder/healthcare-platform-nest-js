@@ -10,4 +10,9 @@ module.exports = {
   transform: {
     '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
   },
+  moduleNameMapper: {
+    '^@shared/(.*)$': '<rootDir>/libs/shared-kernel/src/$1',
+    '^@platform/(.*)$': '<rootDir>/libs/platform/$1/src/index',
+    '^@modules/(.*)$': '<rootDir>/libs/modules/$1/src/public-api',
+  },
 };

@@ -1,13 +1,14 @@
-// * Linked with: @nestjs/common, ./tax-rules.controller, ./tax-rules.handler.
-// * Used by: the package code that imports this component.
-// * Other linkup: The file participates in the package export and dependency-injection flow.
+// * Pricing module: Registers the tax-rules feature.
+// * File: src/features/tax-rules/tax-rules.module.ts
+// ? Keep this feature boundary focused on tax-rule transport and application behavior.
 import { Module } from '@nestjs/common';
+import { PricingInfrastructureModule } from '../../infrastructure/pricing-infrastructure.module';
 import { TaxRulesController } from './tax-rules.controller';
-import { TaxRulesHandler } from './tax-rules.handler';
+import { TaxRulesService } from './tax-rules.service';
 
-// * Define the shared types or behavior used by the surrounding package.
 @Module({
+  imports: [PricingInfrastructureModule],
   controllers: [TaxRulesController],
-  providers: [TaxRulesHandler],
+  providers: [TaxRulesService],
 })
 export class TaxRulesModule {}

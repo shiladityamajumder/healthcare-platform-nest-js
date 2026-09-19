@@ -24,7 +24,7 @@ NestJS is TypeScript server-side application structure built on top of an HTTP a
 
 Start with a module: it is the dependency container and registration boundary. A feature module registers its controller and application service/handler; AppModule assembles the currently live feature and platform modules.
 
-Controllers translate HTTP requests and responses. Schemas/DTOs describe validated input and public output; they are not database rows or domain objects. Injectable services or handlers coordinate business work through constructor-injected collaborators. Auth services are the current service-based implementation; the other contexts still use the scaffolded handler shape.
+Controllers translate HTTP requests and responses. Schemas/DTOs describe validated input and public output; they are not database rows or domain objects. Injectable services or handlers coordinate business work through constructor-injected collaborators. Auth, Catalog, and Pricing use application services and private repositories; the remaining contexts still use the scaffolded handler shape.
 
 Decorators beginning with @ are framework wiring: @Module declares a container, @Controller owns a route, @Get/@Post declare endpoints, and @Injectable marks a constructible provider.
 

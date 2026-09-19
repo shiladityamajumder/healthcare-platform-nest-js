@@ -1,19 +1,72 @@
-// * Linked with: @nestjs/common, @nestjs/swagger, ./price-books.handler.
-// * Used by: API clients through the versioned HTTP route.
-// * Other linkup: The request flows from the controller to the application handler and back through the response DTO.
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { PriceBooksHandler } from './price-books.handler';
-import { PriceBooksRequestDto } from './price-books.request.dto';
+import {
+  PriceBookCreateDto,
+  PriceBookListQueryDto,
+  PriceBookUpdateDto,
+} from './price-books.schema';
+import { auditActor } from '../../contracts/pricing-context';
+import { PriceBooksService } from './price-books.service';
 
-// * Expose the use case through a versioned HTTP endpoint and delegate business work.
-@ApiTags('pricing')
-@Controller({ path: 'pricing/price-books', version: '1' })
+@ApiTags('price-books')
+@Controller({ path: 'price-books', version: '1' })
 export class PriceBooksController {
-  constructor(private readonly handler: PriceBooksHandler) {}
+  constructor(private readonly service: PriceBooksService) {}
+
+  @Get()
+  list(@Query() query: PriceBookListQueryDto) {
+    return this.service.listPriceBooks(query);
+  }
 
   @Post()
-  execute(@Body() request: PriceBooksRequestDto) {
-    return this.handler.execute(request);
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() body: PriceBookCreateDto, @Headers('x-user-id') user?: string) {
+    return this.service.createPriceBook(body, auditActor(user));
+  }
+
+  @Get(':priceBookId')
+  get(
+    @Param('priceBookId', new ParseUUIDPipe()) id: string,
+    @Query('includeDeleted') deleted?: string,
+  ) {
+    return this.service.getPriceBook(id, deleted === 'true');
+  }
+
+  @Patch(':priceBookId')
+  update(
+    @Param('priceBookId', new ParseUUIDPipe()) id: string,
+    @Body() body: PriceBookUpdateDto,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.updatePriceBook(id, body, auditActor(user));
+  }
+
+  @Delete(':priceBookId')
+  remove(
+    @Param('priceBookId', new ParseUUIDPipe()) id: string,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.deactivatePriceBook(id, auditActor(user));
+  }
+
+  @Post(':priceBookId/reactivate')
+  reactivate(
+    @Param('priceBookId', new ParseUUIDPipe()) id: string,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.reactivatePriceBook(id, auditActor(user));
   }
 }

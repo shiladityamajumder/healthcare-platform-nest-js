@@ -53,7 +53,7 @@ that owns the data. Cross-feature contracts live under `auth/src/contracts`,
 shared orchestration under `auth/src/application/workflow`, and technical
 adapters under `auth/src/infrastructure`.
 
-The current repository contains an implemented auth context plus scaffolded slices across users, organizations, patients, practitioners, files, catalog, pricing, inventory, orders, payments, notifications, prescriptions, appointments, and audit. The feature directory is the source of truth for the current inventory.
+The current repository contains implemented auth, catalog, and pricing contexts plus scaffolded slices across users, organizations, patients, practitioners, files, inventory, orders, payments, notifications, prescriptions, appointments, and audit. The feature directory and each context README are the source of truth for the current inventory.
 
 ## Cross-module communication
 

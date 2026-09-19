@@ -12,6 +12,8 @@ import { CacheModule } from '@platform/cache';
 import { HealthModule } from './health/health.module';
 import { BaseModule } from './base/base.module';
 import { AuthModule } from '@modules/auth';
+import { CatalogModule } from '@modules/catalog';
+import { PricingModule } from '@modules/pricing';
 
 // * Register the feature components and their dependencies with NestJS.
 @Module({
@@ -26,6 +28,8 @@ import { AuthModule } from '@modules/auth';
     HealthModule,
     BaseModule,
     AuthModule,
+    CatalogModule,
+    PricingModule,
   ],
 })
 export class AppModule {}

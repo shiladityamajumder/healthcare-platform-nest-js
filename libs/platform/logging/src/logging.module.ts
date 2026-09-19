@@ -1,5 +1,5 @@
 // * Provides context-aware structured application logging for the application.
-import { Global, Injectable, Logger, Module } from '@nestjs/common';
+import { ConsoleLogger, Global, Injectable, Module } from '@nestjs/common';
 import { threadId } from 'node:worker_threads';
 import { getRequestContext } from '../../http/src/context/request-context';
 
@@ -164,7 +164,7 @@ export function sanitizeLogValue(
 
 /** Application logger with the same stable envelope as the Python service. */
 @Injectable()
-export class AppLogger extends Logger {
+export class AppLogger extends ConsoleLogger {
   private readonly configuredLevel = levelFromEnvironment();
   private readonly jsonMode =
     (process.env.LOG_JSON ?? '').toLowerCase() === 'true' ||

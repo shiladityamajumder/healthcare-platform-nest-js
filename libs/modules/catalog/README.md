@@ -6,18 +6,21 @@ Products, brands, categories, and supporting product taxonomy.
 
 ## Current status
 
-This context is a command/handler-oriented scaffold and is not imported by the API composition root. All current handlers return `not-implemented`; the database schema interfaces exist in the platform library, but this context has no live repository workflow.
+This context is implemented and composed into the API. It uses transport DTOs, an application service behind a repository port, and parameterized PostgreSQL persistence against the externally managed `catalog` schema.
 
 ## Feature inventory
 
-- `brands` — brand management
-- `categories` — category management
-- `create-product` — product creation
-- `get-product` — product retrieval
-- `list-products` — product listing
-- `update-product` — product updates
+- `products` — create, retrieve, search, list, update, replace details, bulk status, deactivate, and reactivate products
+- `brands` — list and lifecycle management
+- `manufacturers` — list and lifecycle management
+- `categories` — hierarchical list/tree and lifecycle management
+- `salts` — list and lifecycle management
+- `dosage-forms` — list and lifecycle management
+- `units` — list and lifecycle management
 
-Each feature contains the intended module, controller, command, request/response DTOs, handler, and focused test shape. Implement product identifiers, taxonomy relationships, validation, authorization, persistence, search/list pagination, audit, and integration tests before activation.
+The HTTP paths mirror the former product service under `/api/v1`: `/products`, `/brands`, `/manufacturers`, `/categories`, `/salts`, `/dosage-forms`, and `/units`. Product aggregates include variants, identifiers, salts, attributes, localized content, media, and regulatory data.
+
+Inventory-dependent filters and availability calculations are deliberately excluded. Product summaries therefore return `availableQuantity` as `"0"` until an inventory boundary is implemented. The module does not create or modify database schemas.
 
 ## Boundary rules
 

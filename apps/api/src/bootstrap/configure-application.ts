@@ -7,6 +7,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { BaseModule } from '../base/base.module';
 import { HealthModule } from '../health/health.module';
 import { AuthModule } from '@modules/auth';
+import { CatalogModule } from '@modules/catalog';
+import { PricingModule } from '@modules/pricing';
 
 // * Define the shared types or behavior used by the surrounding package.
 export function configureApplication(app: NestFastifyApplication): void {
@@ -44,9 +46,19 @@ export function configureApplication(app: NestFastifyApplication): void {
         'auth',
         'Registration, authentication, sessions, current-user data, and authorization administration.',
       )
+      .addTag('products', 'Medicine and healthcare product catalogue operations.')
+      .addTag('brands', 'Product brand reference data.')
+      .addTag('manufacturers', 'Product manufacturer reference data.')
+      .addTag('categories', 'Hierarchical product category reference data.')
+      .addTag('salts', 'Medicine salt and composition reference data.')
+      .addTag('dosage-forms', 'Medicine dosage-form reference data.')
+      .addTag('units', 'Units-of-measure reference data.')
+      .addTag('price-books', 'Effective-dated price-book operations.')
+      .addTag('product-prices', 'Effective-dated product price operations.')
+      .addTag('tax-rules', 'Effective-dated tax-rule operations.')
       .build();
     const document = SwaggerModule.createDocument(app, config, {
-      include: [BaseModule, HealthModule, AuthModule],
+      include: [BaseModule, HealthModule, AuthModule, CatalogModule, PricingModule],
       deepScanRoutes: true,
     });
     SwaggerModule.setup('docs', app, document, {
