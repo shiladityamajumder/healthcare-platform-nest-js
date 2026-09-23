@@ -8,10 +8,17 @@ import type {
   CategoryUpdateInput,
   CreateProductInput,
   ProductListQuery,
+  ProductRelationshipCreateInput,
+  ProductRelationshipUpdateInput,
   ProductSearchQuery,
   ReferenceListQuery,
   ReferenceResource,
   ReplaceProductDetailsInput,
+  SubstitutionGroupCreateInput,
+  SubstitutionGroupListQuery,
+  SubstitutionGroupProductCreateInput,
+  SubstitutionGroupProductUpdateInput,
+  SubstitutionGroupUpdateInput,
   UpdateProductInput,
 } from '../contracts/catalog.ports';
 import { CATALOG_REPOSITORY } from '../contracts/catalog.ports';
@@ -78,6 +85,11 @@ export class CatalogService {
     if (input.media.some((item) => item.variantId)) {
       throw new CatalogValidationError(
         'Variant-specific media must reference a persisted product variant.',
+      );
+    }
+    if (input.identifiers.some((item) => item.variantId)) {
+      throw new CatalogValidationError(
+        'Variant-specific identifiers must be added after the product variants are persisted.',
       );
     }
     if (await this.repository.productDuplicate(input.sku.toUpperCase(), productSlug)) {
@@ -174,6 +186,13 @@ export class CatalogService {
       this.validateReplacementCollections(input);
       validateRegulatory(input.regulatory);
       if (input.identifiers) {
+        for (const item of input.identifiers) {
+          if (item.variantId && !(await this.repository.variantMatches(item.variantId, id)))
+            throw new CatalogValidationError(
+              'An identifier variant does not belong to the product.',
+              { variantId: item.variantId },
+            );
+        }
         await this.validateIdentifiers(input.identifiers, id);
         await this.repository.replaceSimpleChildren(id, 'identifiers', input.identifiers, actor);
       }
@@ -267,6 +286,245 @@ export class CatalogService {
       }
       return { updatedCount: rows.length, productIds: input.productIds };
     });
+  }
+
+  async listProductRelationships(productId: string, relationshipType?: string) {
+    if (!(await this.repository.getProductRow(productId))) throw new ProductNotFoundError();
+    return {
+      data: { items: await this.repository.listProductRelationships(productId, relationshipType) },
+    };
+  }
+
+  async getProductRelationship(productId: string, relationshipId: string): Promise<CatalogRecord> {
+    const row = await this.repository.getProductRelationship(productId, relationshipId);
+    if (!row) throw new NotFoundError('The product relationship was not found.');
+    return camelizeCatalogRow(row);
+  }
+
+  async createProductRelationship(
+    productId: string,
+    input: ProductRelationshipCreateInput,
+    actor: string | null,
+  ): Promise<CatalogRecord> {
+    return this.repository.transaction(async () => {
+      await this.requireProduct(productId);
+      if (productId === input.targetProductId)
+        throw new CatalogValidationError('A product cannot relate to itself.');
+      await this.requireProduct(input.targetProductId);
+      if (
+        await this.repository.productRelationshipExists(
+          productId,
+          input.targetProductId,
+          input.relationshipType,
+        )
+      )
+        throw new CatalogConflictError(
+          'PRODUCT_RELATIONSHIP_ALREADY_EXISTS',
+          'This product relationship already exists.',
+        );
+      return camelizeCatalogRow(
+        await this.repository.createProductRelationship(productId, input, actor),
+      );
+    });
+  }
+
+  async updateProductRelationship(
+    productId: string,
+    relationshipId: string,
+    input: ProductRelationshipUpdateInput,
+    actor: string | null,
+  ): Promise<CatalogRecord> {
+    return this.repository.transaction(async () => {
+      const current = await this.repository.getProductRelationship(productId, relationshipId, true);
+      if (!current) throw new NotFoundError('The product relationship was not found.');
+      const values = definedValues(input as Input);
+      delete values.expectedRowVersion;
+      if (!Object.keys(values).length)
+        throw new CatalogValidationError('At least one field must be provided.');
+      if (input.targetProductId) {
+        if (input.targetProductId === productId)
+          throw new CatalogValidationError('A product cannot relate to itself.');
+        await this.requireProduct(input.targetProductId);
+      }
+      const targetProductId = input.targetProductId ?? String(current.target_product_id);
+      const relationshipType = input.relationshipType ?? String(current.relationship_type);
+      if (
+        await this.repository.productRelationshipExists(
+          productId,
+          targetProductId,
+          relationshipType,
+          relationshipId,
+        )
+      )
+        throw new CatalogConflictError(
+          'PRODUCT_RELATIONSHIP_ALREADY_EXISTS',
+          'This product relationship already exists.',
+        );
+      const row = await this.repository.updateProductRelationship(
+        productId,
+        relationshipId,
+        values,
+        actor,
+        input.expectedRowVersion,
+      );
+      if (!row)
+        throw new CatalogConflictError(
+          'PRODUCT_RELATIONSHIP_VERSION_CONFLICT',
+          'The product relationship changed after it was loaded.',
+        );
+      return camelizeCatalogRow(row);
+    });
+  }
+
+  async deleteProductRelationship(productId: string, relationshipId: string) {
+    if (!(await this.repository.deleteProductRelationship(productId, relationshipId)))
+      throw new NotFoundError('The product relationship was not found.');
+    return { message: 'The product relationship has been removed.' };
+  }
+
+  async listProductSubstitutionGroups(productId: string) {
+    await this.requireProduct(productId);
+    return { data: { items: await this.repository.listProductSubstitutionGroups(productId) } };
+  }
+
+  async listSubstitutionGroups(
+    query: SubstitutionGroupListQuery,
+  ): Promise<PageResult<CatalogRecord>> {
+    const result = await this.repository.listSubstitutionGroups(query);
+    return pageResult(result.rows, result.total, query.page, query.pageSize);
+  }
+
+  async getSubstitutionGroup(id: string, includeDeleted = false): Promise<CatalogRecord> {
+    const row = await this.repository.getSubstitutionGroup(id, includeDeleted);
+    if (!row) throw new NotFoundError('The substitution group was not found.');
+    return camelizeCatalogRow(row);
+  }
+
+  async createSubstitutionGroup(
+    input: SubstitutionGroupCreateInput,
+    actor: string | null,
+  ): Promise<CatalogRecord> {
+    if (input.dosageFormId)
+      await this.requireReference('dosageForms', input.dosageFormId, true, 'dosageFormId');
+    if (
+      await this.repository.substitutionGroupDuplicate(
+        input.saltSignature,
+        input.dosageFormId,
+        input.strengthSignature,
+      )
+    )
+      throw new CatalogConflictError(
+        'SUBSTITUTION_GROUP_ALREADY_EXISTS',
+        'A substitution group with the same signature already exists.',
+      );
+    return camelizeCatalogRow(await this.repository.createSubstitutionGroup(input, actor));
+  }
+
+  async updateSubstitutionGroup(
+    id: string,
+    input: SubstitutionGroupUpdateInput,
+    actor: string | null,
+  ): Promise<CatalogRecord> {
+    return this.repository.transaction(async () => {
+      const current = await this.repository.getSubstitutionGroup(id, false, true);
+      if (!current) throw new NotFoundError('The substitution group was not found.');
+      const values = definedValues(input as Input);
+      delete values.expectedRowVersion;
+      if (!Object.keys(values).length)
+        throw new CatalogValidationError('At least one field must be provided.');
+      if (input.dosageFormId)
+        await this.requireReference('dosageForms', input.dosageFormId, true, 'dosageFormId');
+      const saltSignature = input.saltSignature ?? String(current.salt_signature);
+      const dosageFormId = Object.prototype.hasOwnProperty.call(input, 'dosageFormId')
+        ? input.dosageFormId
+        : (current.dosage_form_id as string | null | undefined);
+      const strengthSignature = Object.prototype.hasOwnProperty.call(input, 'strengthSignature')
+        ? input.strengthSignature
+        : (current.strength_signature as string | null | undefined);
+      if (
+        await this.repository.substitutionGroupDuplicate(
+          saltSignature,
+          dosageFormId,
+          strengthSignature,
+          id,
+        )
+      )
+        throw new CatalogConflictError(
+          'SUBSTITUTION_GROUP_ALREADY_EXISTS',
+          'A substitution group with the same signature already exists.',
+        );
+      const row = await this.repository.updateSubstitutionGroup(
+        id,
+        values,
+        actor,
+        input.expectedRowVersion,
+      );
+      if (!row)
+        throw new CatalogConflictError(
+          'SUBSTITUTION_GROUP_VERSION_CONFLICT',
+          'The substitution group changed after it was loaded.',
+        );
+      return camelizeCatalogRow(row);
+    });
+  }
+
+  async deactivateSubstitutionGroup(id: string, actor: string | null) {
+    if (!(await this.repository.deactivateSubstitutionGroup(id, actor)))
+      throw new NotFoundError('The substitution group was not found.');
+    return { message: 'The substitution group has been deactivated.' };
+  }
+
+  async reactivateSubstitutionGroup(id: string, actor: string | null): Promise<CatalogRecord> {
+    const row = await this.repository.reactivateSubstitutionGroup(id, actor);
+    if (!row) throw new NotFoundError('The substitution group was not found.');
+    return camelizeCatalogRow(row);
+  }
+
+  async listSubstitutionGroupProducts(groupId: string) {
+    await this.requireSubstitutionGroup(groupId);
+    return { data: { items: await this.repository.listSubstitutionGroupProducts(groupId) } };
+  }
+
+  async addSubstitutionGroupProduct(
+    groupId: string,
+    input: SubstitutionGroupProductCreateInput,
+    actor: string | null,
+  ): Promise<CatalogRecord> {
+    return this.repository.transaction(async () => {
+      await this.requireSubstitutionGroup(groupId);
+      await this.requireProduct(input.productId);
+      if (await this.repository.substitutionGroupProductExists(groupId, input.productId))
+        throw new CatalogConflictError(
+          'SUBSTITUTION_GROUP_PRODUCT_ALREADY_EXISTS',
+          'The product is already a member of this substitution group.',
+        );
+      return camelizeCatalogRow(
+        await this.repository.addSubstitutionGroupProduct(groupId, input, actor),
+      );
+    });
+  }
+
+  async updateSubstitutionGroupProduct(
+    groupId: string,
+    productId: string,
+    input: SubstitutionGroupProductUpdateInput,
+    actor: string | null,
+  ): Promise<CatalogRecord> {
+    const row = await this.repository.updateSubstitutionGroupProduct(
+      groupId,
+      productId,
+      { priority: input.priority },
+      actor,
+      input.expectedRowVersion,
+    );
+    if (!row) throw new NotFoundError('The substitution group product membership was not found.');
+    return camelizeCatalogRow(row);
+  }
+
+  async removeSubstitutionGroupProduct(groupId: string, productId: string) {
+    if (!(await this.repository.removeSubstitutionGroupProduct(groupId, productId)))
+      throw new NotFoundError('The substitution group product membership was not found.');
+    return { message: 'The product has been removed from the substitution group.' };
   }
 
   async listReferences(
@@ -522,6 +780,15 @@ export class CatalogService {
       throw new CatalogValidationError('createdFrom cannot be after createdTo.');
     if (query.updatedFrom && query.updatedTo && query.updatedFrom > query.updatedTo)
       throw new CatalogValidationError('updatedFrom cannot be after updatedTo.');
+  }
+
+  private async requireProduct(id: string): Promise<void> {
+    if (!(await this.repository.getProductRow(id))) throw new ProductNotFoundError();
+  }
+
+  private async requireSubstitutionGroup(id: string): Promise<void> {
+    if (!(await this.repository.getSubstitutionGroup(id)))
+      throw new NotFoundError('The substitution group was not found.');
   }
 
   private validateProductCollections(
@@ -790,4 +1057,15 @@ function validateRegulatory(input: { maxOrderQuantity?: string } | null | undefi
   ) {
     throw new CatalogValidationError('maxOrderQuantity must be greater than zero.');
   }
+}
+
+function camelizeCatalogRow(row: Record<string, unknown>): CatalogRecord {
+  const mapped = Object.fromEntries(
+    Object.entries(row).map(([key, value]) => [
+      key.replace(/_([a-z])/g, (_match, letter: string) => letter.toUpperCase()),
+      value,
+    ]),
+  ) as CatalogRecord;
+  if (row.row_version !== undefined) mapped.rowVersion = Number(row.row_version);
+  return mapped;
 }

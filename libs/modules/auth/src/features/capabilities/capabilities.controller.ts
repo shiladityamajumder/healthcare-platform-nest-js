@@ -11,10 +11,16 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { NonTransactional } from '@platform/execution';
 import { CapabilitiesService } from './capabilities.service';
-import { ApiAuthOperation, ApiAuthResponse } from '../../contracts/swagger';
+import { ApiAuthErrors, ApiAuthOperation, ApiAuthResponse } from '../../contracts/swagger';
 
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
+@ApiAuthErrors({
+  notFound:
+    'Signing-key metadata is unavailable when the server is not configured with a public-key algorithm such as RS256.',
+  unavailable:
+    'The discovery dependency is temporarily unavailable. The frontend may use previously cached capability metadata where safe.',
+})
 export class CapabilitiesController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: CapabilitiesService) {}
@@ -33,7 +39,10 @@ export class CapabilitiesController {
     passwordPolicy: { minimumLength: 8, minimumCharacterClasses: 3 },
     supportedPlatforms: ['android', 'ios', 'web'],
   })
-  // * Function [capabilities]: Retrieves and returns the requested authentication data.
+  /**
+   * Lets a frontend determine which registration, login, verification, password, and platform
+   * capabilities are enabled before rendering auth screens.
+   */
   capabilities() {
     return this.service.capabilities();
   }
@@ -47,7 +56,10 @@ export class CapabilitiesController {
   @ApiAuthResponse('Signing-key metadata returned.', {
     keys: [{ kty: 'RSA', kid: 'auth-key-1', use: 'sig', alg: 'RS256' }],
   })
-  // * Function [jwks]: Retrieves and returns the requested authentication data.
+  /**
+   * Publishes public signing-key metadata for token verification by compatible clients. This is
+   * discovery metadata, not a login endpoint, and it does not require a bearer token.
+   */
   jwks() {
     return this.service.jwks();
   }

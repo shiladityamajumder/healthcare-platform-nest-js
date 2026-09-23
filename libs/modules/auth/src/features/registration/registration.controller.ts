@@ -19,6 +19,7 @@ import { PhoneSchema } from '../../contracts/phone.schema';
 import { RegistrationService } from './registration.service';
 import {
   ApiAuthBody,
+  ApiAuthErrors,
   ApiAuthOperation,
   ApiAuthResponse,
   ApiClientContextHeaders,
@@ -27,6 +28,14 @@ import {
 
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
+@ApiAuthErrors({
+  unauthorized:
+    'The identity, verification code, or verification challenge was not accepted. Request a new challenge when the code is expired or already used.',
+  conflict:
+    'An account already exists for the supplied email address or phone number, or the requested registration state cannot be created.',
+  unavailable:
+    'The authentication database or configured registration role is temporarily unavailable. Retry later using the request ID for support.',
+})
 export class RegistrationController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: RegistrationService) {}
@@ -59,7 +68,10 @@ export class RegistrationController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [registerEmail]: Creates or issues the requested authentication resource.
+  /**
+   * Creates an email-based customer account. The frontend should redirect the user to the
+   * email-verification flow when `verificationRequired` is true and must not expect tokens yet.
+   */
   registerEmail(@Body() body: EmailRegistrationSchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.registerEmail(body, headers);
   }
@@ -82,7 +94,10 @@ export class RegistrationController {
     201,
   )
   @ApiValidationError()
-  // * Function [requestPhoneOtp]: Creates or issues the requested authentication resource.
+  /**
+   * Starts phone ownership verification. Save `challengeId` and pass it with the OTP returned
+   * by the SMS provider to `register/phone/verify-otp`; do not call this as the final signup step.
+   */
   requestPhoneOtp(@Body() body: PhoneSchema) {
     return this.service.requestPhoneOtp(body);
   }
@@ -111,7 +126,10 @@ export class RegistrationController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [verifyPhone]: Validates the supplied authentication data and rejects unsafe input.
+  /**
+   * Completes phone signup after OTP verification and returns the first token pair for the user.
+   * The optional password allows the frontend to create a password-based login in the same flow.
+   */
   verifyPhone(@Body() body: PhoneRegistrationVerifySchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.verifyPhone(body, headers);
   }
@@ -134,7 +152,10 @@ export class RegistrationController {
     201,
   )
   @ApiValidationError()
-  // * Function [requestEmailVerification]: Creates or issues the requested authentication resource.
+  /**
+   * Starts or restarts email verification for an existing account. Use the returned challenge ID
+   * with the code delivered by email; this endpoint does not authenticate the user by itself.
+   */
   requestEmailVerification(@Body() body: EmailSchema) {
     return this.service.requestEmailVerification(body);
   }
@@ -163,7 +184,10 @@ export class RegistrationController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [verifyEmail]: Validates the supplied authentication data and rejects unsafe input.
+  /**
+   * Confirms email ownership and returns a token pair so the frontend can continue to the account
+   * experience without requiring a second login request.
+   */
   verifyEmail(@Body() body: EmailVerifySchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.verifyEmail(body, headers);
   }

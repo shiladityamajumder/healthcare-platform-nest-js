@@ -6,6 +6,7 @@ import {
   DosageFormsController,
   ManufacturersController,
   SaltsController,
+  SubstitutionGroupsController,
   UnitsController,
 } from './references.controller';
 import { ReferencesService } from './references.service';
@@ -19,6 +20,7 @@ import { ReferencesService } from './references.service';
     SaltsController,
     DosageFormsController,
     UnitsController,
+    SubstitutionGroupsController,
   ],
   providers: [ReferencesService],
 })

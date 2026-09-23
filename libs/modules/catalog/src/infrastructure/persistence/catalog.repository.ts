@@ -4,9 +4,13 @@ import { PostgresDatabase } from '@platform/database';
 import type {
   CreateProductInput,
   ProductListQuery,
+  ProductRelationshipCreateInput,
   ProductSearchQuery,
   ReferenceListQuery,
   ReferenceResource,
+  SubstitutionGroupCreateInput,
+  SubstitutionGroupListQuery,
+  SubstitutionGroupProductCreateInput,
 } from '../../contracts/catalog.ports';
 import type { CatalogRecord, ProductDetails } from '../../contracts/catalog.types';
 
@@ -98,12 +102,14 @@ const PRODUCT_SUMMARY = `
          p.brand_id, b.name AS brand_name,
          p.manufacturer_id, m.name AS manufacturer_name,
          p.category_id, c.name AS category_name,
+         p.dosage_form_id, df.name AS dosage_form_name,
          p.prescription_required, 0::numeric AS available_quantity,
          p.created_at, p.updated_at, p.row_version
     FROM catalog.products p
     LEFT JOIN catalog.brands b ON b.id = p.brand_id AND b.is_deleted = false
     LEFT JOIN catalog.manufacturers m ON m.id = p.manufacturer_id AND m.is_deleted = false
-    LEFT JOIN catalog.categories c ON c.id = p.category_id AND c.is_deleted = false`;
+    LEFT JOIN catalog.categories c ON c.id = p.category_id AND c.is_deleted = false
+    LEFT JOIN catalog.dosage_forms df ON df.id = p.dosage_form_id AND df.is_deleted = false`;
 
 @Injectable()
 export class CatalogRepository {
@@ -216,7 +222,7 @@ export class CatalogRepository {
           [id],
         ),
         this.database.query<Row>(
-          `SELECT id, identifier_type, identifier_value, is_primary
+          `SELECT id, variant_id, identifier_type, identifier_value, is_primary
            FROM catalog.product_identifiers WHERE product_id = $1
           ORDER BY is_primary DESC, created_at, id`,
           [id],
@@ -330,6 +336,346 @@ export class CatalogRepository {
     return Boolean(result.rowCount);
   }
 
+  async productRelationshipExists(
+    sourceProductId: string,
+    targetProductId: string,
+    relationshipType: string,
+    excludeId?: string,
+  ): Promise<boolean> {
+    const result = await this.database.query(
+      `SELECT 1 FROM catalog.product_relationships
+       WHERE source_product_id = $1 AND target_product_id = $2 AND relationship_type = $3
+         AND ($4::uuid IS NULL OR id <> $4) LIMIT 1`,
+      [sourceProductId, targetProductId, relationshipType, excludeId ?? null],
+    );
+    return Boolean(result.rowCount);
+  }
+
+  async listProductRelationships(productId: string, relationshipType?: string) {
+    const values: unknown[] = [productId];
+    const typeFilter = relationshipType ? 'AND pr.relationship_type = $2' : '';
+    if (relationshipType) values.push(relationshipType);
+    const result = await this.database.query<Row>(
+      `SELECT pr.id, pr.source_product_id, sp.sku AS source_sku, sp.name AS source_name,
+              pr.target_product_id, tp.sku AS target_sku, tp.name AS target_name,
+              pr.relationship_type, pr.priority, pr.metadata_json, pr.created_at,
+              pr.updated_at, pr.row_version
+         FROM catalog.product_relationships pr
+         JOIN catalog.products sp ON sp.id = pr.source_product_id AND sp.is_deleted = false
+         JOIN catalog.products tp ON tp.id = pr.target_product_id AND tp.is_deleted = false
+        WHERE pr.source_product_id = $1 ${typeFilter}
+        ORDER BY pr.priority, pr.created_at, pr.id`,
+      values,
+    );
+    return result.rows.map(toCamelRowWithVersion);
+  }
+
+  async getProductRelationship(
+    productId: string,
+    relationshipId: string,
+    forUpdate = false,
+  ): Promise<Row | null> {
+    const result = await this.database.query<Row>(
+      `SELECT * FROM catalog.product_relationships
+       WHERE id = $1 AND source_product_id = $2 ${forUpdate ? 'FOR UPDATE' : ''}`,
+      [relationshipId, productId],
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async createProductRelationship(
+    productId: string,
+    input: ProductRelationshipCreateInput,
+    actor: string | null,
+  ): Promise<Row> {
+    const result = await this.database.query<Row>(
+      `INSERT INTO catalog.product_relationships
+        (source_product_id, target_product_id, relationship_type, priority, metadata_json, created_by, updated_by)
+       VALUES ($1,$2,$3,$4,$5::jsonb,$6,$6) RETURNING *`,
+      [
+        productId,
+        input.targetProductId,
+        input.relationshipType,
+        input.priority,
+        JSON.stringify(input.metadataJson ?? {}),
+        actor,
+      ],
+    );
+    return result.rows[0];
+  }
+
+  async updateProductRelationship(
+    productId: string,
+    relationshipId: string,
+    values: Row,
+    actor: string | null,
+    expectedRowVersion?: number,
+  ): Promise<Row | null> {
+    const columns: Record<string, string> = {
+      targetProductId: 'target_product_id',
+      relationshipType: 'relationship_type',
+      priority: 'priority',
+      metadataJson: 'metadata_json',
+    };
+    const entries = Object.entries(values).filter(([key]) => columns[key]);
+    const params = entries.map(([key, value]) =>
+      key === 'metadataJson' ? JSON.stringify(value) : value,
+    );
+    const assignments = entries.map(
+      ([key], index) => `${columns[key]} = $${index + 1}${key === 'metadataJson' ? '::jsonb' : ''}`,
+    );
+    const actorIndex = params.length + 1;
+    params.push(actor);
+    const versionIndex = expectedRowVersion === undefined ? undefined : params.length + 1;
+    if (expectedRowVersion !== undefined) params.push(expectedRowVersion);
+    params.push(relationshipId, productId);
+    const relationshipIndex = params.length - 1;
+    const productIndex = params.length;
+    const result = await this.database.query<Row>(
+      `UPDATE catalog.product_relationships
+          SET ${assignments.join(', ')}, updated_by = $${actorIndex}, updated_at = now(), row_version = row_version + 1
+        WHERE id = $${relationshipIndex} AND source_product_id = $${productIndex}
+          ${versionIndex === undefined ? '' : `AND row_version = $${versionIndex}`}
+        RETURNING *`,
+      params,
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async deleteProductRelationship(productId: string, relationshipId: string): Promise<boolean> {
+    const result = await this.database.query(
+      `DELETE FROM catalog.product_relationships WHERE id = $1 AND source_product_id = $2`,
+      [relationshipId, productId],
+    );
+    return Boolean(result.rowCount);
+  }
+
+  async listSubstitutionGroups(query: SubstitutionGroupListQuery) {
+    const values: unknown[] = [];
+    const where = ['1 = 1'];
+    if (!query.includeDeleted) where.push('sg.is_deleted = false');
+    if (query.isActive !== undefined) {
+      values.push(query.isActive);
+      where.push(`sg.is_active = $${values.length}`);
+    }
+    if (query.dosageFormId) {
+      values.push(query.dosageFormId);
+      where.push(`sg.dosage_form_id = $${values.length}`);
+    }
+    if (query.search) {
+      values.push(`%${query.search.trim()}%`);
+      where.push(
+        `(sg.salt_signature ILIKE $${values.length} OR sg.strength_signature ILIKE $${values.length})`,
+      );
+    }
+    const totalValues = [...values];
+    const sortMap: Record<string, string> = {
+      name: 'sg.salt_signature',
+      createdAt: 'sg.created_at',
+      updatedAt: 'sg.updated_at',
+    };
+    values.push(query.pageSize, (query.page - 1) * query.pageSize);
+    const rows = await this.database.query<Row>(
+      `SELECT sg.*, df.name AS dosage_form_name
+         FROM catalog.substitution_groups sg
+         LEFT JOIN catalog.dosage_forms df ON df.id = sg.dosage_form_id AND df.is_deleted = false
+        WHERE ${where.join(' AND ')}
+        ORDER BY ${sortMap[query.sortBy] ?? 'sg.created_at'} ${query.sortOrder === 'asc' ? 'ASC' : 'DESC'}, sg.id
+        LIMIT $${values.length - 1} OFFSET $${values.length}`,
+      values,
+    );
+    const count = await this.database.query<{ total: string }>(
+      `SELECT COUNT(*)::text AS total FROM catalog.substitution_groups sg WHERE ${where.join(' AND ')}`,
+      totalValues,
+    );
+    return { rows: rows.rows.map(toCamelRowWithVersion), total: Number(count.rows[0]?.total ?? 0) };
+  }
+
+  async getSubstitutionGroup(
+    id: string,
+    includeDeleted = false,
+    forUpdate = false,
+  ): Promise<Row | null> {
+    const result = await this.database.query<Row>(
+      `SELECT sg.*, df.name AS dosage_form_name
+         FROM catalog.substitution_groups sg
+         LEFT JOIN catalog.dosage_forms df ON df.id = sg.dosage_form_id AND df.is_deleted = false
+        WHERE sg.id = $1 ${includeDeleted ? '' : 'AND sg.is_deleted = false'} ${forUpdate ? 'FOR UPDATE OF sg' : ''}`,
+      [id],
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async substitutionGroupDuplicate(
+    saltSignature: string,
+    dosageFormId?: string | null,
+    strengthSignature?: string | null,
+    excludeId?: string,
+  ): Promise<boolean> {
+    const result = await this.database.query(
+      `SELECT 1 FROM catalog.substitution_groups
+       WHERE is_deleted = false AND salt_signature = $1
+         AND dosage_form_id IS NOT DISTINCT FROM $2::uuid
+         AND strength_signature IS NOT DISTINCT FROM $3::text
+         AND ($4::uuid IS NULL OR id <> $4) LIMIT 1`,
+      [saltSignature, dosageFormId ?? null, strengthSignature ?? null, excludeId ?? null],
+    );
+    return Boolean(result.rowCount);
+  }
+
+  async createSubstitutionGroup(
+    input: SubstitutionGroupCreateInput,
+    actor: string | null,
+  ): Promise<Row> {
+    const result = await this.database.query<Row>(
+      `INSERT INTO catalog.substitution_groups
+        (salt_signature, dosage_form_id, strength_signature, is_active, created_by, updated_by)
+       VALUES ($1,$2,$3,$4,$5,$5) RETURNING *`,
+      [
+        input.saltSignature,
+        input.dosageFormId ?? null,
+        input.strengthSignature ?? null,
+        input.isActive,
+        actor,
+      ],
+    );
+    return result.rows[0];
+  }
+
+  async updateSubstitutionGroup(
+    id: string,
+    values: Row,
+    actor: string | null,
+    expectedRowVersion?: number,
+  ): Promise<Row | null> {
+    const columns: Record<string, string> = {
+      saltSignature: 'salt_signature',
+      dosageFormId: 'dosage_form_id',
+      strengthSignature: 'strength_signature',
+      isActive: 'is_active',
+    };
+    const entries = Object.entries(values).filter(([key]) => columns[key]);
+    const params = entries.map(([, value]) => value);
+    const assignments = entries.map(([key], index) => `${columns[key]} = $${index + 1}`);
+    const actorIndex = params.length + 1;
+    params.push(actor);
+    const versionIndex = expectedRowVersion === undefined ? undefined : params.length + 1;
+    if (expectedRowVersion !== undefined) params.push(expectedRowVersion);
+    const idIndex = params.length + 1;
+    params.push(id);
+    const result = await this.database.query<Row>(
+      `UPDATE catalog.substitution_groups
+          SET ${assignments.join(', ')}, updated_by = $${actorIndex}, updated_at = now(), row_version = row_version + 1
+        WHERE id = $${idIndex} AND is_deleted = false
+          ${versionIndex === undefined ? '' : `AND row_version = $${versionIndex}`}
+        RETURNING *`,
+      params,
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async deactivateSubstitutionGroup(id: string, actor: string | null): Promise<boolean> {
+    const result = await this.database.query(
+      `UPDATE catalog.substitution_groups
+          SET is_active = false, is_deleted = true, deleted_at = now(), deleted_by = $2,
+              updated_by = $2, updated_at = now(), row_version = row_version + 1
+        WHERE id = $1 AND is_deleted = false`,
+      [id, actor],
+    );
+    return Boolean(result.rowCount);
+  }
+
+  async reactivateSubstitutionGroup(id: string, actor: string | null): Promise<Row | null> {
+    const result = await this.database.query<Row>(
+      `UPDATE catalog.substitution_groups
+          SET is_active = true, is_deleted = false, deleted_at = NULL, deleted_by = NULL,
+              updated_by = $2, updated_at = now(), row_version = row_version + 1
+        WHERE id = $1 AND is_deleted = true RETURNING *`,
+      [id, actor],
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async listSubstitutionGroupProducts(groupId: string) {
+    const result = await this.database.query<Row>(
+      `SELECT sgp.id, sgp.group_id, sgp.product_id, p.sku, p.name, p.display_name,
+              p.product_type, p.status, p.prescription_required, sgp.priority,
+              sgp.created_at, sgp.updated_at, sgp.row_version
+         FROM catalog.substitution_group_products sgp
+         JOIN catalog.products p ON p.id = sgp.product_id AND p.is_deleted = false
+        WHERE sgp.group_id = $1 ORDER BY sgp.priority, sgp.created_at, sgp.id`,
+      [groupId],
+    );
+    return result.rows.map(toCamelRowWithVersion);
+  }
+
+  async listProductSubstitutionGroups(productId: string) {
+    const result = await this.database.query<Row>(
+      `SELECT sg.id, sg.salt_signature, sg.dosage_form_id, sg.strength_signature,
+              sg.is_active, sgp.priority AS product_priority, sg.created_at, sg.updated_at,
+              sg.row_version
+         FROM catalog.substitution_group_products sgp
+         JOIN catalog.substitution_groups sg ON sg.id = sgp.group_id AND sg.is_deleted = false
+        WHERE sgp.product_id = $1 ORDER BY sgp.priority, sg.created_at, sg.id`,
+      [productId],
+    );
+    return result.rows.map(toCamelRowWithVersion);
+  }
+
+  async substitutionGroupProductExists(groupId: string, productId: string): Promise<boolean> {
+    const result = await this.database.query(
+      `SELECT 1 FROM catalog.substitution_group_products WHERE group_id = $1 AND product_id = $2 LIMIT 1`,
+      [groupId, productId],
+    );
+    return Boolean(result.rowCount);
+  }
+
+  async addSubstitutionGroupProduct(
+    groupId: string,
+    input: SubstitutionGroupProductCreateInput,
+    actor: string | null,
+  ): Promise<Row> {
+    const result = await this.database.query<Row>(
+      `INSERT INTO catalog.substitution_group_products
+        (group_id, product_id, priority, created_by, updated_by)
+       VALUES ($1,$2,$3,$4,$4) RETURNING *`,
+      [groupId, input.productId, input.priority, actor],
+    );
+    return result.rows[0];
+  }
+
+  async updateSubstitutionGroupProduct(
+    groupId: string,
+    productId: string,
+    values: Row,
+    actor: string | null,
+    expectedRowVersion?: number,
+  ): Promise<Row | null> {
+    const params: unknown[] = [values.priority, actor];
+    let versionClause = '';
+    if (expectedRowVersion !== undefined) {
+      params.push(expectedRowVersion);
+      versionClause = ` AND row_version = $${params.length}`;
+    }
+    params.push(groupId, productId);
+    const result = await this.database.query<Row>(
+      `UPDATE catalog.substitution_group_products
+          SET priority = $1, updated_by = $2, updated_at = now(), row_version = row_version + 1
+        WHERE group_id = $${params.length - 1} AND product_id = $${params.length}${versionClause}
+        RETURNING *`,
+      params,
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async removeSubstitutionGroupProduct(groupId: string, productId: string): Promise<boolean> {
+    const result = await this.database.query(
+      `DELETE FROM catalog.substitution_group_products WHERE group_id = $1 AND product_id = $2`,
+      [groupId, productId],
+    );
+    return Boolean(result.rowCount);
+  }
+
   async createProduct(
     input: CreateProductInput,
     slug: string,
@@ -404,9 +750,16 @@ export class CatalogRepository {
     for (const item of items)
       await this.database.query(
         `INSERT INTO catalog.product_identifiers
-        (product_id, identifier_type, identifier_value, is_primary, created_by, updated_by)
-       VALUES ($1,$2,$3,$4,$5,$5)`,
-        [productId, item.identifierType, item.identifierValue, item.isPrimary ?? false, actor],
+        (product_id, variant_id, identifier_type, identifier_value, is_primary, created_by, updated_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$6)`,
+        [
+          productId,
+          item.variantId ?? null,
+          item.identifierType,
+          item.identifierValue,
+          item.isPrimary ?? false,
+          actor,
+        ],
       );
   }
 
@@ -864,6 +1217,13 @@ export class CatalogRepository {
     if (query.categoryId) add('p.category_id', query.categoryId);
     if (query.brandId) add('p.brand_id', query.brandId);
     if (query.manufacturerId) add('p.manufacturer_id', query.manufacturerId);
+    if (query.dosageFormId) add('p.dosage_form_id', query.dosageFormId);
+    if (query.saltId) {
+      values.push(query.saltId);
+      where.push(
+        `EXISTS (SELECT 1 FROM catalog.product_salts ps WHERE ps.product_id = p.id AND ps.salt_id = $${values.length})`,
+      );
+    }
     if (query.prescriptionRequired !== undefined)
       add('p.prescription_required', query.prescriptionRequired);
     if (query.createdFrom) {

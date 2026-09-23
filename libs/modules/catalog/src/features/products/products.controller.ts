@@ -18,6 +18,8 @@ import {
   BulkProductStatusDto,
   CreateProductDto,
   ProductListQueryDto,
+  ProductRelationshipCreateDto,
+  ProductRelationshipUpdateDto,
   ProductSearchQueryDto,
   ReplaceProductDetailsDto,
   UpdateProductDto,
@@ -54,6 +56,60 @@ export class ProductsController {
   @Patch('bulk-status')
   bulkStatus(@Body() input: BulkProductStatusDto, @Headers('x-user-id') userId?: string) {
     return this.service.bulkProductStatus(input, actorId(userId));
+  }
+
+  @Get(':productId/relationships')
+  relationships(
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+    @Query('relationshipType') relationshipType?: string,
+  ) {
+    return this.service.listProductRelationships(productId, relationshipType);
+  }
+
+  @Get(':productId/relationships/:relationshipId')
+  relationship(
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+    @Param('relationshipId', new ParseUUIDPipe()) relationshipId: string,
+  ) {
+    return this.service.getProductRelationship(productId, relationshipId);
+  }
+
+  @Post(':productId/relationships')
+  @HttpCode(HttpStatus.CREATED)
+  createRelationship(
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+    @Body() input: ProductRelationshipCreateDto,
+    @Headers('x-user-id') userId?: string,
+  ) {
+    return this.service.createProductRelationship(productId, input, actorId(userId));
+  }
+
+  @Patch(':productId/relationships/:relationshipId')
+  updateRelationship(
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+    @Param('relationshipId', new ParseUUIDPipe()) relationshipId: string,
+    @Body() input: ProductRelationshipUpdateDto,
+    @Headers('x-user-id') userId?: string,
+  ) {
+    return this.service.updateProductRelationship(
+      productId,
+      relationshipId,
+      input,
+      actorId(userId),
+    );
+  }
+
+  @Delete(':productId/relationships/:relationshipId')
+  deleteRelationship(
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+    @Param('relationshipId', new ParseUUIDPipe()) relationshipId: string,
+  ) {
+    return this.service.deleteProductRelationship(productId, relationshipId);
+  }
+
+  @Get(':productId/substitution-groups')
+  substitutionGroups(@Param('productId', new ParseUUIDPipe()) productId: string) {
+    return this.service.listProductSubstitutionGroups(productId);
   }
 
   @Get(':productId')

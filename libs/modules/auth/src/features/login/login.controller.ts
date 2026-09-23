@@ -14,6 +14,7 @@ import { PhoneSchema } from '../../contracts/phone.schema';
 import { LoginService } from './login.service';
 import {
   ApiAuthBody,
+  ApiAuthErrors,
   ApiAuthOperation,
   ApiAuthResponse,
   ApiClientContextHeaders,
@@ -22,6 +23,12 @@ import {
 
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
+@ApiAuthErrors({
+  unauthorized:
+    'The credentials, phone OTP, account status, or login challenge is invalid. Keep the user on the login screen and allow a new OTP request when appropriate.',
+  unavailable:
+    'The authentication database or OTP infrastructure is temporarily unavailable. Retry later and retain the request ID for support.',
+})
 export class LoginController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: LoginService) {}
@@ -49,7 +56,10 @@ export class LoginController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [loginPassword]: Handles the loginPassword operation for this authentication component.
+  /**
+   * Authenticates an existing customer or staff identity with a password and creates a session.
+   * Send either email or phone fields according to `channel`; do not send both as the login key.
+   */
   loginPassword(@Body() body: PasswordLoginSchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.loginPassword(body, headers);
   }
@@ -72,7 +82,10 @@ export class LoginController {
     201,
   )
   @ApiValidationError()
-  // * Function [requestPhoneOtp]: Creates or issues the requested authentication resource.
+  /**
+   * Starts passwordless phone login. Store `challengeId` on the client and submit it with the OTP
+   * to `login/phone/verify-otp`; the development OTP is not available in production.
+   */
   requestPhoneOtp(@Body() body: PhoneSchema) {
     return this.service.requestPhoneOtp(body);
   }
@@ -97,7 +110,10 @@ export class LoginController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [verifyPhone]: Validates the supplied authentication data and rejects unsafe input.
+  /**
+   * Verifies the phone login OTP and creates a session. On success, store the access token for API
+   * calls and the refresh token only in the platform's secure token storage.
+   */
   verifyPhone(@Body() body: PhoneLoginVerifySchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.verifyPhone(body, headers);
   }

@@ -50,6 +50,7 @@ import {
 @Controller({ path: 'admin/users', version: '1' })
 @ApiProtected()
 @ApiProtectedErrors()
+@ApiValidationError()
 export class AdminUsersController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: AdministrationService) {}
@@ -72,7 +73,10 @@ export class AdminUsersController {
     pagination: { totalCount: 1, limit: 20, offset: 0, hasNext: false },
   })
   @ApiValidationError()
-  // * Function [list]: Retrieves and returns the requested authentication data.
+  /**
+   * Lists users for staff administration. Use the query filters for the admin user-management
+   * screen; this endpoint returns authorization data and must not be used as a customer directory.
+   */
   async list(
     @Query() query: ListUsersQuerySchema,
     @Headers('authorization') authorization?: string,
@@ -98,7 +102,10 @@ export class AdminUsersController {
     roles: ['clinic_admin'],
     permissions: ['user.read'],
   })
-  // * Function [get]: Retrieves and returns the requested authentication data.
+  /**
+   * Loads one user with resolved roles and permissions for support, security, or administration
+   * screens. The `userId` must be the UUID returned by the list endpoint.
+   */
   async get(
     @Param('userId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Headers('authorization') authorization?: string,
@@ -117,7 +124,10 @@ export class AdminUsersController {
     status: 'suspended',
   })
   @ApiValidationError()
-  // * Function [status]: Handles the status operation for this authentication component.
+  /**
+   * Changes the lifecycle state of a user. Use `suspended`, `locked`, or `closed` for security
+   * actions and keep an auditable reason; non-active states normally revoke active sessions.
+   */
   async status(
     @Param('userId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() body: UpdateStatusSchema,
@@ -138,7 +148,10 @@ export class AdminUsersController {
     HttpStatus.CREATED,
   )
   @ApiValidationError()
-  // * Function [logoutAll]: Invalidates or removes the requested authentication state.
+  /**
+   * Revokes every active session for a target user without changing the user's lifecycle status.
+   * Use this for support-led security actions such as suspected credential compromise.
+   */
   async logoutAll(
     @Param('userId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() body: AdminLogoutSchema,
@@ -159,7 +172,10 @@ export class AdminUsersController {
       },
     ],
   })
-  // * Function [roles]: Retrieves and returns the requested authentication data.
+  /**
+   * Lists the role assignments for a user, including scope and active-state information needed by
+   * an admin role-management screen.
+   */
   async roles(
     @Param('userId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Headers('authorization') authorization?: string,
@@ -185,7 +201,10 @@ export class AdminUsersController {
     HttpStatus.CREATED,
   )
   @ApiValidationError()
-  // * Function [assignRole]: Creates or issues the requested authentication resource.
+  /**
+   * Assigns a role to a user. Supply scope fields together for scoped staff access, and use the
+   * optional validity window for temporary assignments.
+   */
   async assignRole(
     @Param('userId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() body: AssignUserRoleSchema,
@@ -206,7 +225,10 @@ export class AdminUsersController {
     isActive: false,
   })
   @ApiValidationError()
-  // * Function [updateRole]: Handles the updateRole operation for this authentication component.
+  /**
+   * Updates an existing user-role assignment's scope, validity, or active state. The assignment
+   * UUID comes from the user's role list, not from the role catalogue.
+   */
   async updateRole(
     @Param('userId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Param('userRoleId', new ParseUUIDPipe({ version: '4' })) assignmentId: string,
@@ -223,7 +245,10 @@ export class AdminUsersController {
   @ApiAuthUuidParam('userId', 'UUID of the target user.')
   @ApiAuthUuidParam('userRoleId', 'UUID of the role assignment.')
   @ApiAuthResponse('Role assignment removed.', { message: 'The role assignment has been removed.' })
-  // * Function [removeRole]: Invalidates or removes the requested authentication state.
+  /**
+   * Removes one role assignment from a user. Use this when access should be withdrawn rather than
+   * when the entire role definition should be deleted.
+   */
   async removeRole(
     @Param('userId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Param('userRoleId', new ParseUUIDPipe({ version: '4' })) assignmentId: string,
@@ -237,6 +262,7 @@ export class AdminUsersController {
 @Controller({ path: 'admin/roles', version: '1' })
 @ApiProtected()
 @ApiProtectedErrors()
+@ApiValidationError()
 export class AdminRolesController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: AdministrationService) {}
@@ -252,7 +278,7 @@ export class AdminRolesController {
       },
     ],
   })
-  // * Function [list]: Retrieves and returns the requested authentication data.
+  /** Returns the role catalogue used when assigning staff access. */
   async list(@Headers('authorization') authorization?: string) {
     return this.service.listRoles(authorization);
   }
@@ -270,7 +296,7 @@ export class AdminRolesController {
     HttpStatus.CREATED,
   )
   @ApiValidationError()
-  // * Function [create]: Creates or issues the requested authentication resource.
+  /** Creates a reusable role definition; permissions are assigned separately. */
   async create(@Body() body: CreateRoleSchema, @Headers('authorization') authorization?: string) {
     return this.service.createRole(body, authorization);
   }
@@ -282,7 +308,7 @@ export class AdminRolesController {
     code: 'clinic_admin',
     name: 'Clinic Administrator',
   })
-  // * Function [get]: Retrieves and returns the requested authentication data.
+  /** Returns one role definition so the admin UI can display its identity and description. */
   async get(
     @Param('roleId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Headers('authorization') authorization?: string,
@@ -299,7 +325,7 @@ export class AdminRolesController {
     name: 'Clinic Manager',
   })
   @ApiValidationError()
-  // * Function [update]: Updates the requested authentication state after validation.
+  /** Updates mutable role metadata; permission membership is managed by the permissions endpoint. */
   async update(
     @Param('roleId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() body: UpdateRoleSchema,
@@ -314,7 +340,7 @@ export class AdminRolesController {
   )
   @ApiAuthUuidParam('roleId', 'UUID of the role.')
   @ApiAuthResponse('Role deleted.', { message: 'The role has been deleted.' })
-  // * Function [remove]: Invalidates or removes the requested authentication state.
+  /** Deletes a role definition that is no longer part of the authorization model. */
   async remove(
     @Param('roleId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Headers('authorization') authorization?: string,
@@ -338,7 +364,7 @@ export class AdminRolesController {
       },
     ],
   })
-  // * Function [permissions]: Retrieves and returns the requested authentication data.
+  /** Returns the permission IDs and codes currently attached to a role. */
   async permissions(
     @Param('roleId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Headers('authorization') authorization?: string,
@@ -357,7 +383,7 @@ export class AdminRolesController {
     permissions: [{ id: '550e8400-e29b-41d4-a716-446655440000', code: 'user.read' }],
   })
   @ApiValidationError()
-  // * Function [replacePermissions]: Handles the replacePermissions operation for this authentication component.
+  /** Replaces the complete role permission set; send an empty array to remove all permissions. */
   async replacePermissions(
     @Param('roleId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() body: ReplaceRolePermissionsSchema,
@@ -371,6 +397,7 @@ export class AdminRolesController {
 @Controller({ path: 'admin/permissions', version: '1' })
 @ApiProtected()
 @ApiProtectedErrors()
+@ApiValidationError()
 export class AdminPermissionsController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: AdministrationService) {}
@@ -390,7 +417,7 @@ export class AdminPermissionsController {
       },
     ],
   })
-  // * Function [list]: Retrieves and returns the requested authentication data.
+  /** Returns the permission catalogue available for role assignment. */
   async list(@Headers('authorization') authorization?: string) {
     return this.service.listPermissions(authorization);
   }
@@ -412,7 +439,7 @@ export class AdminPermissionsController {
     HttpStatus.CREATED,
   )
   @ApiValidationError()
-  // * Function [create]: Creates or issues the requested authentication resource.
+  /** Creates a permission identified by a stable resource/action code pair. */
   async create(
     @Body() body: CreatePermissionSchema,
     @Headers('authorization') authorization?: string,
@@ -428,7 +455,7 @@ export class AdminPermissionsController {
     resource: 'user',
     action: 'read',
   })
-  // * Function [get]: Retrieves and returns the requested authentication data.
+  /** Returns one permission definition for admin editing or role-assignment screens. */
   async get(
     @Param('permissionId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Headers('authorization') authorization?: string,
@@ -446,7 +473,7 @@ export class AdminPermissionsController {
     action: 'update',
   })
   @ApiValidationError()
-  // * Function [update]: Updates the requested authentication state after validation.
+  /** Updates mutable permission metadata; changing codes can affect authorization checks. */
   async update(
     @Param('permissionId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() body: UpdatePermissionSchema,
@@ -458,7 +485,7 @@ export class AdminPermissionsController {
   @ApiAuthOperation('Delete a permission', 'Deletes a permission from the authorization system.')
   @ApiAuthUuidParam('permissionId', 'UUID of the permission.')
   @ApiAuthResponse('Permission deleted.', { message: 'The permission has been deleted.' })
-  // * Function [remove]: Invalidates or removes the requested authentication state.
+  /** Deletes a permission from the authorization catalogue. */
   async remove(
     @Param('permissionId', new ParseUUIDPipe({ version: '4' })) id: string,
     @Headers('authorization') authorization?: string,

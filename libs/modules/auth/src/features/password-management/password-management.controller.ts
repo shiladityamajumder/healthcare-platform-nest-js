@@ -19,6 +19,7 @@ import type { AuthRequestHeaders } from '../../contracts/auth-context';
 import { PasswordManagementService } from './password-management.service';
 import {
   ApiAuthBody,
+  ApiAuthErrors,
   ApiAuthOperation,
   ApiAuthResponse,
   ApiClientContextHeaders,
@@ -28,6 +29,14 @@ import {
 
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
+@ApiAuthErrors({
+  unauthorized:
+    'The account, password, OTP, reset token, or bearer token was not accepted. Do not reveal whether an account exists; guide the user to retry the recovery flow.',
+  conflict:
+    'The account already has a password, or the requested password operation conflicts with the current account state.',
+  unavailable:
+    'The authentication database or OTP infrastructure is temporarily unavailable. Retry later and retain the request ID for support.',
+})
 export class PasswordManagementController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: PasswordManagementService) {}
@@ -50,7 +59,10 @@ export class PasswordManagementController {
     201,
   )
   @ApiValidationError()
-  // * Function [forgot]: Handles the forgot operation for this authentication component.
+  /**
+   * Starts password recovery through email or SMS. Always show a neutral confirmation to the
+   * user because the API intentionally does not disclose whether the identity exists.
+   */
   forgot(@Body() body: ForgotPasswordSchema) {
     return this.service.forgot(body);
   }
@@ -67,7 +79,10 @@ export class PasswordManagementController {
     201,
   )
   @ApiValidationError()
-  // * Function [verifyReset]: Validates the supplied authentication data and rejects unsafe input.
+  /**
+   * Verifies the recovery OTP and returns a short-lived reset token. Keep this token transient and
+   * send it only to the password-reset endpoint; it is not an access token.
+   */
   verifyReset(@Body() body: ResetVerifySchema) {
     return this.service.verifyReset(body);
   }
@@ -92,7 +107,10 @@ export class PasswordManagementController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [reset]: Updates the requested authentication state after validation.
+  /**
+   * Replaces the password using the short-lived reset token, revokes previous sessions, and
+   * returns a new session. Replace any stored credentials and tokens with the returned pair.
+   */
   reset(@Body() body: ResetPasswordSchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.reset(body, headers);
   }
@@ -114,7 +132,10 @@ export class PasswordManagementController {
   })
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [change]: Updates the requested authentication state after validation.
+  /**
+   * Changes the password for an authenticated user. The current password is required and other
+   * sessions are revoked after success, so the frontend should refresh its stored token pair.
+   */
   change(
     @Body() body: ChangePasswordSchema,
     @Headers('authorization') authorization?: string,
@@ -144,7 +165,10 @@ export class PasswordManagementController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [set]: Creates or issues the requested authentication resource.
+  /**
+   * Sets the first password for an authenticated account that does not have one, such as an
+   * account created through phone OTP. It cannot overwrite an existing password.
+   */
   set(
     @Body() body: SetPasswordSchema,
     @Headers('authorization') authorization?: string,

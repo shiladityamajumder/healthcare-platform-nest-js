@@ -5,6 +5,8 @@ export {
   BulkProductStatusDto,
   CreateProductDto,
   ProductListQueryDto,
+  ProductRelationshipCreateDto,
+  ProductRelationshipUpdateDto,
   ProductSearchQueryDto,
   ReplaceProductDetailsDto,
   UpdateProductDto,

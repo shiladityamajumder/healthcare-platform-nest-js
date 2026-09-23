@@ -13,6 +13,8 @@ export interface ProductListQuery extends PageQuery {
   categoryId?: string;
   brandId?: string;
   manufacturerId?: string;
+  dosageFormId?: string;
+  saltId?: string;
   prescriptionRequired?: boolean;
   includeInactive: boolean;
   includeDeleted: boolean;
@@ -47,6 +49,7 @@ export interface ProductVariantInput {
   isDefault: boolean;
 }
 export interface ProductIdentifierInput {
+  variantId?: string;
   identifierType: string;
   identifierValue: string;
   isPrimary: boolean;
@@ -149,6 +152,44 @@ export interface BulkProductStatusInput {
   productIds: string[];
   status: ProductStatus;
 }
+
+export interface ProductRelationshipCreateInput {
+  targetProductId: string;
+  relationshipType: string;
+  priority: number;
+  metadataJson: Record<string, unknown> | unknown[];
+}
+export interface ProductRelationshipUpdateInput {
+  targetProductId?: string;
+  relationshipType?: string;
+  priority?: number;
+  metadataJson?: Record<string, unknown> | unknown[];
+  expectedRowVersion?: number;
+}
+export interface SubstitutionGroupListQuery extends ReferenceListQuery {
+  dosageFormId?: string;
+}
+export interface SubstitutionGroupCreateInput {
+  saltSignature: string;
+  dosageFormId?: string;
+  strengthSignature?: string;
+  isActive: boolean;
+}
+export interface SubstitutionGroupUpdateInput {
+  saltSignature?: string;
+  dosageFormId?: string | null;
+  strengthSignature?: string | null;
+  isActive?: boolean;
+  expectedRowVersion?: number;
+}
+export interface SubstitutionGroupProductCreateInput {
+  productId: string;
+  priority: number;
+}
+export interface SubstitutionGroupProductUpdateInput {
+  priority: number;
+  expectedRowVersion?: number;
+}
 export interface CategoryCreateInput {
   parentId?: string;
   name: string;
@@ -187,6 +228,73 @@ export interface CatalogRepositoryPort {
   identifierExists(type: string, value: string, excludeProductId?: string): Promise<boolean>;
   variantSkuExists(sku: string, excludeProductId?: string): Promise<boolean>;
   variantMatches(variantId: string, productId: string): Promise<boolean>;
+  productRelationshipExists(
+    sourceProductId: string,
+    targetProductId: string,
+    relationshipType: string,
+    excludeId?: string,
+  ): Promise<boolean>;
+  listProductRelationships(productId: string, relationshipType?: string): Promise<CatalogRecord[]>;
+  getProductRelationship(
+    productId: string,
+    relationshipId: string,
+    forUpdate?: boolean,
+  ): Promise<DatabaseRow | null>;
+  createProductRelationship(
+    productId: string,
+    input: ProductRelationshipCreateInput,
+    actor: string | null,
+  ): Promise<DatabaseRow>;
+  updateProductRelationship(
+    productId: string,
+    relationshipId: string,
+    values: DatabaseRow,
+    actor: string | null,
+    expectedRowVersion?: number,
+  ): Promise<DatabaseRow | null>;
+  deleteProductRelationship(productId: string, relationshipId: string): Promise<boolean>;
+  listSubstitutionGroups(
+    query: SubstitutionGroupListQuery,
+  ): Promise<{ rows: CatalogRecord[]; total: number }>;
+  getSubstitutionGroup(
+    id: string,
+    includeDeleted?: boolean,
+    forUpdate?: boolean,
+  ): Promise<DatabaseRow | null>;
+  substitutionGroupDuplicate(
+    saltSignature: string,
+    dosageFormId?: string | null,
+    strengthSignature?: string | null,
+    excludeId?: string,
+  ): Promise<boolean>;
+  createSubstitutionGroup(
+    input: SubstitutionGroupCreateInput,
+    actor: string | null,
+  ): Promise<DatabaseRow>;
+  updateSubstitutionGroup(
+    id: string,
+    values: DatabaseRow,
+    actor: string | null,
+    expectedRowVersion?: number,
+  ): Promise<DatabaseRow | null>;
+  deactivateSubstitutionGroup(id: string, actor: string | null): Promise<boolean>;
+  reactivateSubstitutionGroup(id: string, actor: string | null): Promise<DatabaseRow | null>;
+  listSubstitutionGroupProducts(groupId: string): Promise<CatalogRecord[]>;
+  listProductSubstitutionGroups(productId: string): Promise<CatalogRecord[]>;
+  substitutionGroupProductExists(groupId: string, productId: string): Promise<boolean>;
+  addSubstitutionGroupProduct(
+    groupId: string,
+    input: SubstitutionGroupProductCreateInput,
+    actor: string | null,
+  ): Promise<DatabaseRow>;
+  updateSubstitutionGroupProduct(
+    groupId: string,
+    productId: string,
+    values: DatabaseRow,
+    actor: string | null,
+    expectedRowVersion?: number,
+  ): Promise<DatabaseRow | null>;
+  removeSubstitutionGroupProduct(groupId: string, productId: string): Promise<boolean>;
   createProduct(input: CreateProductInput, slug: string, actor: string | null): Promise<string>;
   insertVariants(
     productId: string,

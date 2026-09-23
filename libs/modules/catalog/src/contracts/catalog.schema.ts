@@ -50,6 +50,10 @@ export class PageQueryDto {
 }
 
 export class ProductIdentifierInputDto {
+  @IsOptional()
+  @IsUUID()
+  variantId?: string;
+
   @IsString()
   @MinLength(1)
   @MaxLength(32)
@@ -438,6 +442,8 @@ export class ProductListQueryDto extends PageQueryDto {
   @IsOptional() @IsUUID() categoryId?: string;
   @IsOptional() @IsUUID() brandId?: string;
   @IsOptional() @IsUUID() manufacturerId?: string;
+  @IsOptional() @IsUUID() dosageFormId?: string;
+  @IsOptional() @IsUUID() saltId?: string;
   @IsOptional() @Transform(booleanValue) @IsBoolean() prescriptionRequired?: boolean;
   @IsOptional() @Transform(booleanValue) @IsBoolean() includeInactive = false;
   @IsOptional() @Transform(booleanValue) @IsBoolean() includeDeleted = false;
@@ -461,6 +467,90 @@ export class ReferenceListQueryDto extends PageQueryDto {
   @IsOptional() @Transform(booleanValue) @IsBoolean() includeDeleted = false;
   @IsOptional() @IsString() sortBy = 'name';
   @IsOptional() @IsIn(['asc', 'desc']) sortOrder: 'asc' | 'desc' = 'asc';
+}
+
+export class ProductRelationshipCreateDto {
+  @IsUUID()
+  targetProductId!: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(32)
+  relationshipType!: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  priority = 0;
+
+  @IsOptional()
+  @IsDefined()
+  metadataJson: Record<string, unknown> | unknown[] = {};
+}
+
+export class ProductRelationshipUpdateDto {
+  @IsOptional() @IsUUID() targetProductId?: string;
+  @IsOptional() @IsString() @MinLength(1) @MaxLength(32) relationshipType?: string;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(0) priority?: number;
+  @IsOptional() @IsDefined() metadataJson?: Record<string, unknown> | unknown[];
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) expectedRowVersion?: number;
+}
+
+export class SubstitutionGroupListQueryDto extends ReferenceListQueryDto {
+  @IsOptional() @IsUUID() dosageFormId?: string;
+}
+
+export class SubstitutionGroupCreateDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(512)
+  saltSignature!: string;
+
+  @IsOptional()
+  @IsUUID()
+  dosageFormId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  strengthSignature?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive = true;
+}
+
+export class SubstitutionGroupUpdateDto {
+  @IsOptional() @IsString() @MinLength(1) @MaxLength(512) saltSignature?: string;
+  @IsOptional() @IsUUID() dosageFormId?: string | null;
+  @IsOptional() @IsString() @MaxLength(255) strengthSignature?: string | null;
+  @IsOptional() @IsBoolean() isActive?: boolean;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) expectedRowVersion?: number;
+}
+
+export class SubstitutionGroupProductCreateDto {
+  @IsUUID()
+  productId!: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  priority = 0;
+}
+
+export class SubstitutionGroupProductUpdateDto {
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  priority!: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  expectedRowVersion?: number;
 }
 
 export class BrandCreateDto {

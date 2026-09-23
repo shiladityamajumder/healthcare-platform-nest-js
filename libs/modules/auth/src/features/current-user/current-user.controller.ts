@@ -12,6 +12,7 @@ import { UpdateCurrentUserSchema } from './current-user.schema';
 import { CurrentUserService } from './current-user.service';
 import {
   ApiAuthBody,
+  ApiAuthErrors,
   ApiAuthOperation,
   ApiAuthResponse,
   ApiProtected,
@@ -21,6 +22,10 @@ import {
 @ApiTags('auth')
 @Controller({ version: '1' })
 @ApiProtected()
+@ApiAuthErrors({
+  unauthorized:
+    'The bearer access token is missing, expired, revoked, or no longer represents an active user session.',
+})
 export class CurrentUserController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: CurrentUserService) {}
@@ -43,7 +48,10 @@ export class CurrentUserController {
     displayName: 'Aarav Sharma',
     profile: { firstName: 'Aarav', lastName: 'Sharma', preferredName: 'Aarav', avatar: null },
   })
-  // * Function [get]: Retrieves and returns the requested authentication data.
+  /**
+   * Loads the authenticated user's identity and profile summary. Use this after app startup or
+   * token refresh to hydrate the current-user state; sensitive credentials are never returned.
+   */
   get(@Headers('authorization') authorization?: string) {
     return this.service.get(authorization);
   }
@@ -63,7 +71,10 @@ export class CurrentUserController {
     displayName: 'Aarav Sharma',
   })
   @ApiValidationError()
-  // * Function [update]: Updates the requested authentication state after validation.
+  /**
+   * Updates only the editable identity preferences and profile names. Email, phone, verification,
+   * roles, and permissions are not changed through this endpoint.
+   */
   update(@Body() body: UpdateCurrentUserSchema, @Headers('authorization') authorization?: string) {
     return this.service.update(body, authorization);
   }
@@ -77,7 +88,10 @@ export class CurrentUserController {
     roles: ['clinic_admin'],
     permissions: ['user.read', 'user.update'],
   })
-  // * Function [authorization]: Retrieves and returns the requested authentication data.
+  /**
+   * Returns the roles and permissions currently resolved for the bearer token. Use this to decide
+   * whether staff-only frontend actions should be shown; the backend remains the final authority.
+   */
   authorization(@Headers('authorization') authorization?: string) {
     return this.service.authorization(authorization);
   }

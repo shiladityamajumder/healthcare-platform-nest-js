@@ -25,6 +25,11 @@ import {
   ReferenceListQueryDto,
   SaltCreateDto,
   SaltUpdateDto,
+  SubstitutionGroupCreateDto,
+  SubstitutionGroupListQueryDto,
+  SubstitutionGroupProductCreateDto,
+  SubstitutionGroupProductUpdateDto,
+  SubstitutionGroupUpdateDto,
   UnitCreateDto,
   UnitUpdateDto,
 } from './references.schema';
@@ -271,5 +276,88 @@ export class UnitsController {
     @Headers('x-user-id') user?: string,
   ) {
     return this.service.reactivateReference('units', id, actorId(user));
+  }
+}
+
+@ApiTags('substitution-groups')
+@Controller({ path: 'substitution-groups', version: '1' })
+export class SubstitutionGroupsController {
+  constructor(private readonly service: ReferencesService) {}
+
+  @Get()
+  list(@Query() query: SubstitutionGroupListQueryDto) {
+    return this.service.listSubstitutionGroups(query);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() body: SubstitutionGroupCreateDto, @Headers('x-user-id') user?: string) {
+    return this.service.createSubstitutionGroup(body, actorId(user));
+  }
+
+  @Get(':groupId/products')
+  products(@Param('groupId', new ParseUUIDPipe()) groupId: string) {
+    return this.service.listSubstitutionGroupProducts(groupId);
+  }
+
+  @Post(':groupId/products')
+  @HttpCode(HttpStatus.CREATED)
+  addProduct(
+    @Param('groupId', new ParseUUIDPipe()) groupId: string,
+    @Body() body: SubstitutionGroupProductCreateDto,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.addSubstitutionGroupProduct(groupId, body, actorId(user));
+  }
+
+  @Patch(':groupId/products/:productId')
+  updateProduct(
+    @Param('groupId', new ParseUUIDPipe()) groupId: string,
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+    @Body() body: SubstitutionGroupProductUpdateDto,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.updateSubstitutionGroupProduct(groupId, productId, body, actorId(user));
+  }
+
+  @Delete(':groupId/products/:productId')
+  removeProduct(
+    @Param('groupId', new ParseUUIDPipe()) groupId: string,
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+  ) {
+    return this.service.removeSubstitutionGroupProduct(groupId, productId);
+  }
+
+  @Get(':groupId')
+  get(
+    @Param('groupId', new ParseUUIDPipe()) groupId: string,
+    @Query('includeDeleted') deleted?: string,
+  ) {
+    return this.service.getSubstitutionGroup(groupId, deleted === 'true');
+  }
+
+  @Patch(':groupId')
+  update(
+    @Param('groupId', new ParseUUIDPipe()) groupId: string,
+    @Body() body: SubstitutionGroupUpdateDto,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.updateSubstitutionGroup(groupId, body, actorId(user));
+  }
+
+  @Delete(':groupId')
+  remove(
+    @Param('groupId', new ParseUUIDPipe()) groupId: string,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.deactivateSubstitutionGroup(groupId, actorId(user));
+  }
+
+  @Post(':groupId/reactivate')
+  reactivate(
+    @Param('groupId', new ParseUUIDPipe()) groupId: string,
+    @Headers('x-user-id') user?: string,
+  ) {
+    return this.service.reactivateSubstitutionGroup(groupId, actorId(user));
   }
 }

@@ -13,6 +13,11 @@ export {
   ReferenceListQueryDto,
   SaltCreateDto,
   SaltUpdateDto,
+  SubstitutionGroupCreateDto,
+  SubstitutionGroupListQueryDto,
+  SubstitutionGroupProductCreateDto,
+  SubstitutionGroupProductUpdateDto,
+  SubstitutionGroupUpdateDto,
   UnitCreateDto,
   UnitUpdateDto,
 } from '../../contracts/catalog.schema';

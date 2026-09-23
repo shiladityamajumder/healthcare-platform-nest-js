@@ -13,6 +13,7 @@ import type { AuthRequestHeaders } from '../../contracts/auth-context';
 import { SessionManagementService } from './session-management.service';
 import {
   ApiAuthBody,
+  ApiAuthErrors,
   ApiAuthOperation,
   ApiAuthResponse,
   ApiAuthUuidParam,
@@ -23,6 +24,13 @@ import {
 
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
+@ApiAuthErrors({
+  unauthorized:
+    'The access or refresh token is missing, expired, revoked, invalid, or already rotated. Clear the local session and send the user through login when refresh fails.',
+  notFound: 'The requested session does not exist or does not belong to the authenticated user.',
+  unavailable:
+    'The authentication database is temporarily unavailable. Retry later and retain the request ID for support.',
+})
 export class SessionManagementController {
   // * Function [constructor]: Initializes the component with its required dependencies.
   public constructor(private readonly service: SessionManagementService) {}
@@ -50,7 +58,10 @@ export class SessionManagementController {
   )
   @ApiValidationError()
   @ApiClientContextHeaders()
-  // * Function [refresh]: Handles the refresh operation for this authentication component.
+  /**
+   * Exchanges the current refresh token for a new token pair. Replace the stored refresh token
+   * atomically; the previous value must never be reused after a successful response.
+   */
   refresh(@Body() body: RefreshTokenSchema, @Headers() headers: AuthRequestHeaders) {
     return this.service.refresh(body, headers);
   }
@@ -63,7 +74,10 @@ export class SessionManagementController {
   @ApiAuthBody(RefreshTokenSchema, 'Refresh token of the session to revoke.')
   @ApiAuthResponse('Session logged out.', { message: 'The session has been logged out.' }, 201)
   @ApiValidationError()
-  // * Function [logout]: Invalidates or removes the requested authentication state.
+  /**
+   * Logs out the session represented by the supplied refresh token. Use this when the client can
+   * no longer send an access token but still has the refresh token for the current session.
+   */
   logout(@Body() body: RefreshTokenSchema) {
     return this.service.logout(body);
   }
@@ -79,7 +93,10 @@ export class SessionManagementController {
     { message: 'Other sessions have been logged out.' },
     201,
   )
-  // * Function [logoutOthers]: Invalidates or removes the requested authentication state.
+  /**
+   * Logs out every session except the current one. Use this for a user's “log out other devices”
+   * action; the current bearer token remains valid.
+   */
   logoutOthers(@Headers('authorization') authorization?: string) {
     return this.service.logoutOthers(authorization);
   }
@@ -95,7 +112,10 @@ export class SessionManagementController {
     { message: 'All sessions have been logged out.' },
     201,
   )
-  // * Function [logoutAll]: Invalidates or removes the requested authentication state.
+  /**
+   * Logs out every session for the authenticated user. Use this after a security concern or when
+   * the user explicitly chooses “log out everywhere”.
+   */
   logoutAll(@Headers('authorization') authorization?: string) {
     return this.service.logoutAll(authorization);
   }
@@ -121,7 +141,10 @@ export class SessionManagementController {
       },
     ],
   })
-  // * Function [list]: Retrieves and returns the requested authentication data.
+  /**
+   * Returns the user's active sessions so the frontend can show device activity and identify the
+   * current session using `current: true`.
+   */
   list(@Headers('authorization') authorization?: string) {
     return this.service.list(authorization);
   }
@@ -135,7 +158,10 @@ export class SessionManagementController {
   @ApiAuthUuidParam('sessionId', 'UUID of the session to revoke.')
   @ApiAuthResponse('Session revoked.', { message: 'The session has been revoked.' })
   @ApiValidationError()
-  // * Function [revoke]: Invalidates or removes the requested authentication state.
+  /**
+   * Revokes one selected session. Use the UUID from the session list; revoking the current session
+   * invalidates its bearer token and the client should return to the login screen.
+   */
   revoke(
     @Param('sessionId', new ParseUUIDPipe({ version: '4' })) sessionId: string,
     @Headers('authorization') authorization?: string,
