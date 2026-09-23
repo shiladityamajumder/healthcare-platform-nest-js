@@ -1,11 +1,17 @@
+// * Catalog module: Defines application-to-infrastructure ports and input contracts.
+// * File: src/contracts/catalog.ports.ts
+// ? Keep the application service independent from the PostgreSQL repository implementation.
+// ! Changes here must preserve the externally managed database contract.
 import type { ProductStatus, ProductType } from './catalog.rules';
 import type { CatalogRecord, ProductDetails } from './catalog.types';
 
+/** Shared pagination input consumed by catalog list operations. */
 export interface PageQuery {
   page: number;
   pageSize: number;
 }
 
+/** Product browsing filters accepted by list and search use cases. */
 export interface ProductListQuery extends PageQuery {
   search?: string;
   status?: ProductStatus;
@@ -26,11 +32,13 @@ export interface ProductListQuery extends PageQuery {
   sortOrder: 'asc' | 'desc';
 }
 
+/** Search-specific product query with exact-code matching support. */
 export interface ProductSearchQuery extends ProductListQuery {
   search: string;
   exactCodeMatch: boolean;
 }
 
+/** Reference-master browsing filters shared by brands and medical references. */
 export interface ReferenceListQuery extends PageQuery {
   search?: string;
   isActive?: boolean;
@@ -39,6 +47,7 @@ export interface ReferenceListQuery extends PageQuery {
   sortOrder: 'asc' | 'desc';
 }
 
+/** Application input for a product variant child record. */
 export interface ProductVariantInput {
   variantSku: string;
   name: string;
@@ -48,22 +57,26 @@ export interface ProductVariantInput {
   status: ProductStatus;
   isDefault: boolean;
 }
+/** Application input for a product identifier or barcode child record. */
 export interface ProductIdentifierInput {
   variantId?: string;
   identifierType: string;
   identifierValue: string;
   isPrimary: boolean;
 }
+/** Application input for a product salt composition child record. */
 export interface ProductSaltInput {
   saltId: string;
   strength?: string;
   sequence: number;
 }
+/** Application input for a structured product attribute child record. */
 export interface ProductAttributeInput {
   attributeKey: string;
   attributeValue: Record<string, unknown> | unknown[];
   isFilterable: boolean;
 }
+/** Application input for localized product content. */
 export interface ProductContentInput {
   locale: string;
   contentType: string;
@@ -71,6 +84,7 @@ export interface ProductContentInput {
   body: string;
   structuredContent: Record<string, unknown> | unknown[];
 }
+/** Application input for product media attachment metadata. */
 export interface ProductMediaInput {
   variantId?: string;
   mediaType: string;
@@ -79,6 +93,7 @@ export interface ProductMediaInput {
   displayOrder: number;
   isPrimary: boolean;
 }
+/** Application input for product regulatory data. */
 export interface ProductRegulatoryInput {
   drugLicenseCategory?: string;
   storageConditions?: string;
@@ -90,6 +105,7 @@ export interface ProductRegulatoryInput {
   regulatoryMetadata: Record<string, unknown> | unknown[];
 }
 
+/** Application input used to create the product aggregate. */
 export interface CreateProductInput {
   sku: string;
   name: string;
@@ -119,6 +135,7 @@ export interface CreateProductInput {
   regulatory?: ProductRegulatoryInput;
 }
 
+/** Partial application input for product master updates. */
 export interface UpdateProductInput {
   name?: string;
   displayName?: string | null;
@@ -139,6 +156,7 @@ export interface UpdateProductInput {
   searchKeywords?: string[];
   expectedRowVersion?: number;
 }
+/** Application input for replacing selected product child collections. */
 export interface ReplaceProductDetailsInput {
   variants?: ProductVariantInput[];
   identifiers?: ProductIdentifierInput[];
@@ -148,17 +166,20 @@ export interface ReplaceProductDetailsInput {
   media?: ProductMediaInput[];
   regulatory?: ProductRegulatoryInput | null;
 }
+/** Application input for bulk product lifecycle changes. */
 export interface BulkProductStatusInput {
   productIds: string[];
   status: ProductStatus;
 }
 
+/** Application input for creating a directed product relationship. */
 export interface ProductRelationshipCreateInput {
   targetProductId: string;
   relationshipType: string;
   priority: number;
   metadataJson: Record<string, unknown> | unknown[];
 }
+/** Partial application input for relationship updates. */
 export interface ProductRelationshipUpdateInput {
   targetProductId?: string;
   relationshipType?: string;
@@ -166,15 +187,18 @@ export interface ProductRelationshipUpdateInput {
   metadataJson?: Record<string, unknown> | unknown[];
   expectedRowVersion?: number;
 }
+/** Substitution-group list filters including dosage-form narrowing. */
 export interface SubstitutionGroupListQuery extends ReferenceListQuery {
   dosageFormId?: string;
 }
+/** Application input for creating a substitution-group signature. */
 export interface SubstitutionGroupCreateInput {
   saltSignature: string;
   dosageFormId?: string;
   strengthSignature?: string;
   isActive: boolean;
 }
+/** Partial application input for substitution-group updates. */
 export interface SubstitutionGroupUpdateInput {
   saltSignature?: string;
   dosageFormId?: string | null;
@@ -182,14 +206,17 @@ export interface SubstitutionGroupUpdateInput {
   isActive?: boolean;
   expectedRowVersion?: number;
 }
+/** Application input for adding a product to a substitution group. */
 export interface SubstitutionGroupProductCreateInput {
   productId: string;
   priority: number;
 }
+/** Application input for changing substitution membership priority. */
 export interface SubstitutionGroupProductUpdateInput {
   priority: number;
   expectedRowVersion?: number;
 }
+/** Application input for creating a category hierarchy node. */
 export interface CategoryCreateInput {
   parentId?: string;
   name: string;
@@ -198,6 +225,7 @@ export interface CategoryCreateInput {
   isActive: boolean;
   metadataJson: Record<string, unknown> | unknown[];
 }
+/** Partial application input for category hierarchy updates. */
 export interface CategoryUpdateInput {
   parentId?: string | null;
   name?: string;
@@ -207,10 +235,13 @@ export interface CategoryUpdateInput {
   metadataJson?: Record<string, unknown> | unknown[];
 }
 
+/** Fixed reference resource names accepted by the generic reference workflow. */
 export type ReferenceResource =
   'brands' | 'manufacturers' | 'categories' | 'salts' | 'dosage-forms' | 'units';
+/** Raw database-shaped record used at the repository boundary. */
 export type DatabaseRow = Record<string, unknown>;
 
+/** Persistence capabilities required by the catalog application service. */
 export interface CatalogRepositoryPort {
   transaction<T>(work: () => Promise<T>): Promise<T>;
   listProducts(

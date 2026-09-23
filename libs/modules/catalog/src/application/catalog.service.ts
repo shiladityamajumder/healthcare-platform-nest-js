@@ -1,3 +1,7 @@
+// * Catalog module: Coordinates product, reference, relationship, and substitution-group use cases.
+// * File: src/application/catalog.service.ts
+// ? Keep business validation and transaction orchestration in the application boundary.
+// ! Do not move HTTP concerns or raw SQL into this service.
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unnecessary-type-assertion */
 import { Inject, Injectable } from '@nestjs/common';
 import { ConflictError, NotFoundError } from '@shared/errors';
@@ -35,17 +39,20 @@ import {
 type Input = Record<string, any>;
 
 @Injectable()
+/** Application service for the catalog bounded context. */
 export class CatalogService {
   public constructor(
     @Inject(CATALOG_REPOSITORY) private readonly repository: CatalogRepositoryPort,
   ) {}
 
+  /** Lists catalogue summaries using validated pagination and discovery filters. */
   async listProducts(query: ProductListQuery): Promise<PageResult<CatalogRecord>> {
     this.validateRanges(query);
     const result = await this.repository.listProducts(query);
     return pageResult(result.rows, result.total, query.page, query.pageSize);
   }
 
+  /** Executes the catalogue search use case and enforces search-specific limits. */
   async searchProducts(query: ProductSearchQuery): Promise<PageResult<CatalogRecord>> {
     this.validateRanges(query);
     if (query.search.trim().length > 200) {
@@ -59,18 +66,21 @@ export class CatalogService {
     return pageResult(result.rows, result.total, query.page, query.pageSize);
   }
 
+  /** Loads the complete product aggregate for detail and administration screens. */
   async getProduct(id: string, includeDeleted = false): Promise<ProductDetails> {
     const product = await this.repository.getProductDetails(id, includeDeleted);
     if (!product) throw new ProductNotFoundError();
     return product;
   }
 
+  /** Resolves a product by its public SKU or slug. */
   async getProductByCode(value: string): Promise<ProductDetails> {
     const row = await this.repository.getProductByCode(value);
     if (!row) throw new ProductNotFoundError();
     return this.getProduct(String(row.id));
   }
 
+  /** Validates and creates a product master with its child collections atomically. */
   async createProduct(input: CreateProductInput, actor: string | null): Promise<ProductDetails> {
     const productSlug = slugify(input.slug || input.name) || slugify(input.sku);
     if (!productSlug)
@@ -114,6 +124,7 @@ export class CatalogService {
     });
   }
 
+  /** Updates product master data with optimistic row-version protection. */
   async updateProduct(
     id: string,
     input: UpdateProductInput,
@@ -172,6 +183,7 @@ export class CatalogService {
     });
   }
 
+  /** Replaces only the product detail collections supplied by the caller. */
   async replaceProductDetails(
     id: string,
     input: ReplaceProductDetailsInput,
@@ -244,11 +256,13 @@ export class CatalogService {
     });
   }
 
+  /** Soft-deletes a product from normal catalogue visibility. */
   async deactivateProduct(id: string, actor: string | null) {
     if (!(await this.repository.deactivateProduct(id, actor))) throw new ProductNotFoundError();
     return { message: 'The product has been deactivated.' };
   }
 
+  /** Restores a soft-deleted product after uniqueness checks. */
   async reactivateProduct(id: string, actor: string | null): Promise<ProductDetails> {
     return this.repository.transaction(async () => {
       const product = await this.repository.getProductRow(id, true, true);
@@ -266,6 +280,7 @@ export class CatalogService {
     });
   }
 
+  /** Applies a validated lifecycle transition to multiple products in one transaction. */
   async bulkProductStatus(input: BulkProductStatusInput, actor: string | null) {
     return this.repository.transaction(async () => {
       const rows = await this.repository.listProductRowsForUpdate(input.productIds);
@@ -288,6 +303,7 @@ export class CatalogService {
     });
   }
 
+  /** Lists configured directed product relationships for recommendations and merchandising. */
   async listProductRelationships(productId: string, relationshipType?: string) {
     if (!(await this.repository.getProductRow(productId))) throw new ProductNotFoundError();
     return {
@@ -295,12 +311,14 @@ export class CatalogService {
     };
   }
 
+  /** Loads one relationship belonging to the supplied source product. */
   async getProductRelationship(productId: string, relationshipId: string): Promise<CatalogRecord> {
     const row = await this.repository.getProductRelationship(productId, relationshipId);
     if (!row) throw new NotFoundError('The product relationship was not found.');
     return camelizeCatalogRow(row);
   }
 
+  /** Creates a relationship after validating both products and duplicate state. */
   async createProductRelationship(
     productId: string,
     input: ProductRelationshipCreateInput,
@@ -328,6 +346,7 @@ export class CatalogService {
     });
   }
 
+  /** Updates a relationship while protecting concurrent administration edits. */
   async updateProductRelationship(
     productId: string,
     relationshipId: string,
@@ -376,17 +395,20 @@ export class CatalogService {
     });
   }
 
+  /** Removes a directed product relationship. */
   async deleteProductRelationship(productId: string, relationshipId: string) {
     if (!(await this.repository.deleteProductRelationship(productId, relationshipId)))
       throw new NotFoundError('The product relationship was not found.');
     return { message: 'The product relationship has been removed.' };
   }
 
+  /** Resolves substitution groups containing a product for alternative selection. */
   async listProductSubstitutionGroups(productId: string) {
     await this.requireProduct(productId);
     return { data: { items: await this.repository.listProductSubstitutionGroups(productId) } };
   }
 
+  /** Lists substitution-group signatures for administration and matching workflows. */
   async listSubstitutionGroups(
     query: SubstitutionGroupListQuery,
   ): Promise<PageResult<CatalogRecord>> {
@@ -394,12 +416,14 @@ export class CatalogService {
     return pageResult(result.rows, result.total, query.page, query.pageSize);
   }
 
+  /** Loads one substitution-group signature. */
   async getSubstitutionGroup(id: string, includeDeleted = false): Promise<CatalogRecord> {
     const row = await this.repository.getSubstitutionGroup(id, includeDeleted);
     if (!row) throw new NotFoundError('The substitution group was not found.');
     return camelizeCatalogRow(row);
   }
 
+  /** Creates a unique substitution-group signature. */
   async createSubstitutionGroup(
     input: SubstitutionGroupCreateInput,
     actor: string | null,
@@ -420,6 +444,7 @@ export class CatalogService {
     return camelizeCatalogRow(await this.repository.createSubstitutionGroup(input, actor));
   }
 
+  /** Updates a substitution-group signature with duplicate and version checks. */
   async updateSubstitutionGroup(
     id: string,
     input: SubstitutionGroupUpdateInput,
@@ -468,23 +493,27 @@ export class CatalogService {
     });
   }
 
+  /** Soft-deactivates a substitution group. */
   async deactivateSubstitutionGroup(id: string, actor: string | null) {
     if (!(await this.repository.deactivateSubstitutionGroup(id, actor)))
       throw new NotFoundError('The substitution group was not found.');
     return { message: 'The substitution group has been deactivated.' };
   }
 
+  /** Restores a soft-deleted substitution group. */
   async reactivateSubstitutionGroup(id: string, actor: string | null): Promise<CatalogRecord> {
     const row = await this.repository.reactivateSubstitutionGroup(id, actor);
     if (!row) throw new NotFoundError('The substitution group was not found.');
     return camelizeCatalogRow(row);
   }
 
+  /** Lists the products and priorities assigned to a substitution group. */
   async listSubstitutionGroupProducts(groupId: string) {
     await this.requireSubstitutionGroup(groupId);
     return { data: { items: await this.repository.listSubstitutionGroupProducts(groupId) } };
   }
 
+  /** Adds a product membership after group, product, and duplicate checks. */
   async addSubstitutionGroupProduct(
     groupId: string,
     input: SubstitutionGroupProductCreateInput,
@@ -504,6 +533,7 @@ export class CatalogService {
     });
   }
 
+  /** Updates membership priority with optional row-version protection. */
   async updateSubstitutionGroupProduct(
     groupId: string,
     productId: string,
@@ -521,12 +551,14 @@ export class CatalogService {
     return camelizeCatalogRow(row);
   }
 
+  /** Removes a product membership from a substitution group. */
   async removeSubstitutionGroupProduct(groupId: string, productId: string) {
     if (!(await this.repository.removeSubstitutionGroupProduct(groupId, productId)))
       throw new NotFoundError('The substitution group product membership was not found.');
     return { message: 'The product has been removed from the substitution group.' };
   }
 
+  /** Lists one of the generic catalog reference-master resources. */
   async listReferences(
     resource: ReferenceResource,
     query: ReferenceListQuery,
@@ -535,6 +567,7 @@ export class CatalogService {
     return pageResult(result.rows, result.total, query.page, query.pageSize);
   }
 
+  /** Loads one generic reference-master record. */
   async getReference(
     resource: ReferenceResource,
     id: string,
@@ -545,6 +578,7 @@ export class CatalogService {
     return this.repository.mapReference(resource, row);
   }
 
+  /** Creates one generic reference-master record after application validation. */
   async createReference(
     resource: ReferenceResource,
     input: Input,
@@ -559,6 +593,7 @@ export class CatalogService {
     return this.repository.mapReference(resource, row);
   }
 
+  /** Updates one generic reference-master record. */
   async updateReference(
     resource: ReferenceResource,
     id: string,
@@ -582,6 +617,7 @@ export class CatalogService {
     });
   }
 
+  /** Soft-deactivates a generic reference-master record. */
   async deactivateReference(resource: ReferenceResource, id: string, actor: string | null) {
     if (resource === 'categories') return this.deactivateCategory(id, actor);
     if (!(await this.repository.deactivateReference(resource, id, actor)))
@@ -589,6 +625,7 @@ export class CatalogService {
     return { message: `The ${resourceName(resource)} has been deactivated.` };
   }
 
+  /** Restores a soft-deleted generic reference-master record. */
   async reactivateReference(
     resource: ReferenceResource,
     id: string,
@@ -603,6 +640,7 @@ export class CatalogService {
     return this.repository.mapReference(resource, row!);
   }
 
+  /** Builds nested category navigation from flat hierarchy rows. */
   async categoryTree(includeInactive = false): Promise<{ items: CatalogRecord[] }> {
     const rows = await this.repository.categoryTreeRows();
     const nodes = new Map<string, CatalogRecord & { children: CatalogRecord[] }>();

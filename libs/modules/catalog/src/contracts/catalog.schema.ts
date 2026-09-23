@@ -1,3 +1,7 @@
+// * Catalog module: Defines validated request DTOs for product and reference APIs.
+// * File: src/contracts/catalog.schema.ts
+// ? Keep transport validation explicit so frontend payload requirements are discoverable.
+// ! DTO validation does not replace application-level business and authorization rules.
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -34,6 +38,7 @@ const booleanValue = ({ value }: { value: unknown }): unknown => {
   return value;
 };
 
+// * DTO [PageQueryDto]: Validates shared pagination data crossing the HTTP boundary.
 export class PageQueryDto {
   @IsOptional()
   @Type(() => Number)
@@ -49,6 +54,7 @@ export class PageQueryDto {
   pageSize = 20;
 }
 
+// * DTO [ProductIdentifierInputDto]: Validates product barcode and identifier data.
 export class ProductIdentifierInputDto {
   @IsOptional()
   @IsUUID()
@@ -69,6 +75,7 @@ export class ProductIdentifierInputDto {
   isPrimary = false;
 }
 
+// * DTO [ProductSaltInputDto]: Validates active-ingredient composition data.
 export class ProductSaltInputDto {
   @IsUUID()
   saltId!: string;
@@ -86,6 +93,7 @@ export class ProductSaltInputDto {
   sequence = 1;
 }
 
+// * DTO [ProductAttributeInputDto]: Validates structured product attribute data.
 export class ProductAttributeInputDto {
   @IsString()
   @MinLength(1)
@@ -100,6 +108,7 @@ export class ProductAttributeInputDto {
   isFilterable = false;
 }
 
+// * DTO [ProductContentInputDto]: Validates localized product content data.
 export class ProductContentInputDto {
   @IsOptional()
   @IsString()
@@ -126,6 +135,7 @@ export class ProductContentInputDto {
   structuredContent: Record<string, unknown> | unknown[] = {};
 }
 
+// * DTO [ProductMediaInputDto]: Validates product media references and display metadata.
 export class ProductMediaInputDto {
   @IsOptional()
   @IsUUID()
@@ -155,6 +165,7 @@ export class ProductMediaInputDto {
   isPrimary = false;
 }
 
+// * DTO [ProductRegulatoryInputDto]: Validates medicine regulatory and storage data.
 export class ProductRegulatoryInputDto {
   @IsOptional()
   @IsString()
@@ -190,6 +201,7 @@ export class ProductRegulatoryInputDto {
   regulatoryMetadata: Record<string, unknown> | unknown[] = {};
 }
 
+// * DTO [ProductVariantInputDto]: Validates sellable product variant data.
 export class ProductVariantInputDto {
   @IsString()
   @MinLength(1)
@@ -222,6 +234,7 @@ export class ProductVariantInputDto {
   isDefault = false;
 }
 
+// * DTO [CreateProductDto]: Validates a product master and optional child collections.
 export class CreateProductDto {
   @IsString()
   @MinLength(1)
@@ -359,6 +372,7 @@ export class CreateProductDto {
   regulatory?: ProductRegulatoryInputDto;
 }
 
+// * DTO [UpdateProductDto]: Validates partial product master updates.
 export class UpdateProductDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(255) name?: string;
   @IsOptional() @IsString() @MaxLength(255) displayName?: string | null;
@@ -380,6 +394,7 @@ export class UpdateProductDto {
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) expectedRowVersion?: number;
 }
 
+// * DTO [ReplaceProductDetailsDto]: Validates complete replacement child collections.
 export class ReplaceProductDetailsDto {
   @IsOptional()
   @IsArray()
@@ -423,6 +438,7 @@ export class ReplaceProductDetailsDto {
   regulatory?: ProductRegulatoryInputDto | null;
 }
 
+// * DTO [BulkProductStatusDto]: Validates bulk product lifecycle transitions.
 export class BulkProductStatusDto {
   @IsArray()
   @ArrayMinSize(1)
@@ -435,6 +451,7 @@ export class BulkProductStatusDto {
   status!: ProductStatus;
 }
 
+// * DTO [ProductListQueryDto]: Validates product browsing and filter query parameters.
 export class ProductListQueryDto extends PageQueryDto {
   @IsOptional() @IsString() @MaxLength(1000) search?: string;
   @IsOptional() @IsIn(PRODUCT_STATUSES) status?: ProductStatus;
@@ -456,11 +473,13 @@ export class ProductListQueryDto extends PageQueryDto {
   @IsOptional() @IsIn(['asc', 'desc']) sortOrder: 'asc' | 'desc' = 'desc';
 }
 
+// * DTO [ProductSearchQueryDto]: Validates minimum-length product search requests.
 export class ProductSearchQueryDto extends ProductListQueryDto {
   @IsString() @MinLength(2) override search = '';
   @IsOptional() @Transform(booleanValue) @IsBoolean() exactCodeMatch = false;
 }
 
+// * DTO [ReferenceListQueryDto]: Validates shared reference-master list filters.
 export class ReferenceListQueryDto extends PageQueryDto {
   @IsOptional() @IsString() @MaxLength(200) search?: string;
   @IsOptional() @Transform(booleanValue) @IsBoolean() isActive?: boolean;
@@ -469,6 +488,7 @@ export class ReferenceListQueryDto extends PageQueryDto {
   @IsOptional() @IsIn(['asc', 'desc']) sortOrder: 'asc' | 'desc' = 'asc';
 }
 
+// * DTO [ProductRelationshipCreateDto]: Validates related-product creation data.
 export class ProductRelationshipCreateDto {
   @IsUUID()
   targetProductId!: string;
@@ -489,6 +509,7 @@ export class ProductRelationshipCreateDto {
   metadataJson: Record<string, unknown> | unknown[] = {};
 }
 
+// * DTO [ProductRelationshipUpdateDto]: Validates related-product changes and row version.
 export class ProductRelationshipUpdateDto {
   @IsOptional() @IsUUID() targetProductId?: string;
   @IsOptional() @IsString() @MinLength(1) @MaxLength(32) relationshipType?: string;
@@ -497,10 +518,12 @@ export class ProductRelationshipUpdateDto {
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) expectedRowVersion?: number;
 }
 
+// * DTO [SubstitutionGroupListQueryDto]: Validates substitution-group discovery filters.
 export class SubstitutionGroupListQueryDto extends ReferenceListQueryDto {
   @IsOptional() @IsUUID() dosageFormId?: string;
 }
 
+// * DTO [SubstitutionGroupCreateDto]: Validates substitution-group signature creation data.
 export class SubstitutionGroupCreateDto {
   @IsString()
   @MinLength(1)
@@ -521,6 +544,7 @@ export class SubstitutionGroupCreateDto {
   isActive = true;
 }
 
+// * DTO [SubstitutionGroupUpdateDto]: Validates substitution-group changes and row version.
 export class SubstitutionGroupUpdateDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(512) saltSignature?: string;
   @IsOptional() @IsUUID() dosageFormId?: string | null;
@@ -529,6 +553,7 @@ export class SubstitutionGroupUpdateDto {
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) expectedRowVersion?: number;
 }
 
+// * DTO [SubstitutionGroupProductCreateDto]: Validates group membership creation data.
 export class SubstitutionGroupProductCreateDto {
   @IsUUID()
   productId!: string;
@@ -540,6 +565,7 @@ export class SubstitutionGroupProductCreateDto {
   priority = 0;
 }
 
+// * DTO [SubstitutionGroupProductUpdateDto]: Validates membership priority changes.
 export class SubstitutionGroupProductUpdateDto {
   @Type(() => Number)
   @IsInt()
@@ -553,6 +579,7 @@ export class SubstitutionGroupProductUpdateDto {
   expectedRowVersion?: number;
 }
 
+// * DTO [BrandCreateDto]: Validates brand reference creation data.
 export class BrandCreateDto {
   @IsString() @MinLength(1) @MaxLength(255) name!: string;
   @IsOptional() @IsString() @MaxLength(255) slug?: string;
@@ -561,6 +588,7 @@ export class BrandCreateDto {
   @IsOptional() @IsUUID() ownerOrganizationId?: string;
   @IsOptional() @IsBoolean() isActive = true;
 }
+// * DTO [BrandUpdateDto]: Validates brand reference updates.
 export class BrandUpdateDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(255) name?: string;
   @IsOptional() @IsString() @MinLength(1) @MaxLength(255) slug?: string;
@@ -570,6 +598,7 @@ export class BrandUpdateDto {
   @IsOptional() @IsBoolean() isActive?: boolean;
 }
 
+// * DTO [ManufacturerCreateDto]: Validates manufacturer reference creation data.
 export class ManufacturerCreateDto {
   @IsOptional() @IsUUID() organizationId?: string;
   @IsString() @MinLength(1) @MaxLength(255) name!: string;
@@ -578,6 +607,7 @@ export class ManufacturerCreateDto {
   @IsOptional() @IsString() @Matches(/^[A-Za-z]{2}$/) countryCode = 'IN';
   @IsOptional() @IsBoolean() isActive = true;
 }
+// * DTO [ManufacturerUpdateDto]: Validates manufacturer reference updates.
 export class ManufacturerUpdateDto {
   @IsOptional() @IsUUID() organizationId?: string | null;
   @IsOptional() @IsString() @MinLength(1) @MaxLength(255) name?: string;
@@ -587,6 +617,7 @@ export class ManufacturerUpdateDto {
   @IsOptional() @IsBoolean() isActive?: boolean;
 }
 
+// * DTO [CategoryCreateDto]: Validates hierarchical category creation data.
 export class CategoryCreateDto {
   @IsOptional() @IsUUID() parentId?: string;
   @IsString() @MinLength(1) @MaxLength(255) name!: string;
@@ -595,6 +626,7 @@ export class CategoryCreateDto {
   @IsOptional() @IsBoolean() isActive = true;
   @IsOptional() @IsDefined() metadataJson: Record<string, unknown> | unknown[] = {};
 }
+// * DTO [CategoryUpdateDto]: Validates category edits and hierarchy moves.
 export class CategoryUpdateDto {
   @IsOptional() @IsUUID() parentId?: string | null;
   @IsOptional() @IsString() @MinLength(1) @MaxLength(255) name?: string;
@@ -604,23 +636,27 @@ export class CategoryUpdateDto {
   @IsOptional() @IsDefined() metadataJson?: Record<string, unknown> | unknown[];
 }
 
+// * DTO [SaltCreateDto]: Validates salt reference creation data.
 export class SaltCreateDto {
   @IsString() @MinLength(1) @MaxLength(255) name!: string;
   @IsOptional() @IsString() description?: string;
   @IsOptional() @IsString() @MaxLength(64) standardCode?: string;
 }
+// * DTO [SaltUpdateDto]: Validates salt reference updates.
 export class SaltUpdateDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(255) name?: string;
   @IsOptional() @IsString() description?: string | null;
   @IsOptional() @IsString() @MaxLength(64) standardCode?: string | null;
 }
 
+// * DTO [DosageFormCreateDto]: Validates dosage-form reference creation data.
 export class DosageFormCreateDto {
   @IsString() @MinLength(1) @MaxLength(64) code!: string;
   @IsString() @MinLength(1) @MaxLength(128) name!: string;
   @IsOptional() @IsString() @MaxLength(64) routeOfAdministration?: string;
   @IsOptional() @IsBoolean() isActive = true;
 }
+// * DTO [DosageFormUpdateDto]: Validates dosage-form reference updates.
 export class DosageFormUpdateDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(64) code?: string;
   @IsOptional() @IsString() @MinLength(1) @MaxLength(128) name?: string;
@@ -628,12 +664,14 @@ export class DosageFormUpdateDto {
   @IsOptional() @IsBoolean() isActive?: boolean;
 }
 
+// * DTO [UnitCreateDto]: Validates unit-of-measure creation data.
 export class UnitCreateDto {
   @IsString() @MinLength(1) @MaxLength(32) code!: string;
   @IsString() @MinLength(1) @MaxLength(64) name!: string;
   @IsString() @MinLength(1) @MaxLength(32) dimension!: string;
   @IsOptional() @IsNumberString() conversionToBase = '1';
 }
+// * DTO [UnitUpdateDto]: Validates unit-of-measure updates.
 export class UnitUpdateDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(32) code?: string;
   @IsOptional() @IsString() @MinLength(1) @MaxLength(64) name?: string;

@@ -1,4 +1,9 @@
+// * Catalog module: Owns product lifecycle constants, normalization, and business errors.
+// * File: src/contracts/catalog.rules.ts
+// ? Keep rules reusable by application services without coupling them to transport or SQL.
+// ! Status transitions and validation error codes are part of the API behavior.
 import { ConflictError, NotFoundError, ValidationError } from '@shared/errors';
+/** Product lifecycle states accepted by catalog APIs. */
 export const PRODUCT_STATUSES = [
   'draft',
   'review',
@@ -9,6 +14,7 @@ export const PRODUCT_STATUSES = [
 ] as const;
 export type ProductStatus = (typeof PRODUCT_STATUSES)[number];
 
+/** Product types supported by the healthcare catalogue. */
 export const PRODUCT_TYPES = [
   'medicine',
   'otc',
@@ -19,6 +25,7 @@ export const PRODUCT_TYPES = [
 ] as const;
 export type ProductType = (typeof PRODUCT_TYPES)[number];
 
+/** Stable not-found error used by product use cases. */
 export class ProductNotFoundError extends NotFoundError {
   public override readonly code = 'PRODUCT_NOT_FOUND';
   public constructor(details?: unknown) {
@@ -26,6 +33,7 @@ export class ProductNotFoundError extends NotFoundError {
   }
 }
 
+/** Conflict error carrying a catalog-specific stable error code. */
 export class CatalogConflictError extends ConflictError {
   public constructor(
     public override readonly code: string,
@@ -36,6 +44,7 @@ export class CatalogConflictError extends ConflictError {
   }
 }
 
+/** Business validation error for catalog rules beyond DTO validation. */
 export class CatalogValidationError extends ValidationError {
   public constructor(
     message: string,
@@ -46,6 +55,7 @@ export class CatalogValidationError extends ValidationError {
   }
 }
 
+/** Converts a display value into the URL-safe slug used by product and reference records. */
 export const slugify = (value: string): string =>
   value
     .normalize('NFKD')
@@ -56,6 +66,7 @@ export const slugify = (value: string): string =>
     .replace(/^-+|-+$/g, '')
     .slice(0, 255);
 
+/** Normalizes names for case-insensitive duplicate checks. */
 export const normalizeName = (value: string): string =>
   value.trim().replace(/\s+/g, ' ').toLowerCase();
 
@@ -68,6 +79,7 @@ const TRANSITIONS: Record<ProductStatus, readonly ProductStatus[]> = {
   recalled: ['inactive'],
 };
 
+/** Rejects lifecycle transitions that are not allowed by the catalog state machine. */
 export function validateStatusTransition(current: ProductStatus, next: ProductStatus): void {
   if (current === next) return;
   if (!TRANSITIONS[current].includes(next)) {

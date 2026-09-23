@@ -16,4 +16,5 @@ import { CatalogRepository } from './persistence/catalog.repository';
   providers: [CatalogRepository, { provide: CATALOG_REPOSITORY, useExisting: CatalogRepository }],
   exports: [CatalogRepository, CATALOG_REPOSITORY],
 })
+/** Infrastructure module that keeps the database adapter private to catalog features. */
 export class CatalogInfrastructureModule {}

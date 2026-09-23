@@ -1,3 +1,7 @@
+// * Catalog module: Implements the PostgreSQL persistence adapter for catalog use cases.
+// * File: src/infrastructure/persistence/catalog.repository.ts
+// ? Keep SQL, table names, and row mapping inside the catalog infrastructure boundary.
+// ! The physical database schema is externally managed; do not add migrations or alter models here.
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
 import { Injectable } from '@nestjs/common';
 import { PostgresDatabase } from '@platform/database';
@@ -112,13 +116,16 @@ const PRODUCT_SUMMARY = `
     LEFT JOIN catalog.dosage_forms df ON df.id = p.dosage_form_id AND df.is_deleted = false`;
 
 @Injectable()
+/** PostgreSQL repository for catalog products, references, and associations. */
 export class CatalogRepository {
   public constructor(private readonly database: PostgresDatabase) {}
 
+  /** Runs a catalog write workflow using the platform database transaction boundary. */
   transaction<T>(work: () => Promise<T>): Promise<T> {
     return this.database.transaction(() => work());
   }
 
+  /** Builds a paginated product summary query for browsing and search. */
   async listProducts(query: ProductListQuery | ProductSearchQuery) {
     const values: unknown[] = [];
     const where = this.productFilters(query, values);
@@ -187,6 +194,7 @@ export class CatalogRepository {
     return { rows: rows.rows.map(mapProductSummary), total: Number(count.rows[0]?.total ?? 0) };
   }
 
+  /** Reads a product row for application validation or transactional locking. */
   async getProductRow(id: string, includeDeleted = false, forUpdate = false): Promise<Row | null> {
     const result = await this.database.query<Row>(
       `SELECT * FROM catalog.products WHERE id = $1 ${includeDeleted ? '' : 'AND is_deleted = false'} ${forUpdate ? 'FOR UPDATE' : ''}`,
@@ -195,6 +203,7 @@ export class CatalogRepository {
     return result.rows[0] ?? null;
   }
 
+  /** Resolves a non-deleted product by SKU or slug. */
   async getProductByCode(value: string): Promise<Row | null> {
     const result = await this.database.query<Row>(
       `SELECT id FROM catalog.products
@@ -204,6 +213,7 @@ export class CatalogRepository {
     return result.rows[0] ?? null;
   }
 
+  /** Loads the product row and all active child collections for the aggregate response. */
   async getProductDetails(id: string, includeDeleted = false): Promise<ProductDetails | null> {
     const summary = await this.database.query<Row>(
       `${PRODUCT_SUMMARY} WHERE p.id = $1 ${includeDeleted ? '' : 'AND p.is_deleted = false'}`,
@@ -336,6 +346,7 @@ export class CatalogRepository {
     return Boolean(result.rowCount);
   }
 
+  /** Checks for duplicate directed product relationships before insertion or update. */
   async productRelationshipExists(
     sourceProductId: string,
     targetProductId: string,
@@ -450,6 +461,7 @@ export class CatalogRepository {
     return Boolean(result.rowCount);
   }
 
+  /** Lists substitution-group signatures with optional reference filters. */
   async listSubstitutionGroups(query: SubstitutionGroupListQuery) {
     const values: unknown[] = [];
     const where = ['1 = 1'];
@@ -596,6 +608,7 @@ export class CatalogRepository {
     return result.rows[0] ?? null;
   }
 
+  /** Lists products assigned to a substitution group in configured priority order. */
   async listSubstitutionGroupProducts(groupId: string) {
     const result = await this.database.query<Row>(
       `SELECT sgp.id, sgp.group_id, sgp.product_id, p.sku, p.name, p.display_name,
@@ -676,6 +689,7 @@ export class CatalogRepository {
     return Boolean(result.rowCount);
   }
 
+  /** Inserts the product master row using the externally managed catalog table. */
   async createProduct(
     input: CreateProductInput,
     slug: string,
@@ -717,6 +731,7 @@ export class CatalogRepository {
     return result.rows[0].id;
   }
 
+  /** Inserts product variant child rows. */
   async insertVariants(
     productId: string,
     items: readonly Row[],
@@ -742,6 +757,7 @@ export class CatalogRepository {
     }
   }
 
+  /** Inserts product identifier and barcode child rows. */
   async insertIdentifiers(
     productId: string,
     items: readonly Row[],
@@ -910,6 +926,7 @@ export class CatalogRepository {
     return Boolean(result.rowCount);
   }
 
+  /** Replaces non-soft-deleted child collections such as identifiers and salts. */
   async replaceSimpleChildren(
     productId: string,
     kind: 'identifiers' | 'salts' | 'attributes',
@@ -927,6 +944,7 @@ export class CatalogRepository {
     if (kind === 'attributes') await this.insertAttributes(productId, items, actor);
   }
 
+  /** Soft-deletes and reinserts versioned child collections. */
   async replaceSoftDeletedChildren(
     productId: string,
     kind: 'variants' | 'media' | 'regulatory',
@@ -949,6 +967,7 @@ export class CatalogRepository {
     if (kind === 'regulatory' && items[0]) await this.insertRegulatory(productId, items[0], actor);
   }
 
+  /** Replaces localized content while preserving the content history contract. */
   async replaceContent(
     productId: string,
     items: readonly Row[],
@@ -1024,6 +1043,7 @@ export class CatalogRepository {
     );
   }
 
+  /** Lists a configured reference resource using its safe table definition. */
   async listReferences(resource: ReferenceResource, query: ReferenceListQuery) {
     const def = REFERENCES[resource];
     const values: unknown[] = [];
@@ -1161,6 +1181,7 @@ export class CatalogRepository {
     return result.rows[0] ?? null;
   }
 
+  /** Reads category descendants for hierarchy validation and locking. */
   async categoryDescendants(path: string, forUpdate = false): Promise<Row[]> {
     const result = await this.database.query<Row>(
       `SELECT * FROM catalog.categories WHERE path LIKE $1 AND path <> $2 ORDER BY level, display_order, id ${forUpdate ? 'FOR UPDATE' : ''}`,
@@ -1169,6 +1190,7 @@ export class CatalogRepository {
     return result.rows;
   }
 
+  /** Reads category rows used to build the public tree response. */
   async categoryTreeRows(): Promise<Row[]> {
     const result = await this.database.query<Row>(
       `SELECT * FROM catalog.categories WHERE is_deleted = false ORDER BY level, display_order, name, id`,
