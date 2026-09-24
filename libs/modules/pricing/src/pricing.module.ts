@@ -5,11 +5,12 @@ import { Module } from '@nestjs/common';
 import { PriceBooksModule } from './features/price-books/price-books.module';
 import { ProductPricesModule } from './features/product-prices/product-prices.module';
 import { TaxRulesModule } from './features/tax-rules/tax-rules.module';
+import { PromotionsModule } from './features/promotions/promotions.module';
 
 /** Composition root for the Pricing bounded context. */
 // * Register the feature components and their dependencies with NestJS.
 @Module({
-  imports: [PriceBooksModule, ProductPricesModule, TaxRulesModule],
+  imports: [PriceBooksModule, ProductPricesModule, TaxRulesModule, PromotionsModule],
   exports: [],
 })
 export class PricingModule {}

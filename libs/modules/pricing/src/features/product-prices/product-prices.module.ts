@@ -11,4 +11,5 @@ import { ProductPricesService } from './product-prices.service';
   controllers: [ProductPricesController],
   providers: [ProductPricesService],
 })
+/** Registers the product-price controller, service, and pricing infrastructure boundary. */
 export class ProductPricesModule {}

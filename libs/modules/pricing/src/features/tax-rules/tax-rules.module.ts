@@ -11,4 +11,5 @@ import { TaxRulesService } from './tax-rules.service';
   controllers: [TaxRulesController],
   providers: [TaxRulesService],
 })
+/** Registers the tax-rule controller, service, and pricing infrastructure boundary. */
 export class TaxRulesModule {}

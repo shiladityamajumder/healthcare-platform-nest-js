@@ -9,6 +9,7 @@ import { PRICING_REPOSITORY, type PricingRepositoryPort } from '../../contracts/
 /** Product-price-facing service boundary backed by the pricing application workflow. */
 @Injectable()
 export class ProductPricesService extends PricingService {
+  // * Function [constructor]: Initializes the feature service with the pricing repository port.
   public constructor(@Inject(PRICING_REPOSITORY) repository: PricingRepositoryPort) {
     super(repository);
   }

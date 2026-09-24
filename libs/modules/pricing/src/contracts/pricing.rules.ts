@@ -1,5 +1,10 @@
+// * Pricing module: Defines reusable business rules for effective dates, rates, and prices.
+// * File: src/contracts/pricing.rules.ts
+// ? Keep pure pricing validation separate from transport DTOs and repository operations.
+// ! These rules must remain deterministic and free from database side effects.
 import { PricingValidationError } from './pricing.errors';
 
+/** Validates an inclusive or exclusive effective-date window. */
 export function validateDateWindow(
   from: Date,
   until: Date | null | undefined,
@@ -14,6 +19,7 @@ export function validateDateWindow(
   }
 }
 
+/** Validates that a tax rate is a finite percentage between zero and one hundred. */
 export function validateRate(rate: string): void {
   const value = Number(rate);
   if (!Number.isFinite(value) || value < 0 || value > 100) {
@@ -21,6 +27,7 @@ export function validateRate(rate: string): void {
   }
 }
 
+/** Validates MRP, selling price, and optional cost-price relationships. */
 export function validateProductPrice(
   mrpValue: string,
   sellingPriceValue: string,

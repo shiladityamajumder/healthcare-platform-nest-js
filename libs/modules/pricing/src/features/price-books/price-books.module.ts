@@ -11,4 +11,5 @@ import { PriceBooksService } from './price-books.service';
   controllers: [PriceBooksController],
   providers: [PriceBooksService],
 })
+/** Registers the price-book controller, service, and pricing infrastructure boundary. */
 export class PriceBooksModule {}
