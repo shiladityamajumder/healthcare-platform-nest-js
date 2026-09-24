@@ -1,23 +1,12 @@
-// * Linked with: @nestjs/common.
-// * Used by: the feature module/controller and the domain or infrastructure ports it coordinates.
-// * Other linkup: This layer keeps transport concerns separate from domain rules and persistence details.
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { InventoryService } from '../../application/inventory.service';
+import { INVENTORY_REPOSITORY, type InventoryRepositoryPort } from '../../contracts/inventory.ports';
 
-// * Coordinate the use case while keeping transport and persistence concerns outside this class.
+/** Warehouse HTTP-facing handler backed by the shared inventory application service. */
 @Injectable()
-export class WarehousesHandler {
-  async execute(
-    operation: string,
-    input?: unknown,
-    actor?: string,
-  ): Promise<Record<string, unknown>> {
-    // ! TODO: orchestrate domain rules through ports. No SQL/ORM code belongs here.
-    return {
-      feature: 'warehouses',
-      operation,
-      status: 'not-implemented',
-      received: input !== undefined,
-      actorProvided: Boolean(actor),
-    };
+export class WarehousesHandler extends InventoryService {
+  // * Function [constructor]: Connects warehouse routes to the shared inventory application service.
+  public constructor(@Inject(INVENTORY_REPOSITORY) repository: InventoryRepositoryPort) {
+    super(repository);
   }
 }

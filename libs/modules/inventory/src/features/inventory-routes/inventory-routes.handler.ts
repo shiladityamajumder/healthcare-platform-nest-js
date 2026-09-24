@@ -1,15 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { InventoryService } from '../../application/inventory.service';
+import { INVENTORY_REPOSITORY, type InventoryRepositoryPort } from '../../contracts/inventory.ports';
 
-/** Route orchestration seam for inventory workflows awaiting persistence implementation. */
+/** Inventory HTTP-facing handler backed by the shared inventory application service. */
 @Injectable()
-export class InventoryRoutesHandler {
-  execute(operation: string, input: unknown, actor?: string): Record<string, unknown> {
-    return {
-      feature: 'inventory',
-      operation,
-      status: 'not-implemented',
-      received: input !== undefined,
-      actorProvided: Boolean(actor),
-    };
+export class InventoryRoutesHandler extends InventoryService {
+  // * Function [constructor]: Connects the mounted inventory routes to the shared application service.
+  public constructor(@Inject(INVENTORY_REPOSITORY) repository: InventoryRepositoryPort) {
+    super(repository);
   }
 }
