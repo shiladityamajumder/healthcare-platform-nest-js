@@ -30,40 +30,40 @@ This document is the frontend-readable companion to the generated Swagger specif
 
 The application uses the global /api prefix and URI version v1:
 
-~~~text
+```text
 {API_ORIGIN}/api/v1
-~~~
+```
 
 Examples:
 
-~~~http
+```http
 GET  https://api.example.com/api/v1/products
 GET  https://api.example.com/api/v1/products/search?search=paracetamol
 GET  https://api.example.com/api/v1/categories/tree
-~~~
+```
 
 ### Minimal product-list request
 
-~~~http
+```http
 GET /api/v1/products?page=1&pageSize=20&status=active
 Accept: application/json
-~~~
+```
 
 ### Minimal product-create request
 
-~~~http
+```http
 POST /api/v1/products
 Content-Type: application/json
 X-User-ID: 550e8400-e29b-41d4-a716-446655440000
-~~~
+```
 
-~~~json
+```json
 {
   "sku": "PARA-500",
   "name": "Paracetamol 500 mg",
   "productType": "medicine"
 }
-~~~
+```
 
 The DTO defaults optional child collections to empty arrays and product status to draft.
 
@@ -73,27 +73,27 @@ The DTO defaults optional child collections to empty arrays and product status t
 
 ### HTTP and content rules
 
-| Rule | Description |
-| --- | --- |
-| Content type | Send JSON request bodies with Content-Type: application/json. |
-| IDs | Resource identifiers are UUID values. |
-| Dates | Use ISO-8601 date-time strings, for example 2026-01-01T00:00:00.000Z. |
-| Numbers | Quantities stored as numeric database values may be returned as strings. Preserve their precision. |
-| Pagination | page starts at 1; pageSize defaults to 20 and accepts 1–100. |
-| Search | Product search requires at least 2 characters; product list search is limited to 1000 characters. |
-| Unknown fields | Send only documented fields. |
-| Soft deletion | Delete endpoints deactivate records. They do not normally remove historical data. |
-| Versioning | Update DTOs that expose expectedRowVersion support optimistic concurrency. |
+| Rule           | Description                                                                                        |
+| -------------- | -------------------------------------------------------------------------------------------------- |
+| Content type   | Send JSON request bodies with Content-Type: application/json.                                      |
+| IDs            | Resource identifiers are UUID values.                                                              |
+| Dates          | Use ISO-8601 date-time strings, for example 2026-01-01T00:00:00.000Z.                              |
+| Numbers        | Quantities stored as numeric database values may be returned as strings. Preserve their precision. |
+| Pagination     | page starts at 1; pageSize defaults to 20 and accepts 1–100.                                       |
+| Search         | Product search requires at least 2 characters; product list search is limited to 1000 characters.  |
+| Unknown fields | Send only documented fields.                                                                       |
+| Soft deletion  | Delete endpoints deactivate records. They do not normally remove historical data.                  |
+| Versioning     | Update DTOs that expose expectedRowVersion support optimistic concurrency.                         |
 
 ### Common request headers
 
-| Header | Required | Used for | Example |
-| --- | ---: | --- | --- |
-| Authorization | Not enforced by current catalog controllers | Bearer authentication when an application-level guard is added | Bearer eyJhbGciOiJIUzI1NiIs... |
-| Content-Type | JSON body requests | Request body format | application/json |
-| X-Request-ID | Optional | Client-generated request/support ID | catalog-product-screen-001 |
-| X-Correlation-ID | Optional | Correlates related frontend operations | catalog-import-2026-01 |
-| X-User-ID | Optional on writes | UUID used for createdBy, updatedBy, and deletedBy audit fields | 550e8400-e29b-41d4-a716-446655440000 |
+| Header           |                                    Required | Used for                                                       | Example                              |
+| ---------------- | ------------------------------------------: | -------------------------------------------------------------- | ------------------------------------ |
+| Authorization    | Not enforced by current catalog controllers | Bearer authentication when an application-level guard is added | Bearer eyJhbGciOiJIUzI1NiIs...       |
+| Content-Type     |                          JSON body requests | Request body format                                            | application/json                     |
+| X-Request-ID     |                                    Optional | Client-generated request/support ID                            | catalog-product-screen-001           |
+| X-Correlation-ID |                                    Optional | Correlates related frontend operations                         | catalog-import-2026-01               |
+| X-User-ID        |                          Optional on writes | UUID used for createdBy, updatedBy, and deletedBy audit fields | 550e8400-e29b-41d4-a716-446655440000 |
 
 X-User-ID is an audit-context header, not an authentication mechanism. Do not treat it as proof of identity. The current catalog controllers do not declare a bearer guard; protect write routes at the application/deployment authorization boundary before exposing them to untrusted clients.
 
@@ -101,11 +101,11 @@ X-User-ID is an audit-context header, not an authentication mechanism. Do not tr
 
 Successful and error responses may include:
 
-| Header | Meaning |
-| --- | --- |
-| X-Request-ID | Request identifier for logs and customer support. |
+| Header           | Meaning                                                         |
+| ---------------- | --------------------------------------------------------------- |
+| X-Request-ID     | Request identifier for logs and customer support.               |
 | X-Correlation-ID | Correlation identifier supplied or generated for the operation. |
-| X-API-Version | API version that processed the request, normally v1. |
+| X-API-Version    | API version that processed the request, normally v1.            |
 
 ---
 
@@ -113,19 +113,19 @@ Successful and error responses may include:
 
 ### Current implementation behavior
 
-| Operation type | Current catalog behavior |
-| --- | --- |
-| Product/reference reads | No bearer guard is declared in this module. |
-| Product/reference writes | No bearer guard is declared; optional X-User-ID is converted to an audit actor only when it is a valid UUID. |
-| Database authorization | Must be enforced by the application boundary, reverse proxy, gateway policy, or a future auth guard before production exposure. |
+| Operation type           | Current catalog behavior                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Product/reference reads  | No bearer guard is declared in this module.                                                                                     |
+| Product/reference writes | No bearer guard is declared; optional X-User-ID is converted to an audit actor only when it is a valid UUID.                    |
+| Database authorization   | Must be enforced by the application boundary, reverse proxy, gateway policy, or a future auth guard before production exposure. |
 
 Frontend developers should still design the UI around roles and permissions. A future authorization guard may return 401 or 403 without changing the endpoint purpose or request body.
 
 ### Audit header example
 
-~~~http
+```http
 X-User-ID: 550e8400-e29b-41d4-a716-446655440000
-~~~
+```
 
 Invalid or missing values become null for audit purposes. They do not authenticate the request.
 
@@ -137,7 +137,7 @@ All normal HTTP responses use the standard response envelope.
 
 ### Successful response
 
-~~~json
+```json
 {
   "success": true,
   "message": "Operation completed successfully.",
@@ -150,7 +150,7 @@ All normal HTTP responses use the standard response envelope.
     "timestamp": "2026-01-01T00:00:00.000Z"
   }
 }
-~~~
+```
 
 The endpoint-specific result is inside data. Do not read endpoint fields from the top level.
 
@@ -158,7 +158,7 @@ The endpoint-specific result is inside data. Do not read endpoint fields from th
 
 List endpoints return:
 
-~~~json
+```json
 {
   "data": {
     "items": [],
@@ -170,13 +170,13 @@ List endpoints return:
     }
   }
 }
-~~~
+```
 
 offset is calculated as (page - 1) × pageSize. Use hasNext for the next-page control.
 
 ### Error response
 
-~~~json
+```json
 {
   "success": false,
   "message": "The requested product was not found.",
@@ -192,7 +192,7 @@ offset is calculated as (page - 1) × pageSize. Use hasNext for the next-page co
     "timestamp": "2026-01-01T00:00:00.000Z"
   }
 }
-~~~
+```
 
 Use error.code for frontend decisions. Human-readable message text may change and must not be used as a stable programmatic identifier.
 
@@ -202,26 +202,26 @@ Use error.code for frontend decisions. Human-readable message text may change an
 
 ### Common HTTP statuses and catalog codes
 
-| HTTP status | Typical codes | Frontend action |
-| ---: | --- | --- |
-| 400 | VALIDATION_ERROR, BUSINESS_VALIDATION_ERROR, SEARCH_TERM_TOO_LONG | Show field-level correction guidance; do not retry unchanged input. |
-| 401 | AUTHENTICATION_REQUIRED when an application-level guard is enabled | Re-authenticate. |
-| 403 | PERMISSION_DENIED when an application-level guard is enabled | Hide or disable the staff action; do not retry automatically. |
-| 404 | PRODUCT_NOT_FOUND, RESOURCE_NOT_FOUND | Refresh the list or show that the selected record no longer exists. |
-| 409 | PRODUCT_ALREADY_EXISTS, PRODUCT_VERSION_CONFLICT, INVALID_PRODUCT_STATUS_TRANSITION, CATEGORY_ALREADY_EXISTS, CATEGORY_HAS_DESCENDANTS, CATEGORY_PARENT_INACTIVE, and resource-specific conflict codes | Refresh current state, explain the conflict, or ask the user to choose a different value. |
-| 500 | INTERNAL_SERVER_ERROR | Show a generic failure state and retain the request ID for support. |
-| 503 | DATABASE_ERROR, INFRASTRUCTURE_UNAVAILABLE | Show temporary unavailability and retry with backoff if the operation is safe. |
+| HTTP status | Typical codes                                                                                                                                                                                          | Frontend action                                                                           |
+| ----------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+|         400 | VALIDATION_ERROR, BUSINESS_VALIDATION_ERROR, SEARCH_TERM_TOO_LONG                                                                                                                                      | Show field-level correction guidance; do not retry unchanged input.                       |
+|         401 | AUTHENTICATION_REQUIRED when an application-level guard is enabled                                                                                                                                     | Re-authenticate.                                                                          |
+|         403 | PERMISSION_DENIED when an application-level guard is enabled                                                                                                                                           | Hide or disable the staff action; do not retry automatically.                             |
+|         404 | PRODUCT_NOT_FOUND, RESOURCE_NOT_FOUND                                                                                                                                                                  | Refresh the list or show that the selected record no longer exists.                       |
+|         409 | PRODUCT_ALREADY_EXISTS, PRODUCT_VERSION_CONFLICT, INVALID_PRODUCT_STATUS_TRANSITION, CATEGORY_ALREADY_EXISTS, CATEGORY_HAS_DESCENDANTS, CATEGORY_PARENT_INACTIVE, and resource-specific conflict codes | Refresh current state, explain the conflict, or ask the user to choose a different value. |
+|         500 | INTERNAL_SERVER_ERROR                                                                                                                                                                                  | Show a generic failure state and retain the request ID for support.                       |
+|         503 | DATABASE_ERROR, INFRASTRUCTURE_UNAVAILABLE                                                                                                                                                             | Show temporary unavailability and retry with backoff if the operation is safe.            |
 
 ### Optimistic-concurrency errors
 
 When an update DTO supports expectedRowVersion, send the rowVersion returned by the last read:
 
-~~~json
+```json
 {
   "name": "Updated product name",
   "expectedRowVersion": 4
 }
-~~~
+```
 
 If another user changed the record first, the API returns a version conflict. Reload the record and let the user review the new state before retrying.
 
@@ -235,9 +235,9 @@ Products are the main catalog aggregate. A product may contain variants, identif
 
 Allowed product statuses are:
 
-~~~text
+```text
 draft, review, active, inactive, discontinued, recalled
-~~~
+```
 
 The implementation supports these controlled transitions:
 
@@ -252,49 +252,49 @@ Invalid transitions return 409 INVALID_PRODUCT_STATUS_TRANSITION.
 
 ### 1. List products
 
-~~~http
+```http
 GET /api/v1/products
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Browse product summaries for storefront/category pages, search results, administration, or product-selection forms. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Request body | None. |
-| Success | 200 OK with paginated product summaries. |
-| Errors | 400 VALIDATION_ERROR; 503 for database/dependency failure. |
+| Item          | Value                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Why use it    | Browse product summaries for storefront/category pages, search results, administration, or product-selection forms. |
+| Authorization | ❌ No bearer guard is declared by the current catalog controller.                                                   |
+| Request body  | None.                                                                                                               |
+| Success       | 200 OK with paginated product summaries.                                                                            |
+| Errors        | 400 VALIDATION_ERROR; 503 for database/dependency failure.                                                          |
 
 #### Query parameters
 
-| Field | Required | Rules |
-| --- | ---: | --- |
-| page | ❌ | Integer ≥ 1. Default 1. |
-| pageSize | ❌ | Integer 1–100. Default 20. |
-| search | ❌ | String, maximum 1000 characters. |
-| status | ❌ | draft, review, active, inactive, discontinued, or recalled. |
-| productType | ❌ | medicine, otc, device, wellness, lab_test, or service. |
-| categoryId | ❌ | Category UUID. |
-| brandId | ❌ | Brand UUID. |
-| manufacturerId | ❌ | Manufacturer UUID. |
-| dosageFormId | ❌ | Dosage-form UUID. |
-| saltId | ❌ | Salt UUID; returns products containing that salt. |
-| prescriptionRequired | ❌ | Boolean. |
-| includeInactive | ❌ | Boolean; defaults to false. |
-| includeDeleted | ❌ | Boolean; defaults to false. Intended for administration/audit views. |
-| createdFrom, createdTo | ❌ | ISO date-time range. createdFrom cannot be after createdTo. |
-| updatedFrom, updatedTo | ❌ | ISO date-time range. updatedFrom cannot be after updatedTo. |
-| sortBy | ❌ | createdAt, updatedAt, name, sku, status, or productType. |
-| sortOrder | ❌ | asc or desc. Default desc. |
+| Field                  | Required | Rules                                                                |
+| ---------------------- | -------: | -------------------------------------------------------------------- |
+| page                   |       ❌ | Integer ≥ 1. Default 1.                                              |
+| pageSize               |       ❌ | Integer 1–100. Default 20.                                           |
+| search                 |       ❌ | String, maximum 1000 characters.                                     |
+| status                 |       ❌ | draft, review, active, inactive, discontinued, or recalled.          |
+| productType            |       ❌ | medicine, otc, device, wellness, lab_test, or service.               |
+| categoryId             |       ❌ | Category UUID.                                                       |
+| brandId                |       ❌ | Brand UUID.                                                          |
+| manufacturerId         |       ❌ | Manufacturer UUID.                                                   |
+| dosageFormId           |       ❌ | Dosage-form UUID.                                                    |
+| saltId                 |       ❌ | Salt UUID; returns products containing that salt.                    |
+| prescriptionRequired   |       ❌ | Boolean.                                                             |
+| includeInactive        |       ❌ | Boolean; defaults to false.                                          |
+| includeDeleted         |       ❌ | Boolean; defaults to false. Intended for administration/audit views. |
+| createdFrom, createdTo |       ❌ | ISO date-time range. createdFrom cannot be after createdTo.          |
+| updatedFrom, updatedTo |       ❌ | ISO date-time range. updatedFrom cannot be after updatedTo.          |
+| sortBy                 |       ❌ | createdAt, updatedAt, name, sku, status, or productType.             |
+| sortOrder              |       ❌ | asc or desc. Default desc.                                           |
 
 #### Example
 
-~~~http
+```http
 GET /api/v1/products?page=1&pageSize=20&productType=medicine&saltId=550e8400-e29b-41d4-a716-446655440000&status=active
-~~~
+```
 
 #### Success data
 
-~~~json
+```json
 {
   "items": [
     {
@@ -320,62 +320,62 @@ GET /api/v1/products?page=1&pageSize=20&productType=medicine&saltId=550e8400-e29
   ],
   "pagination": { "totalCount": 1, "limit": 20, "offset": 0, "hasNext": false }
 }
-~~~
+```
 
 availableQuantity is currently returned as "0" because inventory is outside the catalog boundary.
 
 ### 2. Search products
 
-~~~http
+```http
 GET /api/v1/products/search?search=paracetamol&exactCodeMatch=false
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Searches product names, display names, SKU, slug, identifiers, salts, content, brands, manufacturers, and categories. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Request body | None. |
-| Success | 200 OK with the same pagination shape as product listing. |
-| Errors | 400 VALIDATION_ERROR when search is shorter than 2 characters; 400 SEARCH_TERM_TOO_LONG; 503 for dependency failure. |
+| Item          | Value                                                                                                                 |
+| ------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Why use it    | Searches product names, display names, SKU, slug, identifiers, salts, content, brands, manufacturers, and categories. |
+| Authorization | ❌ No bearer guard is declared by the current catalog controller.                                                     |
+| Request body  | None.                                                                                                                 |
+| Success       | 200 OK with the same pagination shape as product listing.                                                             |
+| Errors        | 400 VALIDATION_ERROR when search is shorter than 2 characters; 400 SEARCH_TERM_TOO_LONG; 503 for dependency failure.  |
 
 Product search supports all product-list filters plus:
 
-| Field | Required | Rules |
-| --- | ---: | --- |
-| search | ✅ | String with at least 2 characters. |
-| exactCodeMatch | ❌ | Boolean, default false. When true, checks SKU, slug, and identifier value as exact codes. |
+| Field          | Required | Rules                                                                                     |
+| -------------- | -------: | ----------------------------------------------------------------------------------------- |
+| search         |       ✅ | String with at least 2 characters.                                                        |
+| exactCodeMatch |       ❌ | Boolean, default false. When true, checks SKU, slug, and identifier value as exact codes. |
 
 ### 3. Get a product by SKU or slug
 
-~~~http
+```http
 GET /api/v1/products/by-code/{value}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Loads the complete product aggregate when the frontend has a product SKU or public slug. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Path parameter | value: product SKU or slug string. |
-| Request body | None. |
-| Success | 200 OK with product aggregate data. |
-| Errors | 404 PRODUCT_NOT_FOUND; 503 for dependency failure. |
+| Item           | Value                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| Why use it     | Loads the complete product aggregate when the frontend has a product SKU or public slug. |
+| Authorization  | ❌ No bearer guard is declared by the current catalog controller.                        |
+| Path parameter | value: product SKU or slug string.                                                       |
+| Request body   | None.                                                                                    |
+| Success        | 200 OK with product aggregate data.                                                      |
+| Errors         | 404 PRODUCT_NOT_FOUND; 503 for dependency failure.                                       |
 
 ### 4. Create a product
 
-~~~http
+```http
 POST /api/v1/products
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Creates a product master and optional child collections in one transaction. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution when available. |
-| Success | 201 Created. |
-| Errors | 400 VALIDATION_ERROR or BUSINESS_VALIDATION_ERROR; 409 PRODUCT_ALREADY_EXISTS; 503 for database failure. |
+| Item          | Value                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| Why use it    | Creates a product master and optional child collections in one transaction.                              |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution when available.                     |
+| Success       | 201 Created.                                                                                             |
+| Errors        | 400 VALIDATION_ERROR or BUSINESS_VALIDATION_ERROR; 409 PRODUCT_ALREADY_EXISTS; 503 for database failure. |
 
 #### Request body
 
-~~~json
+```json
 {
   "sku": "PARA-500",
   "name": "Paracetamol 500 mg",
@@ -455,27 +455,27 @@ POST /api/v1/products
     "regulatoryMetadata": {}
   }
 }
-~~~
+```
 
 #### Main product fields
 
-| Field | Required | Rules |
-| --- | ---: | --- |
-| sku | ✅ | String, 1–64 characters; duplicate SKU is rejected. |
-| name | ✅ | String, 1–255 characters. |
-| displayName | ❌ | String, maximum 255 characters. |
-| slug | ❌ | String, maximum 255 characters; derived from name when omitted. |
-| brandId, manufacturerId, categoryId, dosageFormId | ❌ | UUIDs referencing active catalog records when supplied. |
-| productType | ✅ | medicine, otc, device, wellness, lab_test, or service. |
-| strengthDisplay, packSizeDisplay | ❌ | Strings, maximum 128 characters. |
-| prescriptionRequired | ❌ | Boolean, default false. |
-| scheduleClass | ❌ | String, maximum 32 characters. |
-| isReturnable | ❌ | Boolean, default true. |
-| returnWindowDays | ❌ | Integer ≥ 0. Must be empty or 0 when isReturnable=false. |
-| taxCode | ❌ | String, maximum 64 characters. |
-| hsnCode | ❌ | String, maximum 32 characters. |
-| status | ❌ | Supported product status; default draft. |
-| searchKeywords | ❌ | Array of strings, maximum 100 entries. |
+| Field                                             | Required | Rules                                                           |
+| ------------------------------------------------- | -------: | --------------------------------------------------------------- |
+| sku                                               |       ✅ | String, 1–64 characters; duplicate SKU is rejected.             |
+| name                                              |       ✅ | String, 1–255 characters.                                       |
+| displayName                                       |       ❌ | String, maximum 255 characters.                                 |
+| slug                                              |       ❌ | String, maximum 255 characters; derived from name when omitted. |
+| brandId, manufacturerId, categoryId, dosageFormId |       ❌ | UUIDs referencing active catalog records when supplied.         |
+| productType                                       |       ✅ | medicine, otc, device, wellness, lab_test, or service.          |
+| strengthDisplay, packSizeDisplay                  |       ❌ | Strings, maximum 128 characters.                                |
+| prescriptionRequired                              |       ❌ | Boolean, default false.                                         |
+| scheduleClass                                     |       ❌ | String, maximum 32 characters.                                  |
+| isReturnable                                      |       ❌ | Boolean, default true.                                          |
+| returnWindowDays                                  |       ❌ | Integer ≥ 0. Must be empty or 0 when isReturnable=false.        |
+| taxCode                                           |       ❌ | String, maximum 64 characters.                                  |
+| hsnCode                                           |       ❌ | String, maximum 32 characters.                                  |
+| status                                            |       ❌ | Supported product status; default draft.                        |
+| searchKeywords                                    |       ❌ | Array of strings, maximum 100 entries.                          |
 
 Child collections have maximum sizes: variants 100, identifiers 50, salts 30, attributes 100, content 50, and media 50. Duplicate variant SKUs, identifier type/value pairs, salt/sequence pairs, attribute keys, or content locale/type pairs are rejected.
 
@@ -483,47 +483,44 @@ Variant-specific identifiers and media require persisted variant IDs and therefo
 
 ### 5. Bulk update product status
 
-~~~http
+```http
 PATCH /api/v1/products/bulk-status
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Applies the same valid lifecycle transition to multiple products from an administration screen. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK. |
-| Errors | 400 for invalid status/UUID data; 404 PRODUCT_NOT_FOUND when any product is missing; 409 INVALID_PRODUCT_STATUS_TRANSITION; 503 for database failure. |
+| Item          | Value                                                                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Why use it    | Applies the same valid lifecycle transition to multiple products from an administration screen.                                                       |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.                                                                                 |
+| Success       | 200 OK.                                                                                                                                               |
+| Errors        | 400 for invalid status/UUID data; 404 PRODUCT_NOT_FOUND when any product is missing; 409 INVALID_PRODUCT_STATUS_TRANSITION; 503 for database failure. |
 
-~~~json
+```json
 {
-  "productIds": [
-    "550e8400-e29b-41d4-a716-446655440000",
-    "550e8400-e29b-41d4-a716-446655440001"
-  ],
+  "productIds": ["550e8400-e29b-41d4-a716-446655440000", "550e8400-e29b-41d4-a716-446655440001"],
   "status": "active"
 }
-~~~
+```
 
 productIds requires 1–500 unique UUIDs. The operation is transactional.
 
 ### 6. Get a product
 
-~~~http
+```http
 GET /api/v1/products/{productId}?includeDeleted=false
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Loads a complete product aggregate for product detail pages, editing forms, or audit views. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Path parameter | productId: product UUID. |
-| Query parameter | includeDeleted: optional boolean, default false. |
-| Success | 200 OK. |
-| Errors | 400 for malformed UUID; 404 PRODUCT_NOT_FOUND; 503 for dependency failure. |
+| Item            | Value                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------- |
+| Why use it      | Loads a complete product aggregate for product detail pages, editing forms, or audit views. |
+| Authorization   | ❌ No bearer guard is declared by the current catalog controller.                           |
+| Path parameter  | productId: product UUID.                                                                    |
+| Query parameter | includeDeleted: optional boolean, default false.                                            |
+| Success         | 200 OK.                                                                                     |
+| Errors          | 400 for malformed UUID; 404 PRODUCT_NOT_FOUND; 503 for dependency failure.                  |
 
 #### Product aggregate shape
 
-~~~json
+```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "sku": "PARA-500",
@@ -540,24 +537,24 @@ GET /api/v1/products/{productId}?includeDeleted=false
   "media": [],
   "regulatory": null
 }
-~~~
+```
 
 Each child item includes persisted IDs and child-specific fields. Identifier items may include variantId; media items may include variantId.
 
 ### 7. Update product master data
 
-~~~http
+```http
 PATCH /api/v1/products/{productId}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Changes product-level fields without replacing variants, identifiers, content, media, or other child collections. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK with the complete product aggregate. |
-| Errors | 400 for invalid data or no fields; 404 PRODUCT_NOT_FOUND; 409 PRODUCT_ALREADY_EXISTS, PRODUCT_VERSION_CONFLICT, or invalid lifecycle transition; 503. |
+| Item          | Value                                                                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Why use it    | Changes product-level fields without replacing variants, identifiers, content, media, or other child collections.                                     |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.                                                                                 |
+| Success       | 200 OK with the complete product aggregate.                                                                                                           |
+| Errors        | 400 for invalid data or no fields; 404 PRODUCT_NOT_FOUND; 409 PRODUCT_ALREADY_EXISTS, PRODUCT_VERSION_CONFLICT, or invalid lifecycle transition; 503. |
 
-~~~json
+```json
 {
   "displayName": "Paracetamol 500 mg Tablet",
   "prescriptionRequired": false,
@@ -565,24 +562,24 @@ PATCH /api/v1/products/{productId}
   "searchKeywords": ["fever", "pain relief"],
   "expectedRowVersion": 1
 }
-~~~
+```
 
 All fields are optional, but at least one changeable field must be provided. Supported fields are the product master fields documented for creation, except sku, productType, and child collections.
 
 ### 8. Replace product details
 
-~~~http
+```http
 PUT /api/v1/products/{productId}/details
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Replaces one or more complete child collections without changing unrelated product master fields. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK with the complete product aggregate. |
-| Errors | 400 for invalid collections or references; 404 PRODUCT_NOT_FOUND; 409 for duplicate identifiers/SKUs or ownership conflicts; 503. |
+| Item          | Value                                                                                                                             |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Why use it    | Replaces one or more complete child collections without changing unrelated product master fields.                                 |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.                                                             |
+| Success       | 200 OK with the complete product aggregate.                                                                                       |
+| Errors        | 400 for invalid collections or references; 404 PRODUCT_NOT_FOUND; 409 for duplicate identifiers/SKUs or ownership conflicts; 503. |
 
-~~~json
+```json
 {
   "variants": [
     {
@@ -602,39 +599,39 @@ PUT /api/v1/products/{productId}/details
     }
   ]
 }
-~~~
+```
 
 Only supplied collections are replaced. Omitted collections remain unchanged. Variant-specific identifiers and media must reference an existing variant belonging to this product.
 
 ### 9. Deactivate a product
 
-~~~http
+```http
 DELETE /api/v1/products/{productId}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Removes a product from normal catalogue browsing while preserving database history. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK. |
-| Errors | 404 PRODUCT_NOT_FOUND; 503 for database failure. |
+| Item          | Value                                                                               |
+| ------------- | ----------------------------------------------------------------------------------- |
+| Why use it    | Removes a product from normal catalogue browsing while preserving database history. |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.               |
+| Success       | 200 OK.                                                                             |
+| Errors        | 404 PRODUCT_NOT_FOUND; 503 for database failure.                                    |
 
-~~~json
+```json
 { "message": "The product has been deactivated." }
-~~~
+```
 
 ### 10. Reactivate a product
 
-~~~http
+```http
 POST /api/v1/products/{productId}/reactivate
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Restores a soft-deleted product after checking that its SKU and slug remain unique. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK with the product aggregate. |
-| Errors | 404 PRODUCT_NOT_FOUND; 409 PRODUCT_ALREADY_EXISTS if SKU/slug is now used; 503. |
+| Item          | Value                                                                               |
+| ------------- | ----------------------------------------------------------------------------------- |
+| Why use it    | Restores a soft-deleted product after checking that its SKU and slug remain unique. |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.               |
+| Success       | 200 OK with the product aggregate.                                                  |
+| Errors        | 404 PRODUCT_NOT_FOUND; 409 PRODUCT_ALREADY_EXISTS if SKU/slug is now used; 503.     |
 
 ---
 
@@ -644,20 +641,20 @@ Relationships are directed links between products. They can represent alternativ
 
 ### 11. List product relationships
 
-~~~http
+```http
 GET /api/v1/products/{productId}/relationships?relationshipType=alternative
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Loads related products for recommendation, cross-sell, accessory, or alternative-product components. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Path parameter | productId: source product UUID. |
-| Query parameter | relationshipType: optional string, maximum 32 characters. |
-| Success | 200 OK, data.items contains relationships. |
-| Errors | 404 PRODUCT_NOT_FOUND; 503. |
+| Item            | Value                                                                                                |
+| --------------- | ---------------------------------------------------------------------------------------------------- |
+| Why use it      | Loads related products for recommendation, cross-sell, accessory, or alternative-product components. |
+| Authorization   | ❌ No bearer guard is declared by the current catalog controller.                                    |
+| Path parameter  | productId: source product UUID.                                                                      |
+| Query parameter | relationshipType: optional string, maximum 32 characters.                                            |
+| Success         | 200 OK, data.items contains relationships.                                                           |
+| Errors          | 404 PRODUCT_NOT_FOUND; 503.                                                                          |
 
-~~~json
+```json
 {
   "items": [
     {
@@ -671,85 +668,85 @@ GET /api/v1/products/{productId}/relationships?relationshipType=alternative
     }
   ]
 }
-~~~
+```
 
 ### 12. Get a product relationship
 
-~~~http
+```http
 GET /api/v1/products/{productId}/relationships/{relationshipId}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Loads one relationship for an administration edit form or audit view. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Path parameters | productId: source product UUID; relationshipId: relationship UUID. |
-| Success | 200 OK. |
-| Errors | 404 RESOURCE_NOT_FOUND; 503. |
+| Item            | Value                                                                 |
+| --------------- | --------------------------------------------------------------------- |
+| Why use it      | Loads one relationship for an administration edit form or audit view. |
+| Authorization   | ❌ No bearer guard is declared by the current catalog controller.     |
+| Path parameters | productId: source product UUID; relationshipId: relationship UUID.    |
+| Success         | 200 OK.                                                               |
+| Errors          | 404 RESOURCE_NOT_FOUND; 503.                                          |
 
 ### 13. Create a product relationship
 
-~~~http
+```http
 POST /api/v1/products/{productId}/relationships
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Creates a directed product link used by related-product experiences. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 201 Created. |
-| Errors | 400 for invalid data or self-reference; 404 PRODUCT_NOT_FOUND; 409 PRODUCT_RELATIONSHIP_ALREADY_EXISTS; 503. |
+| Item          | Value                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| Why use it    | Creates a directed product link used by related-product experiences.                                         |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.                                        |
+| Success       | 201 Created.                                                                                                 |
+| Errors        | 400 for invalid data or self-reference; 404 PRODUCT_NOT_FOUND; 409 PRODUCT_RELATIONSHIP_ALREADY_EXISTS; 503. |
 
-~~~json
+```json
 {
   "targetProductId": "550e8400-e29b-41d4-a716-446655440001",
   "relationshipType": "alternative",
   "priority": 1,
   "metadataJson": { "reason": "same active ingredient" }
 }
-~~~
+```
 
 targetProductId must be a different existing product. priority is an integer ≥ 0 and defaults to 0. metadataJson defaults to an empty object.
 
 ### 14. Update a product relationship
 
-~~~http
+```http
 PATCH /api/v1/products/{productId}/relationships/{relationshipId}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Changes the target product, relationship type, priority, or metadata. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK. |
-| Errors | 400; 404 RESOURCE_NOT_FOUND; 409 PRODUCT_RELATIONSHIP_ALREADY_EXISTS or PRODUCT_RELATIONSHIP_VERSION_CONFLICT; 503. |
+| Item          | Value                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Why use it    | Changes the target product, relationship type, priority, or metadata.                                               |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.                                               |
+| Success       | 200 OK.                                                                                                             |
+| Errors        | 400; 404 RESOURCE_NOT_FOUND; 409 PRODUCT_RELATIONSHIP_ALREADY_EXISTS or PRODUCT_RELATIONSHIP_VERSION_CONFLICT; 503. |
 
-~~~json
+```json
 {
   "priority": 2,
   "metadataJson": { "reason": "updated merchandising rule" },
   "expectedRowVersion": 1
 }
-~~~
+```
 
 All fields are optional, but at least one changeable field must be supplied.
 
 ### 15. Delete a product relationship
 
-~~~http
+```http
 DELETE /api/v1/products/{productId}/relationships/{relationshipId}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Removes a related-product link from recommendation and merchandising responses. |
+| Item          | Value                                                                              |
+| ------------- | ---------------------------------------------------------------------------------- |
+| Why use it    | Removes a related-product link from recommendation and merchandising responses.    |
 | Authorization | ⚠️ No bearer guard is declared; send X-User-ID when audit attribution is required. |
-| Success | 200 OK. |
-| Errors | 404 RESOURCE_NOT_FOUND; 503. |
+| Success       | 200 OK.                                                                            |
+| Errors        | 404 RESOURCE_NOT_FOUND; 503.                                                       |
 
-~~~json
+```json
 { "message": "The product relationship has been removed." }
-~~~
+```
 
 ---
 
@@ -759,188 +756,188 @@ Substitution groups connect products that share a configured salt signature, dos
 
 ### 16. List substitution groups
 
-~~~http
+```http
 GET /api/v1/substitution-groups
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Searches and paginates substitution-group signatures for administration or matching workflows. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Request body | None. |
-| Success | 200 OK with pagination. |
-| Errors | 400 VALIDATION_ERROR; 503. |
+| Item          | Value                                                                                          |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| Why use it    | Searches and paginates substitution-group signatures for administration or matching workflows. |
+| Authorization | ❌ No bearer guard is declared by the current catalog controller.                              |
+| Request body  | None.                                                                                          |
+| Success       | 200 OK with pagination.                                                                        |
+| Errors        | 400 VALIDATION_ERROR; 503.                                                                     |
 
 Uses common pagination/reference filters plus dosageFormId. Search checks saltSignature and strengthSignature.
 
 ### 17. Create a substitution group
 
-~~~http
+```http
 POST /api/v1/substitution-groups
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Creates a unique substitution signature before products are added. |
+| Item          | Value                                                                 |
+| ------------- | --------------------------------------------------------------------- |
+| Why use it    | Creates a unique substitution signature before products are added.    |
 | Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 201 Created. |
-| Errors | 400; 409 SUBSTITUTION_GROUP_ALREADY_EXISTS; 503. |
+| Success       | 201 Created.                                                          |
+| Errors        | 400; 409 SUBSTITUTION_GROUP_ALREADY_EXISTS; 503.                      |
 
-~~~json
+```json
 {
   "saltSignature": "paracetamol",
   "dosageFormId": "550e8400-e29b-41d4-a716-446655440004",
   "strengthSignature": "500mg",
   "isActive": true
 }
-~~~
+```
 
 saltSignature is required and limited to 512 characters. dosageFormId is optional and must reference an active dosage form. strengthSignature is optional and limited to 255 characters. isActive defaults to true.
 
 ### 18. Get a substitution group
 
-~~~http
+```http
 GET /api/v1/substitution-groups/{groupId}?includeDeleted=false
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Loads one substitution signature for administration or audit. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Path parameter | groupId: substitution-group UUID. |
-| Query parameter | includeDeleted: optional boolean, default false. |
-| Success | 200 OK. |
-| Errors | 404 RESOURCE_NOT_FOUND; 503. |
+| Item            | Value                                                             |
+| --------------- | ----------------------------------------------------------------- |
+| Why use it      | Loads one substitution signature for administration or audit.     |
+| Authorization   | ❌ No bearer guard is declared by the current catalog controller. |
+| Path parameter  | groupId: substitution-group UUID.                                 |
+| Query parameter | includeDeleted: optional boolean, default false.                  |
+| Success         | 200 OK.                                                           |
+| Errors          | 404 RESOURCE_NOT_FOUND; 503.                                      |
 
 ### 19. Update a substitution group
 
-~~~http
+```http
 PATCH /api/v1/substitution-groups/{groupId}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Changes a group signature or active state. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK. |
-| Errors | 400; 404 RESOURCE_NOT_FOUND; 409 SUBSTITUTION_GROUP_ALREADY_EXISTS or SUBSTITUTION_GROUP_VERSION_CONFLICT; 503. |
+| Item          | Value                                                                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| Why use it    | Changes a group signature or active state.                                                                      |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.                                           |
+| Success       | 200 OK.                                                                                                         |
+| Errors        | 400; 404 RESOURCE_NOT_FOUND; 409 SUBSTITUTION_GROUP_ALREADY_EXISTS or SUBSTITUTION_GROUP_VERSION_CONFLICT; 503. |
 
-~~~json
+```json
 {
   "strengthSignature": "500 mg",
   "isActive": true,
   "expectedRowVersion": 1
 }
-~~~
+```
 
 All changeable fields are optional, but at least one must be supplied.
 
 ### 20. Deactivate a substitution group
 
-~~~http
+```http
 DELETE /api/v1/substitution-groups/{groupId}
-~~~
+```
 
 Write operation with optional X-User-ID. Soft-deletes the group and returns:
 
-~~~json
+```json
 { "message": "The substitution group has been deactivated." }
-~~~
+```
 
 ### 21. Reactivate a substitution group
 
-~~~http
+```http
 POST /api/v1/substitution-groups/{groupId}/reactivate
-~~~
+```
 
 Write operation with optional X-User-ID. Restores a soft-deleted group. Errors are 404 RESOURCE_NOT_FOUND and 503 when applicable.
 
 ### 22. List products in a substitution group
 
-~~~http
+```http
 GET /api/v1/substitution-groups/{groupId}/products
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Displays or manages products available as alternatives in one group. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Path parameter | groupId: substitution-group UUID. |
-| Success | 200 OK; data.items contains products ordered by priority. |
-| Errors | 404 RESOURCE_NOT_FOUND; 503. |
+| Item           | Value                                                                |
+| -------------- | -------------------------------------------------------------------- |
+| Why use it     | Displays or manages products available as alternatives in one group. |
+| Authorization  | ❌ No bearer guard is declared by the current catalog controller.    |
+| Path parameter | groupId: substitution-group UUID.                                    |
+| Success        | 200 OK; data.items contains products ordered by priority.            |
+| Errors         | 404 RESOURCE_NOT_FOUND; 503.                                         |
 
 ### 23. Add a product to a substitution group
 
-~~~http
+```http
 POST /api/v1/substitution-groups/{groupId}/products
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Makes a product eligible for alternative-product lookup through the group. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 201 Created. |
-| Errors | 400; 404 PRODUCT_NOT_FOUND or RESOURCE_NOT_FOUND; 409 SUBSTITUTION_GROUP_PRODUCT_ALREADY_EXISTS; 503. |
+| Item          | Value                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| Why use it    | Makes a product eligible for alternative-product lookup through the group.                            |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.                                 |
+| Success       | 201 Created.                                                                                          |
+| Errors        | 400; 404 PRODUCT_NOT_FOUND or RESOURCE_NOT_FOUND; 409 SUBSTITUTION_GROUP_PRODUCT_ALREADY_EXISTS; 503. |
 
-~~~json
+```json
 {
   "productId": "550e8400-e29b-41d4-a716-446655440001",
   "priority": 1
 }
-~~~
+```
 
 priority is an integer ≥ 0 and defaults to 0.
 
 ### 24. Update substitution-group product priority
 
-~~~http
+```http
 PATCH /api/v1/substitution-groups/{groupId}/products/{productId}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Changes the order in which a member product is presented as an alternative. |
-| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK. |
-| Errors | 400; 404 when membership is missing; 409 on row-version conflict; 503. |
+| Item          | Value                                                                       |
+| ------------- | --------------------------------------------------------------------------- |
+| Why use it    | Changes the order in which a member product is presented as an alternative. |
+| Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution.       |
+| Success       | 200 OK.                                                                     |
+| Errors        | 400; 404 when membership is missing; 409 on row-version conflict; 503.      |
 
-~~~json
+```json
 {
   "priority": 2,
   "expectedRowVersion": 1
 }
-~~~
+```
 
 ### 25. Remove a product from a substitution group
 
-~~~http
+```http
 DELETE /api/v1/substitution-groups/{groupId}/products/{productId}
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Removes one product membership without deleting the product itself. |
+| Item          | Value                                                                 |
+| ------------- | --------------------------------------------------------------------- |
+| Why use it    | Removes one product membership without deleting the product itself.   |
 | Authorization | ⚠️ No bearer guard is declared; send X-User-ID for audit attribution. |
-| Success | 200 OK. |
-| Errors | 404 when membership is missing; 503. |
+| Success       | 200 OK.                                                               |
+| Errors        | 404 when membership is missing; 503.                                  |
 
-~~~json
+```json
 { "message": "The product has been removed from the substitution group." }
-~~~
+```
 
 ### 26. List substitution groups for a product
 
-~~~http
+```http
 GET /api/v1/products/{productId}/substitution-groups
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Loads alternative groups for a product detail page or substitute-product component. |
-| Authorization | ❌ No bearer guard is declared by the current catalog controller. |
-| Path parameter | productId: product UUID. |
-| Success | 200 OK; data.items contains group signatures and membership priorities. |
-| Errors | 404 PRODUCT_NOT_FOUND; 503. |
+| Item           | Value                                                                               |
+| -------------- | ----------------------------------------------------------------------------------- |
+| Why use it     | Loads alternative groups for a product detail page or substitute-product component. |
+| Authorization  | ❌ No bearer guard is declared by the current catalog controller.                   |
+| Path parameter | productId: product UUID.                                                            |
+| Success        | 200 OK; data.items contains group signatures and membership priorities.             |
+| Errors         | 404 PRODUCT_NOT_FOUND; 503.                                                         |
 
 ---
 
@@ -948,41 +945,41 @@ GET /api/v1/products/{productId}/substitution-groups
 
 Reference endpoints provide controlled values used by product forms, catalogue filters, and product detail displays. All six reference resources support the same lifecycle pattern:
 
-~~~text
+```text
 GET list → POST create → GET by UUID → PATCH update → DELETE deactivate → POST reactivate
-~~~
+```
 
 ### Common reference list query
 
-| Field | Required | Rules |
-| --- | ---: | --- |
-| page | ❌ | Integer ≥ 1; default 1. |
-| pageSize | ❌ | Integer 1–100; default 20. |
-| search | ❌ | String, maximum 200 characters. |
-| isActive | ❌ | Boolean where the resource has an active flag. |
-| includeDeleted | ❌ | Boolean, default false. |
-| sortBy | ❌ | Resource-supported sort field; default name. |
-| sortOrder | ❌ | asc or desc; default asc. |
+| Field          | Required | Rules                                          |
+| -------------- | -------: | ---------------------------------------------- |
+| page           |       ❌ | Integer ≥ 1; default 1.                        |
+| pageSize       |       ❌ | Integer 1–100; default 20.                     |
+| search         |       ❌ | String, maximum 200 characters.                |
+| isActive       |       ❌ | Boolean where the resource has an active flag. |
+| includeDeleted |       ❌ | Boolean, default false.                        |
+| sortBy         |       ❌ | Resource-supported sort field; default name.   |
+| sortOrder      |       ❌ | asc or desc; default asc.                      |
 
 ### Brands
 
 #### 27. List brands
 
-~~~http
+```http
 GET /api/v1/brands
-~~~
+```
 
 Public read. Use the common reference list query. Returns brand records with id, name, slug, description, logoFileId, ownerOrganizationId, isActive, metadata, timestamps, and rowVersion where available.
 
 #### 28. Create a brand
 
-~~~http
+```http
 POST /api/v1/brands
-~~~
+```
 
 Write operation with optional X-User-ID; returns 201 Created.
 
-~~~json
+```json
 {
   "name": "Acme Pharma",
   "slug": "acme-pharma",
@@ -991,43 +988,43 @@ Write operation with optional X-User-ID; returns 201 Created.
   "ownerOrganizationId": "550e8400-e29b-41d4-a716-446655440001",
   "isActive": true
 }
-~~~
+```
 
 name is required and limited to 255 characters. slug, logoFileId, and ownerOrganizationId are optional. Duplicate name/slug returns a 409 conflict.
 
 #### 29. Get a brand
 
-~~~http
+```http
 GET /api/v1/brands/{entityId}?includeDeleted=false
-~~~
+```
 
 Public read. entityId is the brand UUID. Missing records return 404 RESOURCE_NOT_FOUND.
 
 #### 30. Update a brand
 
-~~~http
+```http
 PATCH /api/v1/brands/{entityId}
-~~~
+```
 
 Write operation with optional X-User-ID. At least one editable field is required. Body fields are the optional brand fields from the create example. Returns 200 OK or 400, 404, 409, and 503 as applicable.
 
 #### 31. Deactivate a brand
 
-~~~http
+```http
 DELETE /api/v1/brands/{entityId}
-~~~
+```
 
 Write operation; returns:
 
-~~~json
+```json
 { "message": "The brand has been deactivated." }
-~~~
+```
 
 #### 32. Reactivate a brand
 
-~~~http
+```http
 POST /api/v1/brands/{entityId}/reactivate
-~~~
+```
 
 Write operation; restores a deleted brand after duplicate checks. Returns 200 OK or 404, 409, and 503.
 
@@ -1035,21 +1032,21 @@ Write operation; restores a deleted brand after duplicate checks. Returns 200 OK
 
 #### 33. List manufacturers
 
-~~~http
+```http
 GET /api/v1/manufacturers
-~~~
+```
 
 Public read. Uses the common reference list query and returns manufacturer records.
 
 #### 34. Create a manufacturer
 
-~~~http
+```http
 POST /api/v1/manufacturers
-~~~
+```
 
 Write operation with optional X-User-ID; returns 201 Created.
 
-~~~json
+```json
 {
   "organizationId": "550e8400-e29b-41d4-a716-446655440000",
   "name": "Acme Labs",
@@ -1058,39 +1055,39 @@ Write operation with optional X-User-ID; returns 201 Created.
   "countryCode": "IN",
   "isActive": true
 }
-~~~
+```
 
 name is required; countryCode defaults to IN and must be two letters. Duplicate license/name conflicts return 409.
 
 #### 35. Get a manufacturer
 
-~~~http
+```http
 GET /api/v1/manufacturers/{entityId}?includeDeleted=false
-~~~
+```
 
 Public read. entityId is the manufacturer UUID. Missing records return 404 RESOURCE_NOT_FOUND.
 
 #### 36. Update a manufacturer
 
-~~~http
+```http
 PATCH /api/v1/manufacturers/{entityId}
-~~~
+```
 
 Write operation with optional X-User-ID. Supports organizationId, name, legalName, licenseNumber, countryCode, and isActive.
 
 #### 37. Deactivate a manufacturer
 
-~~~http
+```http
 DELETE /api/v1/manufacturers/{entityId}
-~~~
+```
 
 Write operation; returns { "message": "The manufacturer has been deactivated." }.
 
 #### 38. Reactivate a manufacturer
 
-~~~http
+```http
 POST /api/v1/manufacturers/{entityId}/reactivate
-~~~
+```
 
 Write operation; restores a manufacturer after duplicate checks.
 
@@ -1098,27 +1095,27 @@ Write operation; restores a manufacturer after duplicate checks.
 
 #### 39. List categories
 
-~~~http
+```http
 GET /api/v1/categories
-~~~
+```
 
 Public read. Uses the common reference list query and returns flat category records with hierarchy fields.
 
 #### 40. Get the category tree
 
-~~~http
+```http
 GET /api/v1/categories/tree?includeInactive=false
-~~~
+```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Builds nested catalogue navigation and category selectors. |
-| Authorization | ❌ Not enforced by the current controller. |
-| Query parameter | includeInactive, optional boolean, default false. |
-| Success | 200 OK with data.items root nodes and nested children. |
-| Errors | 503 for database failure. |
+| Item            | Value                                                      |
+| --------------- | ---------------------------------------------------------- |
+| Why use it      | Builds nested catalogue navigation and category selectors. |
+| Authorization   | ❌ Not enforced by the current controller.                 |
+| Query parameter | includeInactive, optional boolean, default false.          |
+| Success         | 200 OK with data.items root nodes and nested children.     |
+| Errors          | 503 for database failure.                                  |
 
-~~~json
+```json
 {
   "items": [
     {
@@ -1133,17 +1130,17 @@ GET /api/v1/categories/tree?includeInactive=false
     }
   ]
 }
-~~~
+```
 
 #### 41. Create a category
 
-~~~http
+```http
 POST /api/v1/categories
-~~~
+```
 
 Write operation with optional X-User-ID; returns 201 Created.
 
-~~~json
+```json
 {
   "parentId": null,
   "name": "Pain relief",
@@ -1152,39 +1149,39 @@ Write operation with optional X-User-ID; returns 201 Created.
   "isActive": true,
   "metadataJson": {}
 }
-~~~
+```
 
 name is required. parentId must reference an active category. The service derives path and level.
 
 #### 42. Get a category
 
-~~~http
+```http
 GET /api/v1/categories/{entityId}?includeDeleted=false
-~~~
+```
 
 Public read. entityId is the category UUID.
 
 #### 43. Update a category
 
-~~~http
+```http
 PATCH /api/v1/categories/{entityId}
-~~~
+```
 
 Write operation with optional X-User-ID. Supports parentId, name, slug, displayOrder, isActive, and metadataJson. The service updates descendant paths when a valid move is requested.
 
 #### 44. Deactivate a category
 
-~~~http
+```http
 DELETE /api/v1/categories/{entityId}
-~~~
+```
 
 Write operation. A category with active descendants cannot be deactivated and returns 409 CATEGORY_HAS_DESCENDANTS.
 
 #### 45. Reactivate a category
 
-~~~http
+```http
 POST /api/v1/categories/{entityId}/reactivate
-~~~
+```
 
 Write operation. Restoration checks slug uniqueness and requires an active parent when the category has a parent. Parent issues return 409 CATEGORY_PARENT_INACTIVE.
 
@@ -1192,59 +1189,59 @@ Write operation. Restoration checks slug uniqueness and requires an active paren
 
 #### 46. List salts
 
-~~~http
+```http
 GET /api/v1/salts
-~~~
+```
 
 Public read. Uses pagination, search, deletion, and sorting filters. Salt records are used in product composition and substitution matching.
 
 #### 47. Create a salt
 
-~~~http
+```http
 POST /api/v1/salts
-~~~
+```
 
 Write operation with optional X-User-ID; returns 201 Created.
 
-~~~json
+```json
 {
   "name": "Paracetamol",
   "description": "Analgesic and antipyretic active ingredient",
   "standardCode": "PCM"
 }
-~~~
+```
 
 name is required and limited to 255 characters. standardCode is optional and limited to 64 characters.
 
 #### 48. Get a salt
 
-~~~http
+```http
 GET /api/v1/salts/{entityId}?includeDeleted=false
-~~~
+```
 
 Public read. entityId is the salt UUID.
 
 #### 49. Update a salt
 
-~~~http
+```http
 PATCH /api/v1/salts/{entityId}
-~~~
+```
 
 Write operation with optional X-User-ID. Supports name, description, and standardCode. At least one field is required.
 
 #### 50. Deactivate a salt
 
-~~~http
+```http
 DELETE /api/v1/salts/{entityId}
-~~~
+```
 
 Write operation; returns { "message": "The salt has been deactivated." }.
 
 #### 51. Reactivate a salt
 
-~~~http
+```http
 POST /api/v1/salts/{entityId}/reactivate
-~~~
+```
 
 Write operation; restores a salt reference.
 
@@ -1252,60 +1249,60 @@ Write operation; restores a salt reference.
 
 #### 52. List dosage forms
 
-~~~http
+```http
 GET /api/v1/dosage-forms
-~~~
+```
 
 Public read. Use isActive=true for active product-form selectors.
 
 #### 53. Create a dosage form
 
-~~~http
+```http
 POST /api/v1/dosage-forms
-~~~
+```
 
 Write operation with optional X-User-ID; returns 201 Created.
 
-~~~json
+```json
 {
   "code": "TAB",
   "name": "Tablet",
   "routeOfAdministration": "oral",
   "isActive": true
 }
-~~~
+```
 
 code and name are required. routeOfAdministration is optional and limited to 64 characters.
 
 #### 54. Get a dosage form
 
-~~~http
+```http
 GET /api/v1/dosage-forms/{entityId}?includeDeleted=false
-~~~
+```
 
 Public read. entityId is the dosage-form UUID.
 
 #### 55. Update a dosage form
 
-~~~http
+```http
 PATCH /api/v1/dosage-forms/{entityId}
-~~~
+```
 
 Write operation with optional X-User-ID. Supports code, name, routeOfAdministration, and isActive.
 
 #### 56. Deactivate a dosage form
 
-~~~http
+```http
 DELETE /api/v1/dosage-forms/{entityId}
-~~~
+```
 
 Write operation; returns { "message": "The dosage form has been deactivated." }.
 
 #### 57. Reactivate a dosage form
 
-~~~http
+```http
 POST /api/v1/dosage-forms/{entityId}/reactivate
-~~~
+```
 
 Write operation; restores a dosage-form reference.
 
@@ -1313,60 +1310,60 @@ Write operation; restores a dosage-form reference.
 
 #### 58. List units
 
-~~~http
+```http
 GET /api/v1/units
-~~~
+```
 
 Public read. Returns units used by product variant pack quantities.
 
 #### 59. Create a unit
 
-~~~http
+```http
 POST /api/v1/units
-~~~
+```
 
 Write operation with optional X-User-ID; returns 201 Created.
 
-~~~json
+```json
 {
   "code": "TAB",
   "name": "Tablet",
   "dimension": "count",
   "conversionToBase": "1"
 }
-~~~
+```
 
 code, name, and dimension are required. conversionToBase is a numeric string, defaults to "1", and must be greater than zero.
 
 #### 60. Get a unit
 
-~~~http
+```http
 GET /api/v1/units/{entityId}?includeDeleted=false
-~~~
+```
 
 Public read. entityId is the unit UUID.
 
 #### 61. Update a unit
 
-~~~http
+```http
 PATCH /api/v1/units/{entityId}
-~~~
+```
 
 Write operation with optional X-User-ID. Supports code, name, dimension, and conversionToBase.
 
 #### 62. Deactivate a unit
 
-~~~http
+```http
 DELETE /api/v1/units/{entityId}
-~~~
+```
 
 Write operation; returns { "message": "The unit has been deactivated." }.
 
 #### 63. Reactivate a unit
 
-~~~http
+```http
 POST /api/v1/units/{entityId}/reactivate
-~~~
+```
 
 Write operation; restores a unit reference.
 
@@ -1422,4 +1419,3 @@ Write operation; restores a unit reference.
 - Generated Swagger UI is available at /api/docs when the API application is running. This document is the frontend-readable companion to that generated specification.
 
 > 🛡️ **Security reminder:** Never treat X-User-ID as authentication. Do not log access tokens, authorization headers, personal data, prescription data, or sensitive product-regulatory metadata.
-

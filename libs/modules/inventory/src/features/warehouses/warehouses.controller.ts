@@ -46,9 +46,24 @@ export class WarehousesController {
   constructor(private readonly handler: WarehousesHandler) {}
 
   @Get()
-  @ApiInventoryOperation('List warehouses', 'Returns paginated warehouse records for fulfilment routing, inventory administration, and capability-based stock selection.')
-  @ApiInventoryQuery(WarehouseListQueryDto, 'Optional search, lifecycle, capability, sorting, soft-delete, and pagination filters.')
-  @ApiInventoryPaginatedResponse('Warehouses returned.', { items: [{ id: '550e8400-e29b-41d4-a716-446655440000', code: 'WH-KOL-01', name: 'Kolkata Central Warehouse', status: 'active' }] })
+  @ApiInventoryOperation(
+    'List warehouses',
+    'Returns paginated warehouse records for fulfilment routing, inventory administration, and capability-based stock selection.',
+  )
+  @ApiInventoryQuery(
+    WarehouseListQueryDto,
+    'Optional search, lifecycle, capability, sorting, soft-delete, and pagination filters.',
+  )
+  @ApiInventoryPaginatedResponse('Warehouses returned.', {
+    items: [
+      {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        code: 'WH-KOL-01',
+        name: 'Kolkata Central Warehouse',
+        status: 'active',
+      },
+    ],
+  })
   // * Function [list]: Returns paginated warehouse records.
   list(@Query() query: WarehouseListQueryDto) {
     return this.handler.execute('list-warehouses', query);
@@ -56,9 +71,25 @@ export class WarehousesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiInventoryOperation('Create a warehouse', 'Creates a warehouse linked to an organization location and records its cold-chain, controlled-drug, and operating-hours capabilities.')
-  @ApiInventoryBody(WarehouseCreateDto, 'Organization, location, code, name, type, capabilities, status, and operating hours.')
-  @ApiInventoryResponse('Warehouse created.', { id: '550e8400-e29b-41d4-a716-446655440000', code: 'WH-KOL-01', name: 'Kolkata Central Warehouse', status: 'active', rowVersion: 1 }, HttpStatus.CREATED)
+  @ApiInventoryOperation(
+    'Create a warehouse',
+    'Creates a warehouse linked to an organization location and records its cold-chain, controlled-drug, and operating-hours capabilities.',
+  )
+  @ApiInventoryBody(
+    WarehouseCreateDto,
+    'Organization, location, code, name, type, capabilities, status, and operating hours.',
+  )
+  @ApiInventoryResponse(
+    'Warehouse created.',
+    {
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      code: 'WH-KOL-01',
+      name: 'Kolkata Central Warehouse',
+      status: 'active',
+      rowVersion: 1,
+    },
+    HttpStatus.CREATED,
+  )
   @ApiInventoryActorHeader()
   // * Function [create]: Creates a warehouse with its location and capabilities.
   create(@Body() request: WarehouseCreateDto, @Headers('x-user-id') user?: string) {
@@ -66,9 +97,18 @@ export class WarehousesController {
   }
 
   @Get(':warehouseId')
-  @ApiInventoryOperation('Get a warehouse', 'Returns one warehouse and its capabilities. Use includeDeleted=true for administrative recovery screens.')
+  @ApiInventoryOperation(
+    'Get a warehouse',
+    'Returns one warehouse and its capabilities. Use includeDeleted=true for administrative recovery screens.',
+  )
   @ApiInventoryUuidParam('warehouseId', 'Warehouse UUID to retrieve.')
-  @ApiInventoryResponse('Warehouse returned.', { id: '550e8400-e29b-41d4-a716-446655440000', code: 'WH-KOL-01', name: 'Kolkata Central Warehouse', supportsColdChain: true, rowVersion: 1 })
+  @ApiInventoryResponse('Warehouse returned.', {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    code: 'WH-KOL-01',
+    name: 'Kolkata Central Warehouse',
+    supportsColdChain: true,
+    rowVersion: 1,
+  })
   // * Function [get]: Retrieves one warehouse, optionally including deleted history.
   get(
     @Param('warehouseId', new ParseUUIDPipe()) warehouseId: string,
@@ -81,10 +121,17 @@ export class WarehousesController {
   }
 
   @Patch(':warehouseId')
-  @ApiInventoryOperation('Update a warehouse', 'Updates mutable warehouse metadata and capabilities using rowVersion to protect concurrent operator edits.')
+  @ApiInventoryOperation(
+    'Update a warehouse',
+    'Updates mutable warehouse metadata and capabilities using rowVersion to protect concurrent operator edits.',
+  )
   @ApiInventoryUuidParam('warehouseId', 'Warehouse UUID to update.')
   @ApiInventoryBody(WarehouseUpdateDto, 'Mutable fields and the current rowVersion.')
-  @ApiInventoryResponse('Warehouse updated.', { id: '550e8400-e29b-41d4-a716-446655440000', name: 'Kolkata Fulfilment Warehouse', rowVersion: 2 })
+  @ApiInventoryResponse('Warehouse updated.', {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Kolkata Fulfilment Warehouse',
+    rowVersion: 2,
+  })
   @ApiInventoryActorHeader()
   // * Function [update]: Applies an optimistic-locked warehouse update.
   update(
@@ -100,9 +147,14 @@ export class WarehousesController {
   }
 
   @Delete(':warehouseId')
-  @ApiInventoryOperation('Deactivate a warehouse', 'Soft-deactivates a warehouse so normal inventory selection excludes it while preserving its history.')
+  @ApiInventoryOperation(
+    'Deactivate a warehouse',
+    'Soft-deactivates a warehouse so normal inventory selection excludes it while preserving its history.',
+  )
   @ApiInventoryUuidParam('warehouseId', 'Warehouse UUID to deactivate.')
-  @ApiInventoryResponse('Warehouse deactivated.', { message: 'The warehouse has been deactivated.' })
+  @ApiInventoryResponse('Warehouse deactivated.', {
+    message: 'The warehouse has been deactivated.',
+  })
   @ApiInventoryActorHeader()
   // * Function [remove]: Soft-deactivates a warehouse.
   remove(
@@ -113,9 +165,16 @@ export class WarehousesController {
   }
 
   @Post(':warehouseId/reactivate')
-  @ApiInventoryOperation('Reactivate a warehouse', 'Restores a soft-deleted warehouse so it can be used by inventory and fulfilment workflows again.')
+  @ApiInventoryOperation(
+    'Reactivate a warehouse',
+    'Restores a soft-deleted warehouse so it can be used by inventory and fulfilment workflows again.',
+  )
   @ApiInventoryUuidParam('warehouseId', 'Warehouse UUID to reactivate.')
-  @ApiInventoryResponse('Warehouse reactivated.', { id: '550e8400-e29b-41d4-a716-446655440000', status: 'active', rowVersion: 3 })
+  @ApiInventoryResponse('Warehouse reactivated.', {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    status: 'active',
+    rowVersion: 3,
+  })
   @ApiInventoryActorHeader()
   // * Function [reactivate]: Restores a soft-deleted warehouse.
   reactivate(
@@ -126,9 +185,20 @@ export class WarehousesController {
   }
 
   @Get(':warehouseId/bins')
-  @ApiInventoryOperation('List warehouse bins', 'Returns active bins and their zone, aisle, and rack context for stock placement, picking, relocation, and receiving.')
+  @ApiInventoryOperation(
+    'List warehouse bins',
+    'Returns active bins and their zone, aisle, and rack context for stock placement, picking, relocation, and receiving.',
+  )
   @ApiInventoryUuidParam('warehouseId', 'Warehouse UUID whose bins should be returned.')
-  @ApiInventoryResponse('Warehouse bins returned.', [{ id: '550e8400-e29b-41d4-a716-446655440009', code: 'A-01', binType: 'pick', status: 'active', pickSequence: 1 }])
+  @ApiInventoryResponse('Warehouse bins returned.', [
+    {
+      id: '550e8400-e29b-41d4-a716-446655440009',
+      code: 'A-01',
+      binType: 'pick',
+      status: 'active',
+      pickSequence: 1,
+    },
+  ])
   // * Function [listBins]: Lists active bins and their hierarchy context.
   listBins(@Param('warehouseId', new ParseUUIDPipe()) warehouseId: string) {
     return this.handler.execute('list-warehouse-bins', { warehouseId });

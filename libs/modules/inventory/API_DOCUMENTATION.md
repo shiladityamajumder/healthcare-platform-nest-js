@@ -83,25 +83,25 @@ X-User-ID: 550e8400-e29b-41d4-a716-446655440099
 
 ### HTTP and data rules
 
-| Rule | Description |
-| --- | --- |
-| Content type | Send JSON bodies with `Content-Type: application/json`. |
-| IDs | Resource IDs are UUID values. Path UUIDs are validated by the API. |
-| Quantities | Send numeric quantities as decimal strings, for example `"25.000"`. This avoids frontend floating-point loss. |
-| Dates | Send ISO-8601 date or date-time strings, for example `2026-01-15` or `2026-01-15T10:00:00.000Z`. |
-| Pagination | List queries use one-based `page` and `pageSize`; default is page `1`, size `20`. |
-| Sorting | Inventory sorting supports `productName`, `expiresAt`, `availableQty`, and `updatedAt`; warehouse sorting supports `name`, `code`, and `createdAt`. |
-| Unknown fields | Send only documented fields. The global validation configuration may reject unknown fields. |
-| Schema ownership | Do not expect this repository to create or migrate tables. The API matches the existing database contract. |
+| Rule             | Description                                                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Content type     | Send JSON bodies with `Content-Type: application/json`.                                                                                             |
+| IDs              | Resource IDs are UUID values. Path UUIDs are validated by the API.                                                                                  |
+| Quantities       | Send numeric quantities as decimal strings, for example `"25.000"`. This avoids frontend floating-point loss.                                       |
+| Dates            | Send ISO-8601 date or date-time strings, for example `2026-01-15` or `2026-01-15T10:00:00.000Z`.                                                    |
+| Pagination       | List queries use one-based `page` and `pageSize`; default is page `1`, size `20`.                                                                   |
+| Sorting          | Inventory sorting supports `productName`, `expiresAt`, `availableQty`, and `updatedAt`; warehouse sorting supports `name`, `code`, and `createdAt`. |
+| Unknown fields   | Send only documented fields. The global validation configuration may reject unknown fields.                                                         |
+| Schema ownership | Do not expect this repository to create or migrate tables. The API matches the existing database contract.                                          |
 
 ### Common request headers
 
-| Header | Required | Used for | Example |
-| --- | --- | --- | --- |
-| `Content-Type` | JSON body requests | Request body format | `application/json` |
-| `X-User-ID` | Required for selected stock mutations; optional for other writes | Audit actor and mutation attribution | `550e8400-e29b-41d4-a716-446655440099` |
-| `X-Request-ID` | Optional | Client-generated support/request ID | `inventory-screen-001` |
-| `X-Correlation-ID` | Optional | Correlates related frontend operations | `fulfilment-flow-2026-001` |
+| Header             | Required                                                         | Used for                               | Example                                |
+| ------------------ | ---------------------------------------------------------------- | -------------------------------------- | -------------------------------------- |
+| `Content-Type`     | JSON body requests                                               | Request body format                    | `application/json`                     |
+| `X-User-ID`        | Required for selected stock mutations; optional for other writes | Audit actor and mutation attribution   | `550e8400-e29b-41d4-a716-446655440099` |
+| `X-Request-ID`     | Optional                                                         | Client-generated support/request ID    | `inventory-screen-001`                 |
+| `X-Correlation-ID` | Optional                                                         | Correlates related frontend operations | `fulfilment-flow-2026-001`             |
 
 The API currently documents `X-User-ID` rather than a direct bearer guard on these controllers. Application-level authentication/authorization should be applied by the platform before exposing mutation endpoints.
 
@@ -109,11 +109,11 @@ The API currently documents `X-User-ID` rather than a direct bearer guard on the
 
 Successful and error responses may include:
 
-| Header | Meaning |
-| --- | --- |
-| `X-Request-ID` | Request identifier for logs and support. |
+| Header             | Meaning                                                         |
+| ------------------ | --------------------------------------------------------------- |
+| `X-Request-ID`     | Request identifier for logs and support.                        |
 | `X-Correlation-ID` | Correlation identifier supplied or generated for the operation. |
-| `X-API-Version` | API version that processed the request, normally `v1`. |
+| `X-API-Version`    | API version that processed the request, normally `v1`.          |
 
 ---
 
@@ -223,13 +223,13 @@ Use `error.code` for frontend decisions. Human-readable `message` text is not a 
 
 ### Common HTTP statuses and codes
 
-| HTTP status | Typical error codes | Frontend action |
-| ---: | --- | --- |
-| `400` | `VALIDATION_ERROR`, `INVENTORY_VALIDATION_ERROR` | Highlight invalid fields, quantities, UUIDs, dates, or missing row versions. Do not retry unchanged input. |
-| `404` | `WAREHOUSE_NOT_FOUND`, `LOCATION_NOT_FOUND`, `PRODUCT_NOT_FOUND`, `BIN_NOT_FOUND`, `LOT_NOT_FOUND`, `BALANCE_NOT_FOUND`, `RESERVATION_NOT_FOUND`, `HOLD_NOT_FOUND`, `ADJUSTMENT_NOT_FOUND`, `TRANSFER_NOT_FOUND`, `TRANSFER_ITEM_NOT_FOUND`, `CYCLE_COUNT_NOT_FOUND`, `CYCLE_COUNT_ITEM_NOT_FOUND` | Refresh the relevant resource list or show that the selected resource no longer exists. |
-| `409` | `INSUFFICIENT_STOCK`, `CONCURRENT_UPDATE`, `RESERVATION_ALREADY_EXISTS`, `INVALID_RESERVATION_STATE`, `INVALID_HOLD_STATE`, `TRANSFER_ALREADY_EXISTS`, `INVALID_TRANSFER_STATE`, `CYCLE_COUNT_ALREADY_COMPLETED`, `INVALID_COUNT_VARIANCE` | Refresh current server state, show the conflict, and require the user to confirm/retry with current data. |
-| `500` | `INTERNAL_SERVER_ERROR` | Show a generic failure state and retain `meta.requestId` for support. |
-| `503` | `DATABASE_ERROR`, `INFRASTRUCTURE_ERROR`, `INFRASTRUCTURE_UNAVAILABLE` | Show temporary unavailability and retry with backoff when the operation is safe to repeat. |
+| HTTP status | Typical error codes                                                                                                                                                                                                                                                                                | Frontend action                                                                                            |
+| ----------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+|       `400` | `VALIDATION_ERROR`, `INVENTORY_VALIDATION_ERROR`                                                                                                                                                                                                                                                   | Highlight invalid fields, quantities, UUIDs, dates, or missing row versions. Do not retry unchanged input. |
+|       `404` | `WAREHOUSE_NOT_FOUND`, `LOCATION_NOT_FOUND`, `PRODUCT_NOT_FOUND`, `BIN_NOT_FOUND`, `LOT_NOT_FOUND`, `BALANCE_NOT_FOUND`, `RESERVATION_NOT_FOUND`, `HOLD_NOT_FOUND`, `ADJUSTMENT_NOT_FOUND`, `TRANSFER_NOT_FOUND`, `TRANSFER_ITEM_NOT_FOUND`, `CYCLE_COUNT_NOT_FOUND`, `CYCLE_COUNT_ITEM_NOT_FOUND` | Refresh the relevant resource list or show that the selected resource no longer exists.                    |
+|       `409` | `INSUFFICIENT_STOCK`, `CONCURRENT_UPDATE`, `RESERVATION_ALREADY_EXISTS`, `INVALID_RESERVATION_STATE`, `INVALID_HOLD_STATE`, `TRANSFER_ALREADY_EXISTS`, `INVALID_TRANSFER_STATE`, `CYCLE_COUNT_ALREADY_COMPLETED`, `INVALID_COUNT_VARIANCE`                                                         | Refresh current server state, show the conflict, and require the user to confirm/retry with current data.  |
+|       `500` | `INTERNAL_SERVER_ERROR`                                                                                                                                                                                                                                                                            | Show a generic failure state and retain `meta.requestId` for support.                                      |
+|       `503` | `DATABASE_ERROR`, `INFRASTRUCTURE_ERROR`, `INFRASTRUCTURE_UNAVAILABLE`                                                                                                                                                                                                                             | Show temporary unavailability and retry with backoff when the operation is safe to repeat.                 |
 
 ### Stock-safety behavior
 
@@ -252,28 +252,28 @@ Use `error.code` for frontend decisions. Human-readable `message` text is not a 
 GET /api/v1/warehouses?page=1&pageSize=20&status=active&supportsColdChain=true
 ```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Populate warehouse selectors, fulfilment routing screens, and warehouse administration lists. |
-| Authorization | Platform authorization recommended; no direct bearer guard in the current controller. |
-| Request body | None. |
-| Success | `200 OK`, paginated. |
-| Errors | `400` invalid query; `503` database/infrastructure failure. |
+| Item          | Value                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| Why use it    | Populate warehouse selectors, fulfilment routing screens, and warehouse administration lists. |
+| Authorization | Platform authorization recommended; no direct bearer guard in the current controller.         |
+| Request body  | None.                                                                                         |
+| Success       | `200 OK`, paginated.                                                                          |
+| Errors        | `400` invalid query; `503` database/infrastructure failure.                                   |
 
 Query fields:
 
-| Field | Required | Rules |
-| --- | ---: | --- |
-| `search` | ❌ | Searches warehouse name and code; maximum 200 characters. |
-| `status` | ❌ | Warehouse lifecycle status, for example `active`. |
-| `warehouseType` | ❌ | Warehouse classification, for example `central` or `fulfilment`. |
-| `supportsColdChain` | ❌ | Boolean filter. |
-| `supportsControlledDrugs` | ❌ | Boolean filter. |
-| `includeDeleted` | ❌ | Boolean; defaults to `false`. |
-| `sortBy` | ❌ | `name`, `code`, or `createdAt`; defaults to `name`. |
-| `sortOrder` | ❌ | `asc` or `desc`; defaults to `asc`. |
-| `page` | ❌ | One-based integer; defaults to `1`. |
-| `pageSize` | ❌ | Integer 1–100; defaults to `20`. |
+| Field                     | Required | Rules                                                            |
+| ------------------------- | -------: | ---------------------------------------------------------------- |
+| `search`                  |       ❌ | Searches warehouse name and code; maximum 200 characters.        |
+| `status`                  |       ❌ | Warehouse lifecycle status, for example `active`.                |
+| `warehouseType`           |       ❌ | Warehouse classification, for example `central` or `fulfilment`. |
+| `supportsColdChain`       |       ❌ | Boolean filter.                                                  |
+| `supportsControlledDrugs` |       ❌ | Boolean filter.                                                  |
+| `includeDeleted`          |       ❌ | Boolean; defaults to `false`.                                    |
+| `sortBy`                  |       ❌ | `name`, `code`, or `createdAt`; defaults to `name`.              |
+| `sortOrder`               |       ❌ | `asc` or `desc`; defaults to `asc`.                              |
+| `page`                    |       ❌ | One-based integer; defaults to `1`.                              |
+| `pageSize`                |       ❌ | Integer 1–100; defaults to `20`.                                 |
 
 ### 2. Create a warehouse
 
@@ -297,17 +297,17 @@ Content-Type: application/json
 }
 ```
 
-| Field | Required | Rules |
-| --- | ---: | --- |
-| `organizationId` | ✅ | Organization UUID. |
-| `locationId` | ✅ | Existing `organization.locations` UUID. |
-| `code` | ✅ | Non-empty string, maximum 64 characters; should be unique for the organization. |
-| `name` | ✅ | Non-empty string, maximum 150 characters. |
-| `warehouseType` | ✅ | Non-empty string, maximum 32 characters. |
-| `status` | ❌ | String, maximum 32 characters; defaults to `active`. |
-| `supportsColdChain` | ❌ | Boolean; defaults to `false`. |
-| `supportsControlledDrugs` | ❌ | Boolean; defaults to `false`. |
-| `operatingHours` | ❌ | JSON object/array; defaults to `{}`. |
+| Field                     | Required | Rules                                                                           |
+| ------------------------- | -------: | ------------------------------------------------------------------------------- |
+| `organizationId`          |       ✅ | Organization UUID.                                                              |
+| `locationId`              |       ✅ | Existing `organization.locations` UUID.                                         |
+| `code`                    |       ✅ | Non-empty string, maximum 64 characters; should be unique for the organization. |
+| `name`                    |       ✅ | Non-empty string, maximum 150 characters.                                       |
+| `warehouseType`           |       ✅ | Non-empty string, maximum 32 characters.                                        |
+| `status`                  |       ❌ | String, maximum 32 characters; defaults to `active`.                            |
+| `supportsColdChain`       |       ❌ | Boolean; defaults to `false`.                                                   |
+| `supportsControlledDrugs` |       ❌ | Boolean; defaults to `false`.                                                   |
+| `operatingHours`          |       ❌ | JSON object/array; defaults to `{}`.                                            |
 
 **Success:** `201 Created`.  
 **Errors:** `400` invalid input; `404 LOCATION_NOT_FOUND`; `409` database uniqueness/state conflict; `503` database unavailable.
@@ -318,14 +318,14 @@ Content-Type: application/json
 GET /api/v1/warehouses/{warehouseId}?includeDeleted=false
 ```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Load warehouse detail, capabilities, row version, and location context. |
-| Path | `warehouseId` is a warehouse UUID. |
-| Query | `includeDeleted` is optional and defaults to `false`. |
+| Item          | Value                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------- |
+| Why use it    | Load warehouse detail, capabilities, row version, and location context.               |
+| Path          | `warehouseId` is a warehouse UUID.                                                    |
+| Query         | `includeDeleted` is optional and defaults to `false`.                                 |
 | Authorization | Platform authorization recommended; no direct bearer guard in the current controller. |
-| Success | `200 OK`. |
-| Errors | `400` malformed UUID; `404 WAREHOUSE_NOT_FOUND`; `503` dependency failure. |
+| Success       | `200 OK`.                                                                             |
+| Errors        | `400` malformed UUID; `404 WAREHOUSE_NOT_FOUND`; `503` dependency failure.            |
 
 ### 4. Update a warehouse
 
@@ -345,15 +345,15 @@ Content-Type: application/json
 
 At least one mutable field is required, together with the current `rowVersion`.
 
-| Field | Required | Rules |
-| --- | ---: | --- |
-| `name` | ❌ | Replacement name, maximum 150 characters. |
-| `warehouseType` | ❌ | Replacement type, maximum 32 characters. |
-| `status` | ❌ | Replacement status, maximum 32 characters. |
-| `supportsColdChain` | ❌ | Boolean. |
-| `supportsControlledDrugs` | ❌ | Boolean. |
-| `operatingHours` | ❌ | Replacement JSON object/array. |
-| `rowVersion` | ✅ | Current integer version from the last warehouse response. |
+| Field                     | Required | Rules                                                     |
+| ------------------------- | -------: | --------------------------------------------------------- |
+| `name`                    |       ❌ | Replacement name, maximum 150 characters.                 |
+| `warehouseType`           |       ❌ | Replacement type, maximum 32 characters.                  |
+| `status`                  |       ❌ | Replacement status, maximum 32 characters.                |
+| `supportsColdChain`       |       ❌ | Boolean.                                                  |
+| `supportsControlledDrugs` |       ❌ | Boolean.                                                  |
+| `operatingHours`          |       ❌ | Replacement JSON object/array.                            |
+| `rowVersion`              |       ✅ | Current integer version from the last warehouse response. |
 
 **Success:** `200 OK`.  
 **Errors:** `400` invalid body or missing row version; `404 WAREHOUSE_NOT_FOUND`; `409 CONCURRENT_UPDATE` if another operator changed the warehouse.
@@ -401,28 +401,28 @@ Returns active bins with zone, aisle, rack, bin code, type, status, and pick seq
 GET /api/v1/product-inventory?productId=550e8400-e29b-41d4-a716-446655440008&inStock=true&page=1&pageSize=20
 ```
 
-| Item | Value |
-| --- | --- |
-| Why use it | Display available stock for catalogue, product detail, fulfilment, and operations screens. |
-| Authorization | Platform authorization recommended; no direct bearer guard in the current controller. |
-| Success | `200 OK`, paginated. |
-| Errors | `400` invalid filter; `503` dependency failure. |
+| Item          | Value                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| Why use it    | Display available stock for catalogue, product detail, fulfilment, and operations screens. |
+| Authorization | Platform authorization recommended; no direct bearer guard in the current controller.      |
+| Success       | `200 OK`, paginated.                                                                       |
+| Errors        | `400` invalid filter; `503` dependency failure.                                            |
 
 Query fields:
 
-| Field | Rules |
-| --- | --- |
-| `productId`, `variantId`, `warehouseId` | Optional UUID filters. |
-| `qualityStatus` | Optional string, maximum 16 characters. |
-| `inStock` | `true` for available quantity greater than zero; `false` for zero/negative availability. |
-| `lowStock` | Returns balances at or below the active replenishment minimum. |
-| `expiringSoon` | Returns lots expiring within `expiryDays`. |
-| `expired` | Returns lots whose expiry date has passed. |
-| `expiryDays` | Integer 1–730; defaults to `90`. |
-| `search` | Searches product name, SKU, or batch number; maximum 200 characters. |
-| `sortBy` | `productName`, `expiresAt`, `availableQty`, or `updatedAt`. |
-| `sortOrder` | `asc` or `desc`. |
-| `page`, `pageSize` | One-based page and size 1–100. |
+| Field                                   | Rules                                                                                    |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `productId`, `variantId`, `warehouseId` | Optional UUID filters.                                                                   |
+| `qualityStatus`                         | Optional string, maximum 16 characters.                                                  |
+| `inStock`                               | `true` for available quantity greater than zero; `false` for zero/negative availability. |
+| `lowStock`                              | Returns balances at or below the active replenishment minimum.                           |
+| `expiringSoon`                          | Returns lots expiring within `expiryDays`.                                               |
+| `expired`                               | Returns lots whose expiry date has passed.                                               |
+| `expiryDays`                            | Integer 1–730; defaults to `90`.                                                         |
+| `search`                                | Searches product name, SKU, or batch number; maximum 200 characters.                     |
+| `sortBy`                                | `productName`, `expiresAt`, `availableQty`, or `updatedAt`.                              |
+| `sortOrder`                             | `asc` or `desc`.                                                                         |
+| `page`, `pageSize`                      | One-based page and size 1–100.                                                           |
 
 ### 9. List inventory lots
 
@@ -552,14 +552,14 @@ GET /api/v1/product-inventory/ledger?warehouseId=550e8400-e29b-41d4-a716-4466554
 
 Available filters:
 
-| Field | Description |
-| --- | --- |
-| `warehouseId`, `lotId`, `referenceId` | UUID filters. |
-| `movementType` | For example `receipt`, `adjustment`, `reservation`, `transfer_out`, `transfer_in`, or `relocation_in`. |
-| `referenceType` | For example `inventory_lot`, `stock_reservation`, `stock_transfer`, or `cycle_count`. |
-| `from` | Include movements at or after this ISO date-time. |
-| `until` | Include movements before this ISO date-time. |
-| `page`, `pageSize` | Pagination controls. |
+| Field                                 | Description                                                                                            |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `warehouseId`, `lotId`, `referenceId` | UUID filters.                                                                                          |
+| `movementType`                        | For example `receipt`, `adjustment`, `reservation`, `transfer_out`, `transfer_in`, or `relocation_in`. |
+| `referenceType`                       | For example `inventory_lot`, `stock_reservation`, `stock_transfer`, or `cycle_count`.                  |
+| `from`                                | Include movements at or after this ISO date-time.                                                      |
+| `until`                               | Include movements before this ISO date-time.                                                           |
+| `page`, `pageSize`                    | Pagination controls.                                                                                   |
 
 Ledger rows are audit history. Frontends should not edit or delete them.
 
@@ -1103,4 +1103,3 @@ GET /api/v1/replenishment-rules?warehouseId=550e8400-e29b-41d4-a716-446655440000
 - On `INSUFFICIENT_STOCK`, reload inventory; do not blindly retry.
 - On a network timeout for an idempotent operation, retry with the same idempotency key.
 - Keep `meta.requestId` in frontend logs and support reports.
-

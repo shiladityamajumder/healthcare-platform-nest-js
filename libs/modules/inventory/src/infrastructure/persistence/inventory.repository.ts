@@ -26,31 +26,45 @@ export class InventoryRepository implements InventoryRepositoryPort {
 
   // * Function [warehouseExists]: Checks whether an active warehouse exists.
   async warehouseExists(id: string): Promise<boolean> {
-    const result = await this.database.query(`SELECT 1 FROM warehouse.warehouses WHERE id = $1 AND is_deleted = false`, [id]);
+    const result = await this.database.query(
+      `SELECT 1 FROM warehouse.warehouses WHERE id = $1 AND is_deleted = false`,
+      [id],
+    );
     return Boolean(result.rowCount);
   }
 
   // * Function [locationExists]: Checks whether an organization location exists.
   async locationExists(id: string): Promise<boolean> {
-    const result = await this.database.query(`SELECT 1 FROM organization.locations WHERE id = $1`, [id]);
+    const result = await this.database.query(`SELECT 1 FROM organization.locations WHERE id = $1`, [
+      id,
+    ]);
     return Boolean(result.rowCount);
   }
 
   // * Function [productExists]: Checks whether an active catalog product exists.
   async productExists(id: string): Promise<boolean> {
-    const result = await this.database.query(`SELECT 1 FROM catalog.products WHERE id = $1 AND is_deleted = false`, [id]);
+    const result = await this.database.query(
+      `SELECT 1 FROM catalog.products WHERE id = $1 AND is_deleted = false`,
+      [id],
+    );
     return Boolean(result.rowCount);
   }
 
   // * Function [variantMatches]: Confirms that a variant belongs to the selected product.
   async variantMatches(id: string, productId: string): Promise<boolean> {
-    const result = await this.database.query(`SELECT 1 FROM catalog.product_variants WHERE id = $1 AND product_id = $2 AND is_deleted = false`, [id, productId]);
+    const result = await this.database.query(
+      `SELECT 1 FROM catalog.product_variants WHERE id = $1 AND product_id = $2 AND is_deleted = false`,
+      [id, productId],
+    );
     return Boolean(result.rowCount);
   }
 
   // * Function [binExistsForWarehouse]: Confirms that a bin belongs to an active warehouse.
   async binExistsForWarehouse(id: string, warehouseId: string): Promise<boolean> {
-    const result = await this.database.query(`SELECT 1 FROM warehouse.bins WHERE id = $1 AND warehouse_id = $2 AND is_deleted = false`, [id, warehouseId]);
+    const result = await this.database.query(
+      `SELECT 1 FROM warehouse.bins WHERE id = $1 AND warehouse_id = $2 AND is_deleted = false`,
+      [id, warehouseId],
+    );
     return Boolean(result.rowCount);
   }
 
@@ -79,7 +93,11 @@ export class InventoryRepository implements InventoryRepositoryPort {
       values.push(query.supportsControlledDrugs);
       where.push(`w.supports_controlled_drugs = $${values.length}`);
     }
-    const sortMap: Record<string, string> = { name: 'w.name', code: 'w.code', createdAt: 'w.created_at' };
+    const sortMap: Record<string, string> = {
+      name: 'w.name',
+      code: 'w.code',
+      createdAt: 'w.created_at',
+    };
     const sort = sortMap[query.sortBy] ?? sortMap.name;
     const direction = query.sortOrder === 'desc' ? 'DESC' : 'ASC';
     const filter = where.length ? `WHERE ${where.join(' AND ')}` : '';
@@ -140,7 +158,10 @@ export class InventoryRepository implements InventoryRepositoryPort {
     const entries = Object.entries(values).filter(([key]) => warehouseFields[key]);
     if (!entries.length) return mapRow(current);
     const params = entries.map(([, value]) => jsonValue(value));
-    const assignments = entries.map(([key], index) => `${warehouseFields[key]} = $${index + 1}${key === 'operatingHours' ? '::jsonb' : ''}`);
+    const assignments = entries.map(
+      ([key], index) =>
+        `${warehouseFields[key]} = $${index + 1}${key === 'operatingHours' ? '::jsonb' : ''}`,
+    );
     const actorIndex = params.length + 1;
     params.push(actor);
     params.push(id);
@@ -226,7 +247,15 @@ export class InventoryRepository implements InventoryRepositoryPort {
          reorder_qty = $4, preferred_supplier_id = $5, is_active = $6,
          updated_by = $7, updated_at = now(), row_version = row_version + 1
          WHERE id = $1 RETURNING *`,
-        [existing.rows[0].id, values.minimumQuantity, values.maximumQuantity, values.reorderQuantity, values.preferredSupplierId ?? null, values.isActive ?? true, actor],
+        [
+          existing.rows[0].id,
+          values.minimumQuantity,
+          values.maximumQuantity,
+          values.reorderQuantity,
+          values.preferredSupplierId ?? null,
+          values.isActive ?? true,
+          actor,
+        ],
       );
       return mapRow(result.rows[0]);
     }
@@ -235,7 +264,17 @@ export class InventoryRepository implements InventoryRepositoryPort {
         (warehouse_id, product_id, variant_id, minimum_qty, maximum_qty, reorder_qty,
          preferred_supplier_id, is_active, created_by, updated_by)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$9) RETURNING *`,
-      [values.warehouseId, values.productId, values.variantId ?? null, values.minimumQuantity, values.maximumQuantity, values.reorderQuantity, values.preferredSupplierId ?? null, values.isActive ?? true, actor],
+      [
+        values.warehouseId,
+        values.productId,
+        values.variantId ?? null,
+        values.minimumQuantity,
+        values.maximumQuantity,
+        values.reorderQuantity,
+        values.preferredSupplierId ?? null,
+        values.isActive ?? true,
+        actor,
+      ],
     );
     return mapRow(result.rows[0]);
   }
@@ -290,14 +329,19 @@ export class InventoryRepository implements InventoryRepositoryPort {
     }
     if (query.search) {
       values.push(`%${query.search}%`);
-      where.push(`(p.name ILIKE $${values.length} OR p.sku ILIKE $${values.length} OR il.batch_number ILIKE $${values.length})`);
+      where.push(
+        `(p.name ILIKE $${values.length} OR p.sku ILIKE $${values.length} OR il.batch_number ILIKE $${values.length})`,
+      );
     }
     if (query.expired === true) where.push('il.expires_at < CURRENT_DATE');
     if (query.expiringSoon === true) {
       values.push(query.expiryDays);
-      where.push(`il.expires_at >= CURRENT_DATE AND il.expires_at <= CURRENT_DATE + $${values.length}::int`);
+      where.push(
+        `il.expires_at >= CURRENT_DATE AND il.expires_at <= CURRENT_DATE + $${values.length}::int`,
+      );
     }
-    const available = '(COALESCE(SUM(sb.on_hand_qty), 0) - COALESCE(SUM(sb.reserved_qty), 0) - COALESCE(SUM(sb.damaged_qty), 0) - COALESCE(SUM(sb.quarantined_qty), 0))';
+    const available =
+      '(COALESCE(SUM(sb.on_hand_qty), 0) - COALESCE(SUM(sb.reserved_qty), 0) - COALESCE(SUM(sb.damaged_qty), 0) - COALESCE(SUM(sb.quarantined_qty), 0))';
     const having: string[] = [];
     if (query.inStock === true) having.push(`${available} > 0`);
     if (query.inStock === false) having.push(`${available} <= 0`);
@@ -310,7 +354,11 @@ export class InventoryRepository implements InventoryRepositoryPort {
     const filter = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const havingFilter = having.length ? `HAVING ${having.join(' AND ')}` : '';
     const groupBy = 'GROUP BY il.id, p.sku, p.name, w.name';
-    const sortMap: Record<string, string> = { productName: 'product_name', expiresAt: 'expires_at', availableQty: 'available_qty' };
+    const sortMap: Record<string, string> = {
+      productName: 'product_name',
+      expiresAt: 'expires_at',
+      availableQty: 'available_qty',
+    };
     const sort = sortMap[query.sortBy] ?? sortMap.productName;
     const direction = query.sortOrder === 'desc' ? 'DESC' : 'ASC';
     const countValues = [...values];
@@ -366,7 +414,9 @@ export class InventoryRepository implements InventoryRepositoryPort {
     }
     if (query.search) {
       values.push(`%${query.search}%`);
-      where.push(`(p.name ILIKE $${values.length} OR p.sku ILIKE $${values.length} OR il.batch_number ILIKE $${values.length})`);
+      where.push(
+        `(p.name ILIKE $${values.length} OR p.sku ILIKE $${values.length} OR il.batch_number ILIKE $${values.length})`,
+      );
     }
     const available = '(sb.on_hand_qty - sb.reserved_qty - sb.damaged_qty - sb.quarantined_qty)';
     if (query.inStock === true) where.push(`${available} > 0`);
@@ -374,7 +424,9 @@ export class InventoryRepository implements InventoryRepositoryPort {
     if (query.expired === true) where.push('il.expires_at < CURRENT_DATE');
     if (query.expiringSoon === true) {
       values.push(query.expiryDays);
-      where.push(`il.expires_at >= CURRENT_DATE AND il.expires_at <= CURRENT_DATE + $${values.length}::int`);
+      where.push(
+        `il.expires_at >= CURRENT_DATE AND il.expires_at <= CURRENT_DATE + $${values.length}::int`,
+      );
     }
     if (query.lowStock === true) {
       where.push(`EXISTS (SELECT 1 FROM warehouse.replenishment_rules rr WHERE rr.warehouse_id = sb.warehouse_id
@@ -428,19 +480,42 @@ export class InventoryRepository implements InventoryRepositoryPort {
          manufactured_at, expires_at, purchase_cost, mrp, quality_status, recall_status, received_at,
          created_by, updated_by)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$14) RETURNING *`,
-      [values.warehouseId, values.productId, values.variantId ?? null, values.supplierId ?? null, values.goodsReceiptItemId ?? null, values.batchNumber, values.manufacturedAt ?? null, values.expiresAt, values.purchaseCost ?? null, values.mrp, values.qualityStatus ?? 'pending', values.recallStatus ?? 'clear', values.receivedAt ?? new Date(), actor],
+      [
+        values.warehouseId,
+        values.productId,
+        values.variantId ?? null,
+        values.supplierId ?? null,
+        values.goodsReceiptItemId ?? null,
+        values.batchNumber,
+        values.manufacturedAt ?? null,
+        values.expiresAt,
+        values.purchaseCost ?? null,
+        values.mrp,
+        values.qualityStatus ?? 'pending',
+        values.recallStatus ?? 'clear',
+        values.receivedAt ?? new Date(),
+        actor,
+      ],
     );
     return mapRow(result.rows[0]);
   }
 
   // * Function [getLot]: Retrieves one inventory lot by UUID.
   async getLot(id: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.inventory_lots WHERE id = $1`, [id]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.inventory_lots WHERE id = $1`,
+      [id],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
   // * Function [updateLot]: Applies a row-version guarded lot update.
-  async updateLot(id: string, values: Row, actor: string | null, rowVersion: number): Promise<Row | null> {
+  async updateLot(
+    id: string,
+    values: Row,
+    actor: string | null,
+    rowVersion: number,
+  ): Promise<Row | null> {
     const entries = Object.entries(values).filter(([key]) => lotFields[key]);
     if (!entries.length) return this.getLot(id);
     const params = entries.map(([, value]) => value);
@@ -532,7 +607,13 @@ export class InventoryRepository implements InventoryRepositoryPort {
   async listLedger(query: Row) {
     const values: unknown[] = [];
     const where: string[] = [];
-    for (const [field, value] of [['warehouse_id', query.warehouseId], ['lot_id', query.lotId], ['movement_type', query.movementType], ['reference_type', query.referenceType], ['reference_id', query.referenceId]] as const) {
+    for (const [field, value] of [
+      ['warehouse_id', query.warehouseId],
+      ['lot_id', query.lotId],
+      ['movement_type', query.movementType],
+      ['reference_type', query.referenceType],
+      ['reference_id', query.referenceId],
+    ] as const) {
       if (value) {
         values.push(value);
         where.push(`${field} = $${values.length}`);
@@ -549,14 +630,23 @@ export class InventoryRepository implements InventoryRepositoryPort {
     const filter = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const countValues = [...values];
     values.push(query.pageSize, (query.page - 1) * query.pageSize);
-    const rows = await this.database.query<Row>(`SELECT * FROM warehouse.stock_ledger ${filter} ORDER BY occurred_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`, values);
-    const count = await this.database.query<{ total: string }>(`SELECT COUNT(*)::text AS total FROM warehouse.stock_ledger ${filter}`, countValues);
+    const rows = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_ledger ${filter} ORDER BY occurred_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`,
+      values,
+    );
+    const count = await this.database.query<{ total: string }>(
+      `SELECT COUNT(*)::text AS total FROM warehouse.stock_ledger ${filter}`,
+      countValues,
+    );
     return { rows: rows.rows.map(mapRow), total: Number(count.rows[0]?.total ?? 0) };
   }
 
   // * Function [findLedgerByIdempotency]: Finds a previously posted movement for safe retries.
   async findLedgerByIdempotency(key: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.stock_ledger WHERE idempotency_key = $1 LIMIT 1`, [key]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_ledger WHERE idempotency_key = $1 LIMIT 1`,
+      [key],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
@@ -567,13 +657,29 @@ export class InventoryRepository implements InventoryRepositoryPort {
         (warehouse_id, bin_id, lot_id, movement_type, quantity, reference_type, reference_id,
          idempotency_key, occurred_at, actor_user_id, notes)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
-      [values.warehouseId, values.binId ?? null, values.lotId, values.movementType, values.quantity, values.referenceType, values.referenceId, values.idempotencyKey, values.occurredAt ?? new Date(), values.actorUserId ?? null, values.notes ?? null],
+      [
+        values.warehouseId,
+        values.binId ?? null,
+        values.lotId,
+        values.movementType,
+        values.quantity,
+        values.referenceType,
+        values.referenceId,
+        values.idempotencyKey,
+        values.occurredAt ?? new Date(),
+        values.actorUserId ?? null,
+        values.notes ?? null,
+      ],
     );
     return mapRow(result.rows[0]);
   }
 
   // * Function [getBalanceForUpdate]: Locks one stock balance for a mutation.
-  async getBalanceForUpdate(warehouseId: string, binId: string, lotId: string): Promise<Row | null> {
+  async getBalanceForUpdate(
+    warehouseId: string,
+    binId: string,
+    lotId: string,
+  ): Promise<Row | null> {
     const result = await this.database.query<Row>(
       `SELECT * FROM warehouse.stock_balances WHERE warehouse_id = $1 AND bin_id = $2 AND lot_id = $3 FOR UPDATE`,
       [warehouseId, binId, lotId],
@@ -603,7 +709,16 @@ export class InventoryRepository implements InventoryRepositoryPort {
          damaged_qty = EXCLUDED.damaged_qty, quarantined_qty = EXCLUDED.quarantined_qty,
          updated_by = EXCLUDED.updated_by, updated_at = now(), row_version = warehouse.stock_balances.row_version + 1
        RETURNING *`,
-      [values.warehouseId, values.binId, values.lotId, values.onHandQty ?? '0', values.reservedQty ?? '0', values.damagedQty ?? '0', values.quarantinedQty ?? '0', values.actorUserId ?? null],
+      [
+        values.warehouseId,
+        values.binId,
+        values.lotId,
+        values.onHandQty ?? '0',
+        values.reservedQty ?? '0',
+        values.damagedQty ?? '0',
+        values.quarantinedQty ?? '0',
+        values.actorUserId ?? null,
+      ],
     );
     return mapRow(result.rows[0]);
   }
@@ -614,20 +729,36 @@ export class InventoryRepository implements InventoryRepositoryPort {
       `INSERT INTO warehouse.stock_reservations
         (reservation_number, order_id, order_item_id, warehouse_id, bin_id, lot_id, quantity, status, expires_at, created_by, updated_by)
        VALUES ($1,$2,$3,$4,$5,$6,$7,'active',$8,$9,$9) RETURNING *`,
-      [values.reservationNumber, values.orderId, values.orderItemId, values.warehouseId, values.binId ?? null, values.lotId, values.quantity, values.expiresAt, actor],
+      [
+        values.reservationNumber,
+        values.orderId,
+        values.orderItemId,
+        values.warehouseId,
+        values.binId ?? null,
+        values.lotId,
+        values.quantity,
+        values.expiresAt,
+        actor,
+      ],
     );
     return mapRow(result.rows[0]);
   }
 
   // * Function [getReservation]: Retrieves or locks one reservation.
   async getReservation(id: string, forUpdate = false): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.stock_reservations WHERE id = $1 ${forUpdate ? 'FOR UPDATE' : ''}`, [id]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_reservations WHERE id = $1 ${forUpdate ? 'FOR UPDATE' : ''}`,
+      [id],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
   // * Function [findReservationByNumber]: Checks the business reservation number for duplicates.
   async findReservationByNumber(reservationNumber: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.stock_reservations WHERE reservation_number = $1 LIMIT 1`, [reservationNumber]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_reservations WHERE reservation_number = $1 LIMIT 1`,
+      [reservationNumber],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
@@ -635,7 +766,12 @@ export class InventoryRepository implements InventoryRepositoryPort {
   async listReservations(query: Row) {
     const values: unknown[] = [];
     const where: string[] = [];
-    for (const [field, value] of [['warehouse_id', query.warehouseId], ['order_id', query.orderId], ['order_item_id', query.orderItemId], ['status', query.status]] as const) {
+    for (const [field, value] of [
+      ['warehouse_id', query.warehouseId],
+      ['order_id', query.orderId],
+      ['order_item_id', query.orderItemId],
+      ['status', query.status],
+    ] as const) {
       if (value) {
         values.push(value);
         where.push(`${field} = $${values.length}`);
@@ -648,13 +784,23 @@ export class InventoryRepository implements InventoryRepositoryPort {
     const filter = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const countValues = [...values];
     values.push(query.pageSize, (query.page - 1) * query.pageSize);
-    const rows = await this.database.query<Row>(`SELECT * FROM warehouse.stock_reservations ${filter} ORDER BY created_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`, values);
-    const count = await this.database.query<{ total: string }>(`SELECT COUNT(*)::text AS total FROM warehouse.stock_reservations ${filter}`, countValues);
+    const rows = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_reservations ${filter} ORDER BY created_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`,
+      values,
+    );
+    const count = await this.database.query<{ total: string }>(
+      `SELECT COUNT(*)::text AS total FROM warehouse.stock_reservations ${filter}`,
+      countValues,
+    );
     return { rows: rows.rows.map(mapRow), total: Number(count.rows[0]?.total ?? 0) };
   }
 
   // * Function [updateReservationStatus]: Records a reservation lifecycle transition and timestamp.
-  async updateReservationStatus(id: string, status: string, actor: string | null): Promise<Row | null> {
+  async updateReservationStatus(
+    id: string,
+    status: string,
+    actor: string | null,
+  ): Promise<Row | null> {
     const field = status === 'released' || status === 'expired' ? 'released_at' : 'committed_at';
     const result = await this.database.query<Row>(
       `UPDATE warehouse.stock_reservations SET status = $2, ${field} = now(), updated_by = $3,
@@ -685,14 +831,24 @@ export class InventoryRepository implements InventoryRepositoryPort {
       `INSERT INTO warehouse.stock_holds
         (warehouse_id, bin_id, lot_id, quantity, reason_code, status, created_by, updated_by)
        VALUES ($1,$2,$3,$4,$5,'active',$6,$6) RETURNING *`,
-      [values.warehouseId, values.binId ?? null, values.lotId, values.quantity, values.reasonCode, actor],
+      [
+        values.warehouseId,
+        values.binId ?? null,
+        values.lotId,
+        values.quantity,
+        values.reasonCode,
+        actor,
+      ],
     );
     return mapRow(result.rows[0]);
   }
 
   // * Function [getHold]: Retrieves or locks one stock hold.
   async getHold(id: string, forUpdate = false): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.stock_holds WHERE id = $1 ${forUpdate ? 'FOR UPDATE' : ''}`, [id]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_holds WHERE id = $1 ${forUpdate ? 'FOR UPDATE' : ''}`,
+      [id],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
@@ -700,7 +856,11 @@ export class InventoryRepository implements InventoryRepositoryPort {
   async listHolds(query: Row) {
     const values: unknown[] = [];
     const where: string[] = [];
-    for (const [field, value] of [['warehouse_id', query.warehouseId], ['lot_id', query.lotId], ['status', query.status]] as const) {
+    for (const [field, value] of [
+      ['warehouse_id', query.warehouseId],
+      ['lot_id', query.lotId],
+      ['status', query.status],
+    ] as const) {
       if (value) {
         values.push(value);
         where.push(`${field} = $${values.length}`);
@@ -709,8 +869,14 @@ export class InventoryRepository implements InventoryRepositoryPort {
     const filter = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const countValues = [...values];
     values.push(query.pageSize, (query.page - 1) * query.pageSize);
-    const rows = await this.database.query<Row>(`SELECT * FROM warehouse.stock_holds ${filter} ORDER BY created_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`, values);
-    const count = await this.database.query<{ total: string }>(`SELECT COUNT(*)::text AS total FROM warehouse.stock_holds ${filter}`, countValues);
+    const rows = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_holds ${filter} ORDER BY created_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`,
+      values,
+    );
+    const count = await this.database.query<{ total: string }>(
+      `SELECT COUNT(*)::text AS total FROM warehouse.stock_holds ${filter}`,
+      countValues,
+    );
     return { rows: rows.rows.map(mapRow), total: Number(count.rows[0]?.total ?? 0) };
   }
 
@@ -742,20 +908,33 @@ export class InventoryRepository implements InventoryRepositoryPort {
       `INSERT INTO warehouse.inventory_adjustment_items
         (adjustment_id, bin_id, lot_id, quantity_delta, notes, created_by, updated_by)
        VALUES ($1,$2,$3,$4,$5,$6,$6) RETURNING *`,
-      [values.adjustmentId, values.binId, values.lotId, values.quantityDelta, values.notes ?? null, actor],
+      [
+        values.adjustmentId,
+        values.binId,
+        values.lotId,
+        values.quantityDelta,
+        values.notes ?? null,
+        actor,
+      ],
     );
     return mapRow(result.rows[0]);
   }
 
   // * Function [getAdjustment]: Retrieves one adjustment header.
   async getAdjustment(id: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.inventory_adjustments WHERE id = $1`, [id]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.inventory_adjustments WHERE id = $1`,
+      [id],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
   // * Function [listAdjustmentItems]: Retrieves the lines belonging to an adjustment.
   async listAdjustmentItems(adjustmentId: string): Promise<Row[]> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.inventory_adjustment_items WHERE adjustment_id = $1 ORDER BY id`, [adjustmentId]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.inventory_adjustment_items WHERE adjustment_id = $1 ORDER BY id`,
+      [adjustmentId],
+    );
     return result.rows.map(mapRow);
   }
 
@@ -763,7 +942,11 @@ export class InventoryRepository implements InventoryRepositoryPort {
   async listAdjustments(query: Row) {
     const values: unknown[] = [];
     const where: string[] = [];
-    for (const [field, value] of [['warehouse_id', query.warehouseId], ['status', query.status], ['reason_code', query.reasonCode]] as const) {
+    for (const [field, value] of [
+      ['warehouse_id', query.warehouseId],
+      ['status', query.status],
+      ['reason_code', query.reasonCode],
+    ] as const) {
       if (value) {
         values.push(value);
         where.push(`${field} = $${values.length}`);
@@ -772,8 +955,14 @@ export class InventoryRepository implements InventoryRepositoryPort {
     const filter = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const countValues = [...values];
     values.push(query.pageSize, (query.page - 1) * query.pageSize);
-    const rows = await this.database.query<Row>(`SELECT * FROM warehouse.inventory_adjustments ${filter} ORDER BY created_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`, values);
-    const count = await this.database.query<{ total: string }>(`SELECT COUNT(*)::text AS total FROM warehouse.inventory_adjustments ${filter}`, countValues);
+    const rows = await this.database.query<Row>(
+      `SELECT * FROM warehouse.inventory_adjustments ${filter} ORDER BY created_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`,
+      values,
+    );
+    const count = await this.database.query<{ total: string }>(
+      `SELECT COUNT(*)::text AS total FROM warehouse.inventory_adjustments ${filter}`,
+      countValues,
+    );
     return { rows: rows.rows.map(mapRow), total: Number(count.rows[0]?.total ?? 0) };
   }
 
@@ -801,19 +990,28 @@ export class InventoryRepository implements InventoryRepositoryPort {
 
   // * Function [getTransfer]: Retrieves one transfer header.
   async getTransfer(id: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.stock_transfers WHERE id = $1`, [id]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_transfers WHERE id = $1`,
+      [id],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
   // * Function [getTransferForUpdate]: Locks one transfer during dispatch or receipt.
   async getTransferForUpdate(id: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.stock_transfers WHERE id = $1 FOR UPDATE`, [id]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_transfers WHERE id = $1 FOR UPDATE`,
+      [id],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
   // * Function [findTransferByNumber]: Checks the business transfer number for duplicates.
   async findTransferByNumber(transferNumber: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.stock_transfers WHERE transfer_number = $1 LIMIT 1`, [transferNumber]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_transfers WHERE transfer_number = $1 LIMIT 1`,
+      [transferNumber],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
@@ -821,7 +1019,11 @@ export class InventoryRepository implements InventoryRepositoryPort {
   async listTransfers(query: Row) {
     const values: unknown[] = [];
     const where: string[] = [];
-    for (const [field, value] of [['source_warehouse_id', query.sourceWarehouseId], ['destination_warehouse_id', query.destinationWarehouseId], ['status', query.status]] as const) {
+    for (const [field, value] of [
+      ['source_warehouse_id', query.sourceWarehouseId],
+      ['destination_warehouse_id', query.destinationWarehouseId],
+      ['status', query.status],
+    ] as const) {
       if (value) {
         values.push(value);
         where.push(`${field} = $${values.length}`);
@@ -830,22 +1032,39 @@ export class InventoryRepository implements InventoryRepositoryPort {
     const filter = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const countValues = [...values];
     values.push(query.pageSize, (query.page - 1) * query.pageSize);
-    const rows = await this.database.query<Row>(`SELECT * FROM warehouse.stock_transfers ${filter} ORDER BY created_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`, values);
-    const count = await this.database.query<{ total: string }>(`SELECT COUNT(*)::text AS total FROM warehouse.stock_transfers ${filter}`, countValues);
+    const rows = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_transfers ${filter} ORDER BY created_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`,
+      values,
+    );
+    const count = await this.database.query<{ total: string }>(
+      `SELECT COUNT(*)::text AS total FROM warehouse.stock_transfers ${filter}`,
+      countValues,
+    );
     return { rows: rows.rows.map(mapRow), total: Number(count.rows[0]?.total ?? 0) };
   }
 
   // * Function [listTransferItems]: Retrieves or locks transfer line items.
   async listTransferItems(transferId: string, forUpdate = false): Promise<Row[]> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.stock_transfer_items WHERE transfer_id = $1 ORDER BY id ${forUpdate ? 'FOR UPDATE' : ''}`, [transferId]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.stock_transfer_items WHERE transfer_id = $1 ORDER BY id ${forUpdate ? 'FOR UPDATE' : ''}`,
+      [transferId],
+    );
     return result.rows.map(mapRow);
   }
 
   // * Function [updateTransferStatus]: Changes transfer lifecycle status and timestamps.
-  async updateTransferStatus(id: string, status: string, actor: string | null): Promise<Row | null> {
-    const timestamp = status === 'dispatched' ? 'dispatched_at' : status === 'received' ? 'received_at' : null;
+  async updateTransferStatus(
+    id: string,
+    status: string,
+    actor: string | null,
+  ): Promise<Row | null> {
+    const timestamp =
+      status === 'dispatched' ? 'dispatched_at' : status === 'received' ? 'received_at' : null;
     const update = timestamp ? `, ${timestamp} = now()` : '';
-    const result = await this.database.query<Row>(`UPDATE warehouse.stock_transfers SET status = $2, updated_by = $3, updated_at = now(), row_version = row_version + 1 ${update} WHERE id = $1 RETURNING *`, [id, status, actor]);
+    const result = await this.database.query<Row>(
+      `UPDATE warehouse.stock_transfers SET status = $2, updated_by = $3, updated_at = now(), row_version = row_version + 1 ${update} WHERE id = $1 RETURNING *`,
+      [id, status, actor],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
@@ -864,7 +1083,14 @@ export class InventoryRepository implements InventoryRepositoryPort {
       `INSERT INTO warehouse.cycle_counts
         (warehouse_id, bin_id, status, scheduled_at, assigned_to_user_id, count_mode, created_by, updated_by)
        VALUES ($1,$2,'scheduled',$3,$4,$5,$6,$6) RETURNING *`,
-      [values.warehouseId, values.binId ?? null, values.scheduledAt ?? new Date(), values.assignedToUserId ?? null, values.countMode ?? 'full', actor],
+      [
+        values.warehouseId,
+        values.binId ?? null,
+        values.scheduledAt ?? new Date(),
+        values.assignedToUserId ?? null,
+        values.countMode ?? 'full',
+        actor,
+      ],
     );
     return mapRow(result.rows[0]);
   }
@@ -875,20 +1101,33 @@ export class InventoryRepository implements InventoryRepositoryPort {
       `INSERT INTO warehouse.cycle_count_items
         (cycle_count_id, bin_id, lot_id, system_qty, counted_qty, variance_qty, reason_code, created_by, updated_by)
        VALUES ($1,$2,$3,$4,NULL,NULL,$5,$6,$6) RETURNING *`,
-      [values.cycleCountId, values.binId, values.lotId, values.systemQty, values.reasonCode ?? null, actor],
+      [
+        values.cycleCountId,
+        values.binId,
+        values.lotId,
+        values.systemQty,
+        values.reasonCode ?? null,
+        actor,
+      ],
     );
     return mapRow(result.rows[0]);
   }
 
   // * Function [getCycleCount]: Retrieves one cycle-count session.
   async getCycleCount(id: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.cycle_counts WHERE id = $1`, [id]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.cycle_counts WHERE id = $1`,
+      [id],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
   // * Function [getCycleCountForUpdate]: Locks one cycle-count session for lifecycle changes.
   async getCycleCountForUpdate(id: string): Promise<Row | null> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.cycle_counts WHERE id = $1 FOR UPDATE`, [id]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.cycle_counts WHERE id = $1 FOR UPDATE`,
+      [id],
+    );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
 
@@ -896,7 +1135,11 @@ export class InventoryRepository implements InventoryRepositoryPort {
   async listCycleCounts(query: Row) {
     const values: unknown[] = [];
     const where: string[] = [];
-    for (const [field, value] of [['warehouse_id', query.warehouseId], ['status', query.status], ['assigned_to_user_id', query.assignedToUserId]] as const) {
+    for (const [field, value] of [
+      ['warehouse_id', query.warehouseId],
+      ['status', query.status],
+      ['assigned_to_user_id', query.assignedToUserId],
+    ] as const) {
       if (value) {
         values.push(value);
         where.push(`${field} = $${values.length}`);
@@ -905,22 +1148,43 @@ export class InventoryRepository implements InventoryRepositoryPort {
     const filter = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const countValues = [...values];
     values.push(query.pageSize, (query.page - 1) * query.pageSize);
-    const rows = await this.database.query<Row>(`SELECT * FROM warehouse.cycle_counts ${filter} ORDER BY scheduled_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`, values);
-    const count = await this.database.query<{ total: string }>(`SELECT COUNT(*)::text AS total FROM warehouse.cycle_counts ${filter}`, countValues);
+    const rows = await this.database.query<Row>(
+      `SELECT * FROM warehouse.cycle_counts ${filter} ORDER BY scheduled_at DESC, id LIMIT $${values.length - 1} OFFSET $${values.length}`,
+      values,
+    );
+    const count = await this.database.query<{ total: string }>(
+      `SELECT COUNT(*)::text AS total FROM warehouse.cycle_counts ${filter}`,
+      countValues,
+    );
     return { rows: rows.rows.map(mapRow), total: Number(count.rows[0]?.total ?? 0) };
   }
 
   // * Function [listCycleCountItems]: Retrieves or locks the lines in a cycle-count session.
   async listCycleCountItems(cycleCountId: string, forUpdate = false): Promise<Row[]> {
-    const result = await this.database.query<Row>(`SELECT * FROM warehouse.cycle_count_items WHERE cycle_count_id = $1 ORDER BY id ${forUpdate ? 'FOR UPDATE' : ''}`, [cycleCountId]);
+    const result = await this.database.query<Row>(
+      `SELECT * FROM warehouse.cycle_count_items WHERE cycle_count_id = $1 ORDER BY id ${forUpdate ? 'FOR UPDATE' : ''}`,
+      [cycleCountId],
+    );
     return result.rows.map(mapRow);
   }
 
   // * Function [updateCycleCount]: Applies a row-version guarded count lifecycle update.
-  async updateCycleCount(id: string, values: Row, actor: string | null, rowVersion: number): Promise<Row | null> {
+  async updateCycleCount(
+    id: string,
+    values: Row,
+    actor: string | null,
+    rowVersion: number,
+  ): Promise<Row | null> {
     const result = await this.database.query<Row>(
       `UPDATE warehouse.cycle_counts SET status = COALESCE($2, status), started_at = COALESCE($3, started_at), completed_at = COALESCE($4, completed_at), updated_by = $5, updated_at = now(), row_version = row_version + 1 WHERE id = $1 AND row_version = $6 RETURNING *`,
-      [id, values.status ?? null, values.startedAt ?? null, values.completedAt ?? null, actor, rowVersion],
+      [
+        id,
+        values.status ?? null,
+        values.startedAt ?? null,
+        values.completedAt ?? null,
+        actor,
+        rowVersion,
+      ],
     );
     return result.rows[0] ? mapRow(result.rows[0]) : null;
   }
@@ -953,7 +1217,9 @@ const lotFields: Record<string, string> = {
 
 // * Function [jsonValue]: Serializes JSON request values before parameterized persistence.
 function jsonValue(value: unknown): unknown {
-  return value && typeof value === 'object' && !(value instanceof Date) ? JSON.stringify(value) : value;
+  return value && typeof value === 'object' && !(value instanceof Date)
+    ? JSON.stringify(value)
+    : value;
 }
 
 // * Function [mapRow]: Maps database snake_case columns to the public camelCase application shape.

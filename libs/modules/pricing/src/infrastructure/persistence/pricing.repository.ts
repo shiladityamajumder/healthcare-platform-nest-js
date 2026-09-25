@@ -360,7 +360,9 @@ export class PricingRepository {
     if (query.activeAt) {
       values.push(query.activeAt);
       const n = values.length;
-      where.push(`starts_at <= $${n} AND (ends_at IS NULL OR ends_at > $${n}) AND status = 'active'`);
+      where.push(
+        `starts_at <= $${n} AND (ends_at IS NULL OR ends_at > $${n}) AND status = 'active'`,
+      );
     }
     const countValues = [...values];
     values.push(query.pageSize, (query.page - 1) * query.pageSize);
@@ -377,7 +379,12 @@ export class PricingRepository {
   }
 
   // * Function [updatePromotion]: Updates allowed promotion fields with row-version protection.
-  async updatePromotion(id: string, values: Row, actor: string | null, expectedRowVersion: number): Promise<Row | null> {
+  async updatePromotion(
+    id: string,
+    values: Row,
+    actor: string | null,
+    expectedRowVersion: number,
+  ): Promise<Row | null> {
     return this.updateMutable(
       'pricing.promotions',
       id,
@@ -548,7 +555,9 @@ export class PricingRepository {
     if (query.activeAt) {
       values.push(query.activeAt);
       const n = values.length;
-      where.push(`cc.is_active = true AND (cc.valid_from IS NULL OR cc.valid_from <= $${n}) AND (cc.valid_until IS NULL OR cc.valid_until > $${n})`);
+      where.push(
+        `cc.is_active = true AND (cc.valid_from IS NULL OR cc.valid_from <= $${n}) AND (cc.valid_until IS NULL OR cc.valid_until > $${n})`,
+      );
     }
     const countValues = [...values];
     values.push(query.pageSize, (query.page - 1) * query.pageSize);
@@ -565,7 +574,12 @@ export class PricingRepository {
   }
 
   // * Function [updateCouponCode]: Updates allowed coupon fields with row-version protection.
-  async updateCouponCode(id: string, values: Row, actor: string | null, expectedRowVersion: number): Promise<Row | null> {
+  async updateCouponCode(
+    id: string,
+    values: Row,
+    actor: string | null,
+    expectedRowVersion: number,
+  ): Promise<Row | null> {
     return this.updateMutable(
       'pricing.coupon_codes',
       id,
@@ -668,7 +682,10 @@ export class PricingRepository {
       `SELECT COUNT(*)::text AS total FROM pricing.promotion_redemptions WHERE ${where.join(' AND ')}`,
       countValues,
     );
-    return { rows: rows.rows.map(mapPromotionRedemption), total: Number(count.rows[0]?.total ?? 0) };
+    return {
+      rows: rows.rows.map(mapPromotionRedemption),
+      total: Number(count.rows[0]?.total ?? 0),
+    };
   }
 
   // * Function [createPricingEvaluation]: Inserts a pricing request/response audit snapshot.

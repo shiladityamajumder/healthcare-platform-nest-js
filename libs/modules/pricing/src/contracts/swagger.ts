@@ -77,13 +77,15 @@ export function ApiPricingOperation(summary: string, description: string): Metho
     ApiHeader({
       name: 'X-Request-ID',
       required: false,
-      description: 'Optional client-generated request identifier. The API generates one when omitted.',
+      description:
+        'Optional client-generated request identifier. The API generates one when omitted.',
       schema: { type: 'string', example: 'request-id' },
     }),
     ApiHeader({
       name: 'X-Correlation-ID',
       required: false,
-      description: 'Optional identifier for correlating this request with related client operations.',
+      description:
+        'Optional identifier for correlating this request with related client operations.',
       schema: { type: 'string', example: 'pricing-screen-load-01' },
     }),
   );
@@ -141,12 +143,17 @@ export function ApiPricingValidationError(): MethodDecorator {
   return ApiBadRequestResponse({
     description:
       'The request body, query, or path parameter failed validation. Common causes include a malformed UUID, invalid date window, unsupported status, invalid numeric amount, or missing optimistic-lock rowVersion.',
-    schema: errorSchema('VALIDATION_ERROR', 'The request contains invalid or incomplete pricing data.'),
+    schema: errorSchema(
+      'VALIDATION_ERROR',
+      'The request contains invalid or incomplete pricing data.',
+    ),
   });
 }
 
 /** Document errors that can be returned by pricing application workflows. */
-export function ApiPricingErrors(options: PricingErrorDocumentation): MethodDecorator & ClassDecorator {
+export function ApiPricingErrors(
+  options: PricingErrorDocumentation,
+): MethodDecorator & ClassDecorator {
   const decorators: MethodDecorator[] = [];
 
   if (options.notFound) {
@@ -213,7 +220,10 @@ export function ApiPricingResponse(
 }
 
 /** Add the standard successful response envelope for paginated list endpoints. */
-export function ApiPricingPaginatedResponse(description: string, dataExample: unknown): MethodDecorator {
+export function ApiPricingPaginatedResponse(
+  description: string,
+  dataExample: unknown,
+): MethodDecorator {
   return ApiResponse({
     status: 200,
     description,

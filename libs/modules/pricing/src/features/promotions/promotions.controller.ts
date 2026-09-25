@@ -50,8 +50,10 @@ import { PromotionsService } from './promotions.service';
 @Controller({ path: 'promotions', version: '1' })
 @ApiPricingErrors({
   notFound: 'The requested promotion or promotion version does not exist.',
-  conflict: 'The promotion code, version number, or requested lifecycle change conflicts with existing pricing state.',
-  unavailable: 'The pricing database is temporarily unavailable. Retry using the request ID for support.',
+  conflict:
+    'The promotion code, version number, or requested lifecycle change conflicts with existing pricing state.',
+  unavailable:
+    'The pricing database is temporarily unavailable. Retry using the request ID for support.',
   internal: 'An unexpected promotion-processing failure occurred.',
 })
 /** HTTP routes for promotion definitions and version lifecycle management. */
@@ -61,9 +63,24 @@ export class PromotionsController {
 
   // * Function [list]: Returns paginated promotion definitions for selection or administration.
   @Get()
-  @ApiPricingOperation('List promotions', 'Returns paginated promotions for administration or promotion selection, with optional status and effective-time filtering.')
-  @ApiPricingQuery(PromotionListQueryDto, 'Optional search, status, effective-at, page, and page-size filters.')
-  @ApiPricingPaginatedResponse('Promotions returned.', [{ id: '550e8400-e29b-41d4-a716-446655440004', code: 'WELCOME10', name: 'Welcome discount', status: 'active', priority: 10, rowVersion: 1 }])
+  @ApiPricingOperation(
+    'List promotions',
+    'Returns paginated promotions for administration or promotion selection, with optional status and effective-time filtering.',
+  )
+  @ApiPricingQuery(
+    PromotionListQueryDto,
+    'Optional search, status, effective-at, page, and page-size filters.',
+  )
+  @ApiPricingPaginatedResponse('Promotions returned.', [
+    {
+      id: '550e8400-e29b-41d4-a716-446655440004',
+      code: 'WELCOME10',
+      name: 'Welcome discount',
+      status: 'active',
+      priority: 10,
+      rowVersion: 1,
+    },
+  ])
   @ApiPricingValidationError()
   list(@Query() query: PromotionListQueryDto) {
     return this.service.listPromotions(query);
@@ -72,9 +89,24 @@ export class PromotionsController {
   // * Function [create]: Creates a promotion definition from the validated request body.
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiPricingOperation('Create a promotion', 'Creates a promotion definition that can later receive versioned rules and benefits for checkout evaluation.')
-  @ApiPricingBody(PromotionCreateDto, 'Promotion code, type, limits, stackability, validity window, lifecycle status, and exclusivity.')
-  @ApiPricingResponse('Promotion created.', { id: '550e8400-e29b-41d4-a716-446655440004', code: 'WELCOME10', status: 'draft', rowVersion: 1 }, HttpStatus.CREATED)
+  @ApiPricingOperation(
+    'Create a promotion',
+    'Creates a promotion definition that can later receive versioned rules and benefits for checkout evaluation.',
+  )
+  @ApiPricingBody(
+    PromotionCreateDto,
+    'Promotion code, type, limits, stackability, validity window, lifecycle status, and exclusivity.',
+  )
+  @ApiPricingResponse(
+    'Promotion created.',
+    {
+      id: '550e8400-e29b-41d4-a716-446655440004',
+      code: 'WELCOME10',
+      status: 'draft',
+      rowVersion: 1,
+    },
+    HttpStatus.CREATED,
+  )
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   create(@Body() body: PromotionCreateDto, @Headers('x-user-id') user?: string) {
@@ -83,10 +115,21 @@ export class PromotionsController {
 
   // * Function [versions]: Lists the version history for one promotion.
   @Get(':promotionId/versions')
-  @ApiPricingOperation('List promotion versions', 'Returns the version history for one promotion so operators can inspect drafts and published pricing rules.')
+  @ApiPricingOperation(
+    'List promotion versions',
+    'Returns the version history for one promotion so operators can inspect drafts and published pricing rules.',
+  )
   @ApiPricingUuidParam('promotionId', 'Promotion UUID whose versions should be listed.')
   @ApiPricingQuery(PromotionVersionListQueryDto, 'Optional published-only and pagination filters.')
-  @ApiPricingPaginatedResponse('Promotion versions returned.', [{ id: '550e8400-e29b-41d4-a716-446655440007', promotionId: '550e8400-e29b-41d4-a716-446655440004', versionNo: 1, publishedAt: null, rowVersion: 1 }])
+  @ApiPricingPaginatedResponse('Promotion versions returned.', [
+    {
+      id: '550e8400-e29b-41d4-a716-446655440007',
+      promotionId: '550e8400-e29b-41d4-a716-446655440004',
+      versionNo: 1,
+      publishedAt: null,
+      rowVersion: 1,
+    },
+  ])
   @ApiPricingValidationError()
   versions(
     @Param('promotionId', new ParseUUIDPipe()) promotionId: string,
@@ -98,10 +141,26 @@ export class PromotionsController {
   // * Function [createVersion]: Creates a versioned rules-and-benefits snapshot.
   @Post(':promotionId/versions')
   @HttpCode(HttpStatus.CREATED)
-  @ApiPricingOperation('Create a promotion version', 'Creates a versioned rules-and-benefits snapshot for a promotion, allowing pricing logic to evolve without rewriting history.')
+  @ApiPricingOperation(
+    'Create a promotion version',
+    'Creates a versioned rules-and-benefits snapshot for a promotion, allowing pricing logic to evolve without rewriting history.',
+  )
   @ApiPricingUuidParam('promotionId', 'Promotion UUID receiving the new version.')
-  @ApiPricingBody(PromotionVersionCreateDto, 'Version number, pricing rules, benefits, and optional publish timestamp.')
-  @ApiPricingResponse('Promotion version created.', { id: '550e8400-e29b-41d4-a716-446655440007', promotionId: '550e8400-e29b-41d4-a716-446655440004', versionNo: 1, publishedAt: null, rowVersion: 1 }, HttpStatus.CREATED)
+  @ApiPricingBody(
+    PromotionVersionCreateDto,
+    'Version number, pricing rules, benefits, and optional publish timestamp.',
+  )
+  @ApiPricingResponse(
+    'Promotion version created.',
+    {
+      id: '550e8400-e29b-41d4-a716-446655440007',
+      promotionId: '550e8400-e29b-41d4-a716-446655440004',
+      versionNo: 1,
+      publishedAt: null,
+      rowVersion: 1,
+    },
+    HttpStatus.CREATED,
+  )
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   createVersion(
@@ -114,10 +173,21 @@ export class PromotionsController {
 
   // * Function [getVersion]: Retrieves one promotion version for audit or administration.
   @Get(':promotionId/versions/:versionId')
-  @ApiPricingOperation('Get a promotion version', 'Returns one immutable rules-and-benefits version for administration or pricing audit inspection.')
+  @ApiPricingOperation(
+    'Get a promotion version',
+    'Returns one immutable rules-and-benefits version for administration or pricing audit inspection.',
+  )
   @ApiPricingUuidParam('promotionId', 'Parent promotion UUID in the route.')
   @ApiPricingUuidParam('versionId', 'Promotion-version UUID to retrieve.')
-  @ApiPricingResponse('Promotion version returned.', { id: '550e8400-e29b-41d4-a716-446655440007', promotionId: '550e8400-e29b-41d4-a716-446655440004', versionNo: 1, rules: { minimumOrderValue: '999.00' }, benefits: { discountPercent: 10 }, publishedAt: '2026-01-01T00:00:00.000Z', rowVersion: 2 })
+  @ApiPricingResponse('Promotion version returned.', {
+    id: '550e8400-e29b-41d4-a716-446655440007',
+    promotionId: '550e8400-e29b-41d4-a716-446655440004',
+    versionNo: 1,
+    rules: { minimumOrderValue: '999.00' },
+    benefits: { discountPercent: 10 },
+    publishedAt: '2026-01-01T00:00:00.000Z',
+    rowVersion: 2,
+  })
   @ApiPricingValidationError()
   getVersion(@Param('versionId', new ParseUUIDPipe()) versionId: string) {
     return this.service.getPromotionVersion(versionId);
@@ -125,10 +195,17 @@ export class PromotionsController {
 
   // * Function [publishVersion]: Publishes one promotion version for pricing evaluation.
   @Post(':promotionId/versions/:versionId/publish')
-  @ApiPricingOperation('Publish a promotion version', 'Marks a promotion version as published so the pricing engine can use its rules and benefits.')
+  @ApiPricingOperation(
+    'Publish a promotion version',
+    'Marks a promotion version as published so the pricing engine can use its rules and benefits.',
+  )
   @ApiPricingUuidParam('promotionId', 'Parent promotion UUID in the route.')
   @ApiPricingUuidParam('versionId', 'Promotion-version UUID to publish.')
-  @ApiPricingResponse('Promotion version published.', { id: '550e8400-e29b-41d4-a716-446655440007', publishedAt: '2026-01-01T00:00:00.000Z', rowVersion: 2 })
+  @ApiPricingResponse('Promotion version published.', {
+    id: '550e8400-e29b-41d4-a716-446655440007',
+    publishedAt: '2026-01-01T00:00:00.000Z',
+    rowVersion: 2,
+  })
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   publishVersion(
@@ -140,10 +217,19 @@ export class PromotionsController {
 
   // * Function [get]: Retrieves one promotion, optionally including soft-deleted history.
   @Get(':promotionId')
-  @ApiPricingOperation('Get a promotion', 'Returns one promotion definition and its lifecycle/version state for administration or eligibility preparation.')
+  @ApiPricingOperation(
+    'Get a promotion',
+    'Returns one promotion definition and its lifecycle/version state for administration or eligibility preparation.',
+  )
   @ApiPricingUuidParam('promotionId', 'Promotion UUID to retrieve.')
   @ApiPricingIncludeDeletedQuery()
-  @ApiPricingResponse('Promotion returned.', { id: '550e8400-e29b-41d4-a716-446655440004', code: 'WELCOME10', name: 'Welcome discount', status: 'active', rowVersion: 1 })
+  @ApiPricingResponse('Promotion returned.', {
+    id: '550e8400-e29b-41d4-a716-446655440004',
+    code: 'WELCOME10',
+    name: 'Welcome discount',
+    status: 'active',
+    rowVersion: 1,
+  })
   @ApiPricingValidationError()
   get(
     @Param('promotionId', new ParseUUIDPipe()) id: string,
@@ -154,10 +240,18 @@ export class PromotionsController {
 
   // * Function [update]: Updates mutable promotion metadata using optimistic locking.
   @Patch(':promotionId')
-  @ApiPricingOperation('Update a promotion', 'Updates mutable promotion metadata and limits using optimistic locking while preserving its version history.')
+  @ApiPricingOperation(
+    'Update a promotion',
+    'Updates mutable promotion metadata and limits using optimistic locking while preserving its version history.',
+  )
   @ApiPricingUuidParam('promotionId', 'Promotion UUID to update.')
   @ApiPricingBody(PromotionUpdateDto, 'Mutable promotion fields and the current rowVersion.')
-  @ApiPricingResponse('Promotion updated.', { id: '550e8400-e29b-41d4-a716-446655440004', code: 'WELCOME15', status: 'active', rowVersion: 2 })
+  @ApiPricingResponse('Promotion updated.', {
+    id: '550e8400-e29b-41d4-a716-446655440004',
+    code: 'WELCOME15',
+    status: 'active',
+    rowVersion: 2,
+  })
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   update(
@@ -170,7 +264,10 @@ export class PromotionsController {
 
   // * Function [remove]: Deactivates a promotion while preserving its history.
   @Delete(':promotionId')
-  @ApiPricingOperation('Deactivate a promotion', 'Soft-deactivates a promotion so it is excluded from normal promotion selection while preserving its audit history.')
+  @ApiPricingOperation(
+    'Deactivate a promotion',
+    'Soft-deactivates a promotion so it is excluded from normal promotion selection while preserving its audit history.',
+  )
   @ApiPricingUuidParam('promotionId', 'Promotion UUID to deactivate.')
   @ApiPricingResponse('Promotion deactivated.', { message: 'The promotion has been deactivated.' })
   @ApiPricingValidationError()
@@ -184,9 +281,16 @@ export class PromotionsController {
 
   // * Function [reactivate]: Restores a deleted promotion as inactive.
   @Post(':promotionId/reactivate')
-  @ApiPricingOperation('Reactivate a promotion', 'Restores a soft-deleted promotion as inactive so an operator can review it before activating it.')
+  @ApiPricingOperation(
+    'Reactivate a promotion',
+    'Restores a soft-deleted promotion as inactive so an operator can review it before activating it.',
+  )
   @ApiPricingUuidParam('promotionId', 'Promotion UUID to reactivate.')
-  @ApiPricingResponse('Promotion reactivated.', { id: '550e8400-e29b-41d4-a716-446655440004', status: 'inactive', rowVersion: 3 })
+  @ApiPricingResponse('Promotion reactivated.', {
+    id: '550e8400-e29b-41d4-a716-446655440004',
+    status: 'inactive',
+    rowVersion: 3,
+  })
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   reactivate(
@@ -201,8 +305,10 @@ export class PromotionsController {
 @Controller({ path: 'coupon-codes', version: '1' })
 @ApiPricingErrors({
   notFound: 'The requested coupon code or parent promotion does not exist.',
-  conflict: 'The coupon code already exists or the requested lifecycle change conflicts with current state.',
-  unavailable: 'The pricing database is temporarily unavailable. Retry using the request ID for support.',
+  conflict:
+    'The coupon code already exists or the requested lifecycle change conflicts with current state.',
+  unavailable:
+    'The pricing database is temporarily unavailable. Retry using the request ID for support.',
   internal: 'An unexpected coupon-processing failure occurred.',
 })
 /** HTTP routes for coupon-code creation, maintenance, and lifecycle management. */
@@ -212,9 +318,23 @@ export class CouponCodesController {
 
   // * Function [list]: Returns paginated coupon codes and validity filters.
   @Get()
-  @ApiPricingOperation('List coupon codes', 'Returns paginated coupon codes for administration, assignment, and validity-window inspection.')
-  @ApiPricingQuery(CouponCodeListQueryDto, 'Optional promotion, assigned-user, search, effective-time, and pagination filters.')
-  @ApiPricingPaginatedResponse('Coupon codes returned.', [{ id: '550e8400-e29b-41d4-a716-446655440008', promotionId: '550e8400-e29b-41d4-a716-446655440004', code: 'WELCOME2026', isActive: true, rowVersion: 1 }])
+  @ApiPricingOperation(
+    'List coupon codes',
+    'Returns paginated coupon codes for administration, assignment, and validity-window inspection.',
+  )
+  @ApiPricingQuery(
+    CouponCodeListQueryDto,
+    'Optional promotion, assigned-user, search, effective-time, and pagination filters.',
+  )
+  @ApiPricingPaginatedResponse('Coupon codes returned.', [
+    {
+      id: '550e8400-e29b-41d4-a716-446655440008',
+      promotionId: '550e8400-e29b-41d4-a716-446655440004',
+      code: 'WELCOME2026',
+      isActive: true,
+      rowVersion: 1,
+    },
+  ])
   @ApiPricingValidationError()
   list(@Query() query: CouponCodeListQueryDto) {
     return this.service.listCouponCodes(query);
@@ -223,9 +343,24 @@ export class CouponCodesController {
   // * Function [create]: Creates a unique coupon code linked to a promotion.
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiPricingOperation('Create a coupon code', 'Creates a unique coupon code linked to a promotion with optional user assignment, redemption limit, and validity dates.')
-  @ApiPricingBody(CouponCodeCreateDto, 'Parent promotion, code, redemption limit, assignment, validity window, and active flag.')
-  @ApiPricingResponse('Coupon code created.', { id: '550e8400-e29b-41d4-a716-446655440008', code: 'WELCOME2026', isActive: true, rowVersion: 1 }, HttpStatus.CREATED)
+  @ApiPricingOperation(
+    'Create a coupon code',
+    'Creates a unique coupon code linked to a promotion with optional user assignment, redemption limit, and validity dates.',
+  )
+  @ApiPricingBody(
+    CouponCodeCreateDto,
+    'Parent promotion, code, redemption limit, assignment, validity window, and active flag.',
+  )
+  @ApiPricingResponse(
+    'Coupon code created.',
+    {
+      id: '550e8400-e29b-41d4-a716-446655440008',
+      code: 'WELCOME2026',
+      isActive: true,
+      rowVersion: 1,
+    },
+    HttpStatus.CREATED,
+  )
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   create(@Body() body: CouponCodeCreateDto, @Headers('x-user-id') user?: string) {
@@ -234,10 +369,18 @@ export class CouponCodesController {
 
   // * Function [get]: Retrieves one coupon code, optionally including soft-deleted history.
   @Get(':couponCodeId')
-  @ApiPricingOperation('Get a coupon code', 'Returns one coupon code and its current assignment, validity, active state, and row version.')
+  @ApiPricingOperation(
+    'Get a coupon code',
+    'Returns one coupon code and its current assignment, validity, active state, and row version.',
+  )
   @ApiPricingUuidParam('couponCodeId', 'Coupon-code UUID to retrieve.')
   @ApiPricingIncludeDeletedQuery()
-  @ApiPricingResponse('Coupon code returned.', { id: '550e8400-e29b-41d4-a716-446655440008', code: 'WELCOME2026', isActive: true, rowVersion: 1 })
+  @ApiPricingResponse('Coupon code returned.', {
+    id: '550e8400-e29b-41d4-a716-446655440008',
+    code: 'WELCOME2026',
+    isActive: true,
+    rowVersion: 1,
+  })
   @ApiPricingValidationError()
   get(
     @Param('couponCodeId', new ParseUUIDPipe()) id: string,
@@ -248,10 +391,17 @@ export class CouponCodesController {
 
   // * Function [update]: Updates mutable coupon fields using optimistic locking.
   @Patch(':couponCodeId')
-  @ApiPricingOperation('Update a coupon code', 'Updates coupon assignment, limits, validity, or active state using optimistic locking.')
+  @ApiPricingOperation(
+    'Update a coupon code',
+    'Updates coupon assignment, limits, validity, or active state using optimistic locking.',
+  )
   @ApiPricingUuidParam('couponCodeId', 'Coupon-code UUID to update.')
   @ApiPricingBody(CouponCodeUpdateDto, 'Mutable coupon fields and the current rowVersion.')
-  @ApiPricingResponse('Coupon code updated.', { id: '550e8400-e29b-41d4-a716-446655440008', isActive: false, rowVersion: 2 })
+  @ApiPricingResponse('Coupon code updated.', {
+    id: '550e8400-e29b-41d4-a716-446655440008',
+    isActive: false,
+    rowVersion: 2,
+  })
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   update(
@@ -264,9 +414,14 @@ export class CouponCodesController {
 
   // * Function [remove]: Deactivates a coupon code while preserving redemption history.
   @Delete(':couponCodeId')
-  @ApiPricingOperation('Deactivate a coupon code', 'Soft-deactivates a coupon code so it cannot be selected while preserving redemption and audit history.')
+  @ApiPricingOperation(
+    'Deactivate a coupon code',
+    'Soft-deactivates a coupon code so it cannot be selected while preserving redemption and audit history.',
+  )
   @ApiPricingUuidParam('couponCodeId', 'Coupon-code UUID to deactivate.')
-  @ApiPricingResponse('Coupon code deactivated.', { message: 'The coupon code has been deactivated.' })
+  @ApiPricingResponse('Coupon code deactivated.', {
+    message: 'The coupon code has been deactivated.',
+  })
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   remove(
@@ -278,9 +433,16 @@ export class CouponCodesController {
 
   // * Function [reactivate]: Restores a deleted coupon code as active.
   @Post(':couponCodeId/reactivate')
-  @ApiPricingOperation('Reactivate a coupon code', 'Restores a soft-deleted coupon code as active for future eligibility checks.')
+  @ApiPricingOperation(
+    'Reactivate a coupon code',
+    'Restores a soft-deleted coupon code as active for future eligibility checks.',
+  )
   @ApiPricingUuidParam('couponCodeId', 'Coupon-code UUID to reactivate.')
-  @ApiPricingResponse('Coupon code reactivated.', { id: '550e8400-e29b-41d4-a716-446655440008', isActive: true, rowVersion: 3 })
+  @ApiPricingResponse('Coupon code reactivated.', {
+    id: '550e8400-e29b-41d4-a716-446655440008',
+    isActive: true,
+    rowVersion: 3,
+  })
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   reactivate(
@@ -294,9 +456,11 @@ export class CouponCodesController {
 @ApiTags('promotion-redemptions')
 @Controller({ path: 'promotion-redemptions', version: '1' })
 @ApiPricingErrors({
-  notFound: 'The promotion referenced by the redemption or the requested redemption record does not exist.',
+  notFound:
+    'The promotion referenced by the redemption or the requested redemption record does not exist.',
   conflict: 'The idempotency key has already been used for a redemption.',
-  unavailable: 'The pricing database is temporarily unavailable. Retry using the request ID for support.',
+  unavailable:
+    'The pricing database is temporarily unavailable. Retry using the request ID for support.',
   internal: 'An unexpected redemption-processing failure occurred.',
 })
 /** HTTP routes for promotion-redemption recording and reconciliation. */
@@ -306,9 +470,23 @@ export class PromotionRedemptionsController {
 
   // * Function [list]: Returns redemption history for reconciliation and support workflows.
   @Get()
-  @ApiPricingOperation('List promotion redemptions', 'Returns paginated redemption records for order, user, promotion, reconciliation, and audit views.')
-  @ApiPricingQuery(PromotionRedemptionListQueryDto, 'Optional promotion, user, order, and pagination filters.')
-  @ApiPricingPaginatedResponse('Promotion redemptions returned.', [{ id: '550e8400-e29b-41d4-a716-446655440011', promotionId: '550e8400-e29b-41d4-a716-446655440004', userId: '550e8400-e29b-41d4-a716-446655440005', discountAmount: '100.00', idempotencyKey: 'checkout-order-10001-promo-WELCOME10' }])
+  @ApiPricingOperation(
+    'List promotion redemptions',
+    'Returns paginated redemption records for order, user, promotion, reconciliation, and audit views.',
+  )
+  @ApiPricingQuery(
+    PromotionRedemptionListQueryDto,
+    'Optional promotion, user, order, and pagination filters.',
+  )
+  @ApiPricingPaginatedResponse('Promotion redemptions returned.', [
+    {
+      id: '550e8400-e29b-41d4-a716-446655440011',
+      promotionId: '550e8400-e29b-41d4-a716-446655440004',
+      userId: '550e8400-e29b-41d4-a716-446655440005',
+      discountAmount: '100.00',
+      idempotencyKey: 'checkout-order-10001-promo-WELCOME10',
+    },
+  ])
   @ApiPricingValidationError()
   list(@Query() query: PromotionRedemptionListQueryDto) {
     return this.service.listPromotionRedemptions(query);
@@ -317,9 +495,24 @@ export class PromotionRedemptionsController {
   // * Function [create]: Records a promotion redemption with idempotency protection.
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiPricingOperation('Record a promotion redemption', 'Records the promotion benefit applied to a user/order and uses the idempotency key to prevent duplicate redemption records.')
-  @ApiPricingBody(PromotionRedemptionCreateDto, 'Promotion, optional version/coupon/order references, user, discount amount, redemption time, and idempotency key.')
-  @ApiPricingResponse('Promotion redemption recorded.', { id: '550e8400-e29b-41d4-a716-446655440011', promotionId: '550e8400-e29b-41d4-a716-446655440004', discountAmount: '100.00', redeemedAt: '2026-06-01T12:00:00.000Z' }, HttpStatus.CREATED)
+  @ApiPricingOperation(
+    'Record a promotion redemption',
+    'Records the promotion benefit applied to a user/order and uses the idempotency key to prevent duplicate redemption records.',
+  )
+  @ApiPricingBody(
+    PromotionRedemptionCreateDto,
+    'Promotion, optional version/coupon/order references, user, discount amount, redemption time, and idempotency key.',
+  )
+  @ApiPricingResponse(
+    'Promotion redemption recorded.',
+    {
+      id: '550e8400-e29b-41d4-a716-446655440011',
+      promotionId: '550e8400-e29b-41d4-a716-446655440004',
+      discountAmount: '100.00',
+      redeemedAt: '2026-06-01T12:00:00.000Z',
+    },
+    HttpStatus.CREATED,
+  )
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   create(@Body() body: PromotionRedemptionCreateDto, @Headers('x-user-id') user?: string) {
@@ -328,9 +521,17 @@ export class PromotionRedemptionsController {
 
   // * Function [get]: Retrieves one promotion redemption record.
   @Get(':redemptionId')
-  @ApiPricingOperation('Get a promotion redemption', 'Returns one redemption record for checkout confirmation, customer support, or reconciliation.')
+  @ApiPricingOperation(
+    'Get a promotion redemption',
+    'Returns one redemption record for checkout confirmation, customer support, or reconciliation.',
+  )
   @ApiPricingUuidParam('redemptionId', 'Promotion-redemption UUID to retrieve.')
-  @ApiPricingResponse('Promotion redemption returned.', { id: '550e8400-e29b-41d4-a716-446655440011', promotionId: '550e8400-e29b-41d4-a716-446655440004', discountAmount: '100.00', redeemedAt: '2026-06-01T12:00:00.000Z' })
+  @ApiPricingResponse('Promotion redemption returned.', {
+    id: '550e8400-e29b-41d4-a716-446655440011',
+    promotionId: '550e8400-e29b-41d4-a716-446655440004',
+    discountAmount: '100.00',
+    redeemedAt: '2026-06-01T12:00:00.000Z',
+  })
   @ApiPricingValidationError()
   get(@Param('redemptionId', new ParseUUIDPipe()) id: string) {
     return this.service.getPromotionRedemption(id);
@@ -341,7 +542,8 @@ export class PromotionRedemptionsController {
 @Controller({ path: 'pricing-evaluations', version: '1' })
 @ApiPricingErrors({
   notFound: 'The requested pricing evaluation does not exist.',
-  unavailable: 'The pricing database is temporarily unavailable. Retry using the request ID for support.',
+  unavailable:
+    'The pricing database is temporarily unavailable. Retry using the request ID for support.',
   internal: 'An unexpected pricing-evaluation failure occurred.',
 })
 /** HTTP routes for pricing-engine evaluation snapshots and diagnostics. */
@@ -351,9 +553,22 @@ export class PricingEvaluationsController {
 
   // * Function [list]: Returns pricing-engine audit snapshots with pagination.
   @Get()
-  @ApiPricingOperation('List pricing evaluations', 'Returns pricing-engine request/response snapshots for troubleshooting, audit, and price-calculation observability.')
-  @ApiPricingQuery(PricingEvaluationListQueryDto, 'Optional reference, user, and pagination filters.')
-  @ApiPricingPaginatedResponse('Pricing evaluations returned.', [{ id: '550e8400-e29b-41d4-a716-446655440012', referenceType: 'order', referenceId: '550e8400-e29b-41d4-a716-446655440006', ruleVersion: 'promotion-v3' }])
+  @ApiPricingOperation(
+    'List pricing evaluations',
+    'Returns pricing-engine request/response snapshots for troubleshooting, audit, and price-calculation observability.',
+  )
+  @ApiPricingQuery(
+    PricingEvaluationListQueryDto,
+    'Optional reference, user, and pagination filters.',
+  )
+  @ApiPricingPaginatedResponse('Pricing evaluations returned.', [
+    {
+      id: '550e8400-e29b-41d4-a716-446655440012',
+      referenceType: 'order',
+      referenceId: '550e8400-e29b-41d4-a716-446655440006',
+      ruleVersion: 'promotion-v3',
+    },
+  ])
   @ApiPricingValidationError()
   list(@Query() query: PricingEvaluationListQueryDto) {
     return this.service.listPricingEvaluations(query);
@@ -362,9 +577,24 @@ export class PricingEvaluationsController {
   // * Function [create]: Records a pricing request and response snapshot.
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiPricingOperation('Record a pricing evaluation', 'Stores the input and output snapshots of a pricing calculation so checkout results can be audited and diagnosed later.')
-  @ApiPricingBody(PricingEvaluationCreateDto, 'Reference identity, optional user, pricing request snapshot, response snapshot, and rule version.')
-  @ApiPricingResponse('Pricing evaluation recorded.', { id: '550e8400-e29b-41d4-a716-446655440012', referenceType: 'order', referenceId: '550e8400-e29b-41d4-a716-446655440006', ruleVersion: 'promotion-v3' }, HttpStatus.CREATED)
+  @ApiPricingOperation(
+    'Record a pricing evaluation',
+    'Stores the input and output snapshots of a pricing calculation so checkout results can be audited and diagnosed later.',
+  )
+  @ApiPricingBody(
+    PricingEvaluationCreateDto,
+    'Reference identity, optional user, pricing request snapshot, response snapshot, and rule version.',
+  )
+  @ApiPricingResponse(
+    'Pricing evaluation recorded.',
+    {
+      id: '550e8400-e29b-41d4-a716-446655440012',
+      referenceType: 'order',
+      referenceId: '550e8400-e29b-41d4-a716-446655440006',
+      ruleVersion: 'promotion-v3',
+    },
+    HttpStatus.CREATED,
+  )
   @ApiPricingValidationError()
   @ApiPricingAuditHeader()
   create(@Body() body: PricingEvaluationCreateDto, @Headers('x-user-id') user?: string) {
@@ -373,9 +603,19 @@ export class PricingEvaluationsController {
 
   // * Function [get]: Retrieves one pricing evaluation audit record.
   @Get(':evaluationId')
-  @ApiPricingOperation('Get a pricing evaluation', 'Returns one pricing request/response snapshot for support, reconciliation, or pricing-rule diagnostics.')
+  @ApiPricingOperation(
+    'Get a pricing evaluation',
+    'Returns one pricing request/response snapshot for support, reconciliation, or pricing-rule diagnostics.',
+  )
   @ApiPricingUuidParam('evaluationId', 'Pricing-evaluation UUID to retrieve.')
-  @ApiPricingResponse('Pricing evaluation returned.', { id: '550e8400-e29b-41d4-a716-446655440012', referenceType: 'order', referenceId: '550e8400-e29b-41d4-a716-446655440006', requestPayload: { subtotal: '998.00' }, responseSnapshot: { total: '898.00' }, ruleVersion: 'promotion-v3' })
+  @ApiPricingResponse('Pricing evaluation returned.', {
+    id: '550e8400-e29b-41d4-a716-446655440012',
+    referenceType: 'order',
+    referenceId: '550e8400-e29b-41d4-a716-446655440006',
+    requestPayload: { subtotal: '998.00' },
+    responseSnapshot: { total: '898.00' },
+    ruleVersion: 'promotion-v3',
+  })
   @ApiPricingValidationError()
   get(@Param('evaluationId', new ParseUUIDPipe()) id: string) {
     return this.service.getPricingEvaluation(id);

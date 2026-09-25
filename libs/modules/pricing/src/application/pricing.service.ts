@@ -229,7 +229,8 @@ export class PricingService {
   // * Function [getProductPrice]: Retrieves one product-price record with its price-book context.
   async getProductPrice(id: string) {
     const row = await this.repository.getProductPrice(id);
-    if (!row) throw new PricingNotFoundError('PRODUCT_PRICE_NOT_FOUND', 'The product price was not found.');
+    if (!row)
+      throw new PricingNotFoundError('PRODUCT_PRICE_NOT_FOUND', 'The product price was not found.');
     return row;
   }
 
@@ -242,13 +243,23 @@ export class PricingService {
   // * Function [createPromotion]: Validates and creates a promotion definition.
   async createPromotion(input: PromotionCreateInput, actor: string | null) {
     validateDateWindow(input.startsAt, input.endsAt, false);
-    if (input.budgetAmount !== undefined && (!Number.isFinite(Number(input.budgetAmount)) || Number(input.budgetAmount) < 0))
+    if (
+      input.budgetAmount !== undefined &&
+      (!Number.isFinite(Number(input.budgetAmount)) || Number(input.budgetAmount) < 0)
+    )
       throw new PricingValidationError('budgetAmount must be a non-negative number.');
-    if (input.usageLimit != null && input.perUserLimit != null && input.perUserLimit > input.usageLimit)
+    if (
+      input.usageLimit != null &&
+      input.perUserLimit != null &&
+      input.perUserLimit > input.usageLimit
+    )
       throw new PricingValidationError('perUserLimit cannot exceed usageLimit.');
     return this.repository.transaction(async () => {
       if (await this.repository.promotionCodeExists(input.code.toUpperCase()))
-        throw new PricingConflictError('PROMOTION_ALREADY_EXISTS', 'A promotion with this code already exists.');
+        throw new PricingConflictError(
+          'PROMOTION_ALREADY_EXISTS',
+          'A promotion with this code already exists.',
+        );
       return this.repository.createPromotion(
         { ...input, code: input.code.toUpperCase(), status: input.status ?? 'draft' },
         actor,
@@ -267,25 +278,41 @@ export class PricingService {
   async updatePromotion(id: string, input: PromotionUpdateInput, actor: string | null) {
     return this.repository.transaction(async () => {
       const current = await this.repository.getPromotion(id, false, true);
-      if (!current) throw new PricingNotFoundError('PROMOTION_NOT_FOUND', 'The promotion was not found.');
+      if (!current)
+        throw new PricingNotFoundError('PROMOTION_NOT_FOUND', 'The promotion was not found.');
       if (Number(current.row_version) !== input.rowVersion) versionConflict(current.row_version);
       const values = patchValues(input as Row, ['rowVersion']);
-      if (!Object.keys(values).length) throw new PricingValidationError('At least one mutable field must be provided.');
+      if (!Object.keys(values).length)
+        throw new PricingValidationError('At least one mutable field must be provided.');
       const nextFrom = (values.startsAt as Date | undefined) ?? current.starts_at;
-      const nextUntil = Object.prototype.hasOwnProperty.call(values, 'endsAt') ? values.endsAt : current.ends_at;
+      const nextUntil = Object.prototype.hasOwnProperty.call(values, 'endsAt')
+        ? values.endsAt
+        : current.ends_at;
       validateDateWindow(nextFrom, nextUntil, false);
       if (values.code) {
         values.code = String(values.code).toUpperCase();
         if (await this.repository.promotionCodeExists(String(values.code), id))
-          throw new PricingConflictError('PROMOTION_ALREADY_EXISTS', 'A promotion with this code already exists.');
+          throw new PricingConflictError(
+            'PROMOTION_ALREADY_EXISTS',
+            'A promotion with this code already exists.',
+          );
       }
-      if (values.budgetAmount !== undefined && values.budgetAmount !== null && (!Number.isFinite(Number(values.budgetAmount)) || Number(values.budgetAmount) < 0))
+      if (
+        values.budgetAmount !== undefined &&
+        values.budgetAmount !== null &&
+        (!Number.isFinite(Number(values.budgetAmount)) || Number(values.budgetAmount) < 0)
+      )
         throw new PricingValidationError('budgetAmount must be a non-negative number.');
       const usageLimit = values.usageLimit ?? current.usage_limit;
       const perUserLimit = values.perUserLimit ?? current.per_user_limit;
       if (usageLimit != null && perUserLimit != null && Number(perUserLimit) > Number(usageLimit))
         throw new PricingValidationError('perUserLimit cannot exceed usageLimit.');
-      const row = await this.repository.updatePromotion(id, values, actor, Number(current.row_version));
+      const row = await this.repository.updatePromotion(
+        id,
+        values,
+        actor,
+        Number(current.row_version),
+      );
       if (!row) versionConflict(current.row_version);
       return row;
     });
@@ -322,21 +349,35 @@ export class PricingService {
     if (!(await this.repository.getPromotion(promotionId)))
       throw new PricingNotFoundError('PROMOTION_NOT_FOUND', 'The promotion was not found.');
     if (await this.repository.promotionVersionExists(promotionId, input.versionNo))
-      throw new PricingConflictError('PROMOTION_VERSION_ALREADY_EXISTS', 'This promotion version already exists.');
-    return this.repository.createPromotionVersion({ ...input, promotionId } as PromotionVersionCreateInput, actor);
+      throw new PricingConflictError(
+        'PROMOTION_VERSION_ALREADY_EXISTS',
+        'This promotion version already exists.',
+      );
+    return this.repository.createPromotionVersion(
+      { ...input, promotionId } as PromotionVersionCreateInput,
+      actor,
+    );
   }
 
   // * Function [getPromotionVersion]: Retrieves one promotion version for audit or administration.
   async getPromotionVersion(id: string) {
     const row = await this.repository.getPromotionVersion(id);
-    if (!row) throw new PricingNotFoundError('PROMOTION_VERSION_NOT_FOUND', 'The promotion version was not found.');
+    if (!row)
+      throw new PricingNotFoundError(
+        'PROMOTION_VERSION_NOT_FOUND',
+        'The promotion version was not found.',
+      );
     return row;
   }
 
   // * Function [publishPromotionVersion]: Publishes a promotion version for pricing evaluation.
   async publishPromotionVersion(id: string, actor: string | null) {
     const row = await this.repository.publishPromotionVersion(id, actor);
-    if (!row) throw new PricingNotFoundError('PROMOTION_VERSION_NOT_FOUND', 'The promotion version was not found.');
+    if (!row)
+      throw new PricingNotFoundError(
+        'PROMOTION_VERSION_NOT_FOUND',
+        'The promotion version was not found.',
+      );
     return row;
   }
 
@@ -352,14 +393,18 @@ export class PricingService {
     if (!(await this.repository.getPromotion(input.promotionId)))
       throw new PricingNotFoundError('PROMOTION_NOT_FOUND', 'The promotion was not found.');
     if (await this.repository.couponCodeExists(input.code.toUpperCase()))
-      throw new PricingConflictError('COUPON_CODE_ALREADY_EXISTS', 'A coupon code with this value already exists.');
+      throw new PricingConflictError(
+        'COUPON_CODE_ALREADY_EXISTS',
+        'A coupon code with this value already exists.',
+      );
     return this.repository.createCouponCode({ ...input, code: input.code.toUpperCase() }, actor);
   }
 
   // * Function [getCouponCode]: Retrieves one coupon code, optionally including soft-deleted history.
   async getCouponCode(id: string, includeDeleted = false) {
     const row = await this.repository.getCouponCode(id, includeDeleted);
-    if (!row) throw new PricingNotFoundError('COUPON_CODE_NOT_FOUND', 'The coupon code was not found.');
+    if (!row)
+      throw new PricingNotFoundError('COUPON_CODE_NOT_FOUND', 'The coupon code was not found.');
     return row;
   }
 
@@ -367,19 +412,33 @@ export class PricingService {
   async updateCouponCode(id: string, input: CouponCodeUpdateInput, actor: string | null) {
     return this.repository.transaction(async () => {
       const current = await this.repository.getCouponCode(id, false, true);
-      if (!current) throw new PricingNotFoundError('COUPON_CODE_NOT_FOUND', 'The coupon code was not found.');
+      if (!current)
+        throw new PricingNotFoundError('COUPON_CODE_NOT_FOUND', 'The coupon code was not found.');
       if (Number(current.row_version) !== input.rowVersion) versionConflict(current.row_version);
       const values = patchValues(input as Row, ['rowVersion']);
-      if (!Object.keys(values).length) throw new PricingValidationError('At least one mutable field must be provided.');
-      const from = Object.prototype.hasOwnProperty.call(values, 'validFrom') ? values.validFrom : current.valid_from;
-      const until = Object.prototype.hasOwnProperty.call(values, 'validUntil') ? values.validUntil : current.valid_until;
+      if (!Object.keys(values).length)
+        throw new PricingValidationError('At least one mutable field must be provided.');
+      const from = Object.prototype.hasOwnProperty.call(values, 'validFrom')
+        ? values.validFrom
+        : current.valid_from;
+      const until = Object.prototype.hasOwnProperty.call(values, 'validUntil')
+        ? values.validUntil
+        : current.valid_until;
       validateDateWindow(from ?? new Date(0), until, false);
       if (values.code) {
         values.code = String(values.code).toUpperCase();
         if (await this.repository.couponCodeExists(String(values.code), id))
-          throw new PricingConflictError('COUPON_CODE_ALREADY_EXISTS', 'A coupon code with this value already exists.');
+          throw new PricingConflictError(
+            'COUPON_CODE_ALREADY_EXISTS',
+            'A coupon code with this value already exists.',
+          );
       }
-      const row = await this.repository.updateCouponCode(id, values, actor, Number(current.row_version));
+      const row = await this.repository.updateCouponCode(
+        id,
+        values,
+        actor,
+        Number(current.row_version),
+      );
       if (!row) versionConflict(current.row_version);
       return row;
     });
@@ -395,7 +454,8 @@ export class PricingService {
   // * Function [reactivateCouponCode]: Restores a deleted coupon code as active.
   async reactivateCouponCode(id: string, actor: string | null) {
     const row = await this.repository.reactivateCouponCode(id, actor);
-    if (!row) throw new PricingNotFoundError('COUPON_CODE_NOT_FOUND', 'The coupon code was not found.');
+    if (!row)
+      throw new PricingNotFoundError('COUPON_CODE_NOT_FOUND', 'The coupon code was not found.');
     return row;
   }
 
@@ -412,14 +472,21 @@ export class PricingService {
     if (!(await this.repository.getPromotion(input.promotionId)))
       throw new PricingNotFoundError('PROMOTION_NOT_FOUND', 'The promotion was not found.');
     if (await this.repository.redemptionIdempotencyExists(input.idempotencyKey))
-      throw new PricingConflictError('REDEMPTION_ALREADY_RECORDED', 'This redemption idempotency key was already used.');
+      throw new PricingConflictError(
+        'REDEMPTION_ALREADY_RECORDED',
+        'This redemption idempotency key was already used.',
+      );
     return this.repository.createPromotionRedemption(input, actor);
   }
 
   // * Function [getPromotionRedemption]: Retrieves one promotion redemption record.
   async getPromotionRedemption(id: string) {
     const row = await this.repository.getPromotionRedemption(id);
-    if (!row) throw new PricingNotFoundError('REDEMPTION_NOT_FOUND', 'The promotion redemption was not found.');
+    if (!row)
+      throw new PricingNotFoundError(
+        'REDEMPTION_NOT_FOUND',
+        'The promotion redemption was not found.',
+      );
     return row;
   }
 
@@ -437,7 +504,11 @@ export class PricingService {
   // * Function [getPricingEvaluation]: Retrieves one pricing evaluation audit record.
   async getPricingEvaluation(id: string) {
     const row = await this.repository.getPricingEvaluation(id);
-    if (!row) throw new PricingNotFoundError('PRICING_EVALUATION_NOT_FOUND', 'The pricing evaluation was not found.');
+    if (!row)
+      throw new PricingNotFoundError(
+        'PRICING_EVALUATION_NOT_FOUND',
+        'The pricing evaluation was not found.',
+      );
     return row;
   }
 

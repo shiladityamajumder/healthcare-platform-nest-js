@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InventoryService } from '../../application/inventory.service';
-import { INVENTORY_REPOSITORY, type InventoryRepositoryPort } from '../../contracts/inventory.ports';
+import {
+  INVENTORY_REPOSITORY,
+  type InventoryRepositoryPort,
+} from '../../contracts/inventory.ports';
 
 /** Inventory HTTP-facing handler backed by the shared inventory application service. */
 @Injectable()

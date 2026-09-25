@@ -70,7 +70,8 @@ export function ApiInventoryOperation(summary: string, description: string): Met
     ApiHeader({
       name: 'X-Request-ID',
       required: false,
-      description: 'Optional client-generated request identifier. The API generates one when omitted.',
+      description:
+        'Optional client-generated request identifier. The API generates one when omitted.',
       schema: { type: 'string', example: 'request-id' },
     }),
     ApiHeader({
@@ -155,13 +156,13 @@ export function ApiInventoryResponse(
 }
 
 /** Add the paginated success envelope used by inventory listing endpoints. */
-export function ApiInventoryPaginatedResponse(description: string, itemsExample: unknown): MethodDecorator {
-  return ApiInventoryResponse(
-    description,
-    {
-      items: itemsExample,
-    },
-  );
+export function ApiInventoryPaginatedResponse(
+  description: string,
+  itemsExample: unknown,
+): MethodDecorator {
+  return ApiInventoryResponse(description, {
+    items: itemsExample,
+  });
 }
 
 /** Document the standard inventory validation, missing-resource, conflict, and infrastructure errors. */
@@ -180,14 +181,21 @@ export function ApiInventoryErrors(): MethodDecorator & ClassDecorator {
     ApiConflictResponse({
       description:
         'The operation conflicts with current stock, lifecycle state, idempotency key, transfer/reservation state, or optimistic rowVersion.',
-      schema: errorSchema('RESOURCE_CONFLICT', 'The inventory operation conflicts with current state.'),
+      schema: errorSchema(
+        'RESOURCE_CONFLICT',
+        'The inventory operation conflicts with current state.',
+      ),
     }),
     ApiInternalServerErrorResponse({
       description: 'An unexpected inventory application or infrastructure failure occurred.',
-      schema: errorSchema('INTERNAL_SERVER_ERROR', 'The inventory operation could not be completed.'),
+      schema: errorSchema(
+        'INTERNAL_SERVER_ERROR',
+        'The inventory operation could not be completed.',
+      ),
     }),
     ApiServiceUnavailableResponse({
-      description: 'The externally managed inventory database or another required dependency is temporarily unavailable.',
+      description:
+        'The externally managed inventory database or another required dependency is temporarily unavailable.',
       schema: errorSchema('DATABASE_ERROR', 'A required inventory dependency is unavailable.'),
     }),
   );

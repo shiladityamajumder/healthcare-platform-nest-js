@@ -17,7 +17,10 @@ export class InventoryConflictError extends ConflictError {
 
 /** Not-found error raised when an inventory resource is unavailable. */
 export class InventoryNotFoundError extends NotFoundError {
-  public constructor(public override readonly code: string, message: string) {
+  public constructor(
+    public override readonly code: string,
+    message: string,
+  ) {
     super(message);
   }
 }

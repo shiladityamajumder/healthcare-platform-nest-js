@@ -9,7 +9,10 @@ import { InventoryRepository } from './persistence/inventory.repository';
 
 @Module({
   imports: [DatabaseModule],
-  providers: [InventoryRepository, { provide: INVENTORY_REPOSITORY, useExisting: InventoryRepository }],
+  providers: [
+    InventoryRepository,
+    { provide: INVENTORY_REPOSITORY, useExisting: InventoryRepository },
+  ],
   exports: [InventoryRepository, INVENTORY_REPOSITORY],
 })
 /** Provides the inventory repository adapter without owning database schema lifecycle. */

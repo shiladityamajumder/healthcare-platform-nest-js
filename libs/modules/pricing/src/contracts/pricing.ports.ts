@@ -218,30 +218,64 @@ export interface PricingRepositoryPort {
   reactivateTaxRule(id: string, actor: string | null): Promise<PricingRow | null>;
   promotionCodeExists(code: string, excludeId?: string): Promise<boolean>;
   createPromotion(values: PricingRow, actor: string | null): Promise<PricingRow>;
-  getPromotion(id: string, includeDeleted?: boolean, forUpdate?: boolean): Promise<PricingRow | null>;
+  getPromotion(
+    id: string,
+    includeDeleted?: boolean,
+    forUpdate?: boolean,
+  ): Promise<PricingRow | null>;
   listPromotions(query: PromotionListQuery): Promise<{ rows: PricingRow[]; total: number }>;
-  updatePromotion(id: string, values: PricingRow, actor: string | null, expectedRowVersion: number): Promise<PricingRow | null>;
+  updatePromotion(
+    id: string,
+    values: PricingRow,
+    actor: string | null,
+    expectedRowVersion: number,
+  ): Promise<PricingRow | null>;
   deactivatePromotion(id: string, actor: string | null): Promise<boolean>;
   reactivatePromotion(id: string, actor: string | null): Promise<PricingRow | null>;
   promotionVersionExists(promotionId: string, versionNo: number): Promise<boolean>;
-  createPromotionVersion(values: PromotionVersionCreateInput, actor: string | null): Promise<PricingRow>;
+  createPromotionVersion(
+    values: PromotionVersionCreateInput,
+    actor: string | null,
+  ): Promise<PricingRow>;
   getPromotionVersion(id: string): Promise<PricingRow | null>;
-  listPromotionVersions(promotionId: string, query: PromotionVersionListQuery): Promise<{ rows: PricingRow[]; total: number }>;
+  listPromotionVersions(
+    promotionId: string,
+    query: PromotionVersionListQuery,
+  ): Promise<{ rows: PricingRow[]; total: number }>;
   publishPromotionVersion(id: string, actor: string | null): Promise<PricingRow | null>;
   couponCodeExists(code: string, excludeId?: string): Promise<boolean>;
   createCouponCode(values: CouponCodeCreateInput, actor: string | null): Promise<PricingRow>;
-  getCouponCode(id: string, includeDeleted?: boolean, forUpdate?: boolean): Promise<PricingRow | null>;
+  getCouponCode(
+    id: string,
+    includeDeleted?: boolean,
+    forUpdate?: boolean,
+  ): Promise<PricingRow | null>;
   listCouponCodes(query: CouponCodeListQuery): Promise<{ rows: PricingRow[]; total: number }>;
-  updateCouponCode(id: string, values: PricingRow, actor: string | null, expectedRowVersion: number): Promise<PricingRow | null>;
+  updateCouponCode(
+    id: string,
+    values: PricingRow,
+    actor: string | null,
+    expectedRowVersion: number,
+  ): Promise<PricingRow | null>;
   deactivateCouponCode(id: string, actor: string | null): Promise<boolean>;
   reactivateCouponCode(id: string, actor: string | null): Promise<PricingRow | null>;
   redemptionIdempotencyExists(key: string): Promise<boolean>;
-  createPromotionRedemption(values: PromotionRedemptionCreateInput, actor: string | null): Promise<PricingRow>;
+  createPromotionRedemption(
+    values: PromotionRedemptionCreateInput,
+    actor: string | null,
+  ): Promise<PricingRow>;
   getPromotionRedemption(id: string): Promise<PricingRow | null>;
-  listPromotionRedemptions(query: PromotionRedemptionListQuery): Promise<{ rows: PricingRow[]; total: number }>;
-  createPricingEvaluation(values: PricingEvaluationCreateInput, actor: string | null): Promise<PricingRow>;
+  listPromotionRedemptions(
+    query: PromotionRedemptionListQuery,
+  ): Promise<{ rows: PricingRow[]; total: number }>;
+  createPricingEvaluation(
+    values: PricingEvaluationCreateInput,
+    actor: string | null,
+  ): Promise<PricingRow>;
   getPricingEvaluation(id: string): Promise<PricingRow | null>;
-  listPricingEvaluations(query: PricingEvaluationListQuery): Promise<{ rows: PricingRow[]; total: number }>;
+  listPricingEvaluations(
+    query: PricingEvaluationListQuery,
+  ): Promise<{ rows: PricingRow[]; total: number }>;
 }
 
 export const PRICING_REPOSITORY = Symbol('PRICING_REPOSITORY');

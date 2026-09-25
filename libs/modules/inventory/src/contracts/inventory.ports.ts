@@ -65,36 +65,70 @@ export interface InventoryRepositoryPort {
 
   listWarehouses(query: WarehouseListQuery): Promise<{ rows: InventoryRow[]; total: number }>;
   createWarehouse(values: InventoryRow, actor: string | null): Promise<InventoryRow>;
-  getWarehouse(id: string, includeDeleted?: boolean, forUpdate?: boolean): Promise<InventoryRow | null>;
-  updateWarehouse(id: string, values: InventoryRow, actor: string | null): Promise<InventoryRow | null>;
+  getWarehouse(
+    id: string,
+    includeDeleted?: boolean,
+    forUpdate?: boolean,
+  ): Promise<InventoryRow | null>;
+  updateWarehouse(
+    id: string,
+    values: InventoryRow,
+    actor: string | null,
+  ): Promise<InventoryRow | null>;
   deactivateWarehouse(id: string, actor: string | null): Promise<boolean>;
   reactivateWarehouse(id: string, actor: string | null): Promise<InventoryRow | null>;
   listWarehouseBins(warehouseId: string): Promise<InventoryRow[]>;
   listLocationHierarchy(warehouseId?: string): Promise<InventoryRow[]>;
   upsertReplenishmentRule(values: InventoryRow, actor: string | null): Promise<InventoryRow>;
-  listReplenishmentRules(warehouseId: string, query: InventoryPageQuery): Promise<{ rows: InventoryRow[]; total: number }>;
+  listReplenishmentRules(
+    warehouseId: string,
+    query: InventoryPageQuery,
+  ): Promise<{ rows: InventoryRow[]; total: number }>;
 
   listInventory(query: InventoryListQuery): Promise<{ rows: InventoryRow[]; total: number }>;
   listLots(query: InventoryListQuery): Promise<{ rows: InventoryRow[]; total: number }>;
   createLot(values: InventoryRow, actor: string | null): Promise<InventoryRow>;
   getLot(id: string): Promise<InventoryRow | null>;
-  updateLot(id: string, values: InventoryRow, actor: string | null, rowVersion: number): Promise<InventoryRow | null>;
+  updateLot(
+    id: string,
+    values: InventoryRow,
+    actor: string | null,
+    rowVersion: number,
+  ): Promise<InventoryRow | null>;
   listProductLocations(productId: string, warehouseId?: string): Promise<InventoryRow[]>;
   listProductWarehouses(productId: string): Promise<InventoryRow[]>;
-  listWarehouseInventory(warehouseId: string, query: InventoryListQuery): Promise<{ rows: InventoryRow[]; total: number }>;
-  listWarehouseProducts(warehouseId: string, query: InventoryListQuery): Promise<{ rows: InventoryRow[]; total: number }>;
+  listWarehouseInventory(
+    warehouseId: string,
+    query: InventoryListQuery,
+  ): Promise<{ rows: InventoryRow[]; total: number }>;
+  listWarehouseProducts(
+    warehouseId: string,
+    query: InventoryListQuery,
+  ): Promise<{ rows: InventoryRow[]; total: number }>;
   listLedger(query: InventoryRow): Promise<{ rows: InventoryRow[]; total: number }>;
   findLedgerByIdempotency(key: string): Promise<InventoryRow | null>;
   createLedger(values: InventoryRow): Promise<InventoryRow>;
-  getBalanceForUpdate(warehouseId: string, binId: string, lotId: string): Promise<InventoryRow | null>;
-  listBalancesForLot(warehouseId: string, lotId: string, forUpdate?: boolean): Promise<InventoryRow[]>;
+  getBalanceForUpdate(
+    warehouseId: string,
+    binId: string,
+    lotId: string,
+  ): Promise<InventoryRow | null>;
+  listBalancesForLot(
+    warehouseId: string,
+    lotId: string,
+    forUpdate?: boolean,
+  ): Promise<InventoryRow[]>;
   upsertBalance(values: InventoryRow): Promise<InventoryRow>;
 
   createReservation(values: InventoryRow, actor: string | null): Promise<InventoryRow>;
   getReservation(id: string, forUpdate?: boolean): Promise<InventoryRow | null>;
   findReservationByNumber(reservationNumber: string): Promise<InventoryRow | null>;
   listReservations(query: InventoryRow): Promise<{ rows: InventoryRow[]; total: number }>;
-  updateReservationStatus(id: string, status: string, actor: string | null): Promise<InventoryRow | null>;
+  updateReservationStatus(
+    id: string,
+    status: string,
+    actor: string | null,
+  ): Promise<InventoryRow | null>;
   expireReservations(limit: number, actor: string | null): Promise<InventoryRow[]>;
 
   createHold(values: InventoryRow, actor: string | null): Promise<InventoryRow>;
@@ -115,8 +149,16 @@ export interface InventoryRepositoryPort {
   findTransferByNumber(transferNumber: string): Promise<InventoryRow | null>;
   listTransfers(query: InventoryRow): Promise<{ rows: InventoryRow[]; total: number }>;
   listTransferItems(transferId: string, forUpdate?: boolean): Promise<InventoryRow[]>;
-  updateTransferStatus(id: string, status: string, actor: string | null): Promise<InventoryRow | null>;
-  updateTransferItem(id: string, values: InventoryRow, actor: string | null): Promise<InventoryRow | null>;
+  updateTransferStatus(
+    id: string,
+    status: string,
+    actor: string | null,
+  ): Promise<InventoryRow | null>;
+  updateTransferItem(
+    id: string,
+    values: InventoryRow,
+    actor: string | null,
+  ): Promise<InventoryRow | null>;
 
   createCycleCount(values: InventoryRow, actor: string | null): Promise<InventoryRow>;
   createCycleCountItem(values: InventoryRow, actor: string | null): Promise<InventoryRow>;
@@ -124,13 +166,22 @@ export interface InventoryRepositoryPort {
   getCycleCountForUpdate(id: string): Promise<InventoryRow | null>;
   listCycleCounts(query: InventoryRow): Promise<{ rows: InventoryRow[]; total: number }>;
   listCycleCountItems(cycleCountId: string, forUpdate?: boolean): Promise<InventoryRow[]>;
-  updateCycleCount(id: string, values: InventoryRow, actor: string | null, rowVersion: number): Promise<InventoryRow | null>;
-  updateCycleCountItem(id: string, values: InventoryRow, actor: string | null): Promise<InventoryRow | null>;
+  updateCycleCount(
+    id: string,
+    values: InventoryRow,
+    actor: string | null,
+    rowVersion: number,
+  ): Promise<InventoryRow | null>;
+  updateCycleCountItem(
+    id: string,
+    values: InventoryRow,
+    actor: string | null,
+  ): Promise<InventoryRow | null>;
 }
 
 export const INVENTORY_REPOSITORY = Symbol('INVENTORY_REPOSITORY');
-  // * Warehouse and replenishment operations.
-  // * Inventory lot, balance, location, and ledger operations.
-  // * Reservation and hold lifecycle operations.
-  // * Adjustment and transfer operations.
-  // * Cycle-count operations.
+// * Warehouse and replenishment operations.
+// * Inventory lot, balance, location, and ledger operations.
+// * Reservation and hold lifecycle operations.
+// * Adjustment and transfer operations.
+// * Cycle-count operations.
