@@ -1,8 +1,16 @@
-# Adding a feature
+# 📘 Adding a feature
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 Use a vertical feature slice for a new workflow. The goal is to keep the transport contract, orchestration, tests, and module wiring close enough that ownership is obvious.
 
-## Workflow
+## 🔹 Workflow
 
 1. Identify the owning bounded context. If ownership is unclear, resolve that before creating a folder.
 2. Check the context's `README.md`, `public-api.ts`, and existing feature patterns.
@@ -15,7 +23,7 @@ Use a vertical feature slice for a new workflow. The goal is to keep the transpo
 9. Update the context README, API documentation, and an ADR when the change alters a durable architectural decision.
 10. Run the full verification commands before review.
 
-## Expected scaffold shape
+## 🔹 Expected scaffold shape
 
 ```text
 libs/modules/<context>/src/features/<feature>/
@@ -48,11 +56,11 @@ libs/modules/auth/src/features/<feature>/
 Use `libs/modules/auth/README.md` as the source of truth for auth feature
 ownership and its application/infrastructure collaborators.
 
-## Cross-context needs
+## 🔹 Cross-context needs
 
 If another bounded context needs a result immediately, add the smallest useful operation to the owning context's public facade. If it only needs to react, publish a versioned integration event. Never export a handler or import another context's private implementation.
 
-## Definition of done
+## 🔹 Definition of done
 
 - Input is validated and output follows the context's public response contract.
 - Business rules are covered independently of NestJS and PostgreSQL where practical.

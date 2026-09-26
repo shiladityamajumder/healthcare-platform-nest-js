@@ -1,16 +1,24 @@
-# Contributing
+# 📘 Contributing
 
-## Before coding
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
+## 🔹 Before coding
 
 Read [architecture](02-ARCHITECTURE.md), [module boundaries](04-MODULE-BOUNDARIES.md), and the README for the owning context. Confirm whether the change affects a public contract, schema, security control, or operational behavior.
 
-## Change ownership
+## 🔹 Change ownership
 
 Keep a pull request focused on one bounded context or one cross-cutting concern. Cross-context edits are acceptable when the public contract or integration behavior genuinely changes; explain the dependency in the pull request.
 
 Do not move code into `libs/shared-kernel` or `libs/platform` only to remove local duplication. Promote code only when its ownership is stable and its abstraction is genuinely domain-neutral or technical.
 
-## Pull request checklist
+## 🔹 Pull request checklist
 
 - [ ] Scope and owning context are clear.
 - [ ] Public API or facade changes have been reviewed by consumers.
@@ -21,7 +29,7 @@ Do not move code into `libs/shared-kernel` or `libs/platform` only to remove loc
 - [ ] Documentation and ADRs are updated when required.
 - [ ] `pnpm check` passes.
 
-## Local verification
+## 🔹 Local verification
 
 ```bash
 pnpm architecture:check

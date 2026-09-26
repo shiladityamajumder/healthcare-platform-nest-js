@@ -1,11 +1,19 @@
-# Identity master-data seed
+# 📘 Identity master-data seed
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 The NestJS equivalent of `auth_service/scripts/seed_identity_master_data.py` is
 [`tools/seed/seed-identity-master-data.ts`](../tools/seed/seed-identity-master-data.ts),
 with its static RBAC manifest in
 [`tools/seed/identity-rbac-manifest.json`](../tools/seed/identity-rbac-manifest.json).
 
-## Why this exists
+## 🔹 Why this exists
 
 The identity service and the NestJS platform share the externally managed
 PostgreSQL `identity` schema. This command installs the canonical RBAC master
@@ -26,7 +34,7 @@ not delete roles or permissions outside the manifest. Permissions are
 capabilities only; domain services must still enforce ownership, scope,
 purpose-of-use, consent, and other domain invariants.
 
-## Prerequisites
+## 🔹 Prerequisites
 
 - Run the externally owned `healthcare_db` identity migrations first.
 - Use Node.js 22+ and pnpm 11.
@@ -36,7 +44,7 @@ purpose-of-use, consent, and other domain invariants.
 - Ensure `DEFAULT_ROLE_CODE` is one of the seeded roles; it defaults to
   `customer`.
 
-## Run it
+## 🔹 Run it
 
 From `healthcare-platform-nest-js/`:
 
@@ -61,7 +69,7 @@ $env:DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/healthcare'
 pnpm seed:identity
 ```
 
-## Operational notes
+## 🔹 Operational notes
 
 Run this after a fresh database migration and before registering users or
 starting workflows that require role resolution. Review the output in deployment

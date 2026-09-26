@@ -1,8 +1,16 @@
-# Libraries reference
+# 📘 Libraries reference
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 This catalog is the current navigation index for libs/. Most scaffolded feature folders use the command/handler pattern explained in 05-LIBS-GUIDE.md. Auth is the implemented service-based variant with feature controllers, schemas, services, and focused repositories. Many non-auth handlers are scaffolds; the catalog describes code shape, not production readiness.
 
-## Business contexts and feature slices
+## 🔹 Business contexts and feature slices
 
 | Context         | Feature folders                                                                                          |
 | --------------- | -------------------------------------------------------------------------------------------------------- |
@@ -24,7 +32,7 @@ This catalog is the current navigation index for libs/. Most scaffolded feature 
 
 Every context also contains a root module, public API entry point, contract facade, and README. Most scaffolded feature folders contain the repeated command/handler pattern described in 05-LIBS-GUIDE.md. Auth instead keeps each feature's controller, schema, service, and feature-owned repository together, with cross-feature contracts under `src/contracts`, orchestration under `src/application/workflow`, and adapters under `src/infrastructure`.
 
-## Platform packages
+## 🔹 Platform packages
 
 | Package       | Source areas                                                      | Purpose                                                    |
 | ------------- | ----------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -38,11 +46,11 @@ Every context also contains a root module, public API entry point, contract faca
 | observability | observability.module.ts, index.ts                                 | Metrics/tracing seam                                       |
 | security      | security.module.ts, index.ts                                      | Shared security policy seam                                |
 
-## Database row-contract groups
+## 🔹 Database row-contract groups
 
 The database schema tree has an index.ts plus one row-interface file per table. The groups are appointment, catalog, clinical, commerce, compliance, customer, diagnostics, finance, fulfillment, identity, insurance, logistics, marketplace, membership, notification, organization, payment, platform, pricing, procurement, risk, search, support, and warehouse. Each file name is the corresponding table name, such as schema/catalog/products.ts or schema/payment/payment_intents.ts.
 
-## Shared kernel files
+## 🔹 Shared kernel files
 
 | File                                            | Purpose                                            |
 | ----------------------------------------------- | -------------------------------------------------- |

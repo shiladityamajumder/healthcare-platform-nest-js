@@ -1,8 +1,16 @@
-# Libraries guide
+# 📘 Libraries guide
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 This is the detailed map for code under libs/. Read it before adding a file or importing from another library.
 
-## Three kinds of library
+## 🔹 Three kinds of library
 
 | Location                | Owns                                                | May depend on                        | Must not become                  |
 | ----------------------- | --------------------------------------------------- | ------------------------------------ | -------------------------------- |
@@ -12,13 +20,13 @@ This is the detailed map for code under libs/. Read it before adding a file or i
 
 Dependency direction is inward: controller -> application service/handler -> domain/ports. Infrastructure implements ports and depends inward. A business context can be consumed by another context only through @modules/<name>, which points to public-api.ts.
 
-## A business context
+## 🔹 A business context
 
 Each directory in libs/modules is a bounded context such as Auth, Orders, Inventory, or Patients. It owns its business decisions and externally visible contract. Its README names the capability and feature inventory; docs/06-LIBS-REFERENCE.md lists every current context and feature.
 
 The root <context>.module.ts registers the context. public-api.ts is the only supported cross-context import surface. contracts/*.facade.ts contains narrow interfaces or tokens for callers that really need a synchronous answer. Auth additionally keeps internal contracts under `src/contracts`, application orchestration under `src/application`, and technical adapters under `src/infrastructure`.
 
-## Feature slice files
+## 🔹 Feature slice files
 
 Every feature folder is a vertical slice. The repeated file names are deliberate: learn one slice and you can navigate all of them.
 
@@ -52,7 +60,7 @@ one giant auth repository or service.
 
 If a handler is currently a not-implemented placeholder, implement the rule, authorization, persistence behavior, audit needs, and tests together. Do not treat the scaffold return value as a usable business result.
 
-## Platform libraries
+## 🔹 Platform libraries
 
 Platform packages are technical utilities shared by the process. They must not import a business module. Import them through their @platform/<package> alias.
 
@@ -70,17 +78,17 @@ Platform packages are technical utilities shared by the process. They must not i
 
 Most of these packages are intentionally light scaffolds. Add an integration only when a real use case needs it; keep provider-specific code behind the platform package rather than leaking an SDK into a business module.
 
-## Database schema files
+## 🔹 Database schema files
 
 libs/platform/database/src/schema is a catalog of TypeScript row interfaces, grouped by database domain such as identity, customer, clinical, catalog, commerce, payment, warehouse, and platform. A file like schema/catalog/products.ts describes the columns returned by catalog.products. index.ts files re-export the group; table-names.ts centralizes table identifiers.
 
 These are not ORM entities: they do not own migrations, synchronize tables, or contain business behavior. Use them to type parameterized raw SQL in the owning repository. Keep table writes in the owning bounded context even though the row interface is centrally visible.
 
-## Shared kernel
+## 🔹 Shared kernel
 
 shared-kernel contains Entity, DomainEvent, IntegrationEvent, ApplicationError, and Page primitives. Use one only when the concept is stable and has the same meaning in many contexts. Context-specific concepts must stay in their owner module.
 
-## How to write code in libs
+## 🔹 How to write code in libs
 
 1. Pick the owning context; do not place business logic in apps/api or platform.
 2. Copy the shape of the nearest feature, not just a class name.

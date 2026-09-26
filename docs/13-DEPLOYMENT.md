@@ -1,6 +1,14 @@
-# Deployment model
+# 📘 Deployment model
 
-## Current topology
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
+## 🔹 Current topology
 
 The repository produces one backend deployable. All business contexts run in the same NestJS process and scale as one stateless API unit.
 
@@ -14,11 +22,11 @@ flowchart LR
   API2 -. optional .-> R
 ```
 
-## Local topology
+## 🔹 Local topology
 
 `docker compose up -d postgres` starts the local PostgreSQL dependency. The API runs from the host with `pnpm start:dev`. MongoDB and Redis are optional and are not started by the current compose file.
 
-## Production baseline
+## 🔹 Production baseline
 
 - Run multiple API replicas behind a load balancer.
 - Keep containers stateless; store files in object storage, not the container filesystem.
@@ -29,10 +37,10 @@ flowchart LR
 - Define health semantics that distinguish process liveness from dependency readiness before production rollout.
 - Set resource limits, graceful shutdown, timeouts, retry policies, and rate limits explicitly.
 
-## Container
+## 🔹 Container
 
 The `Dockerfile` builds the Nest API and starts `dist/apps/api/main.js`. The image should be scanned, pinned to an approved base-image policy, and run as a non-root user before production use.
 
-## Release gate
+## 🔹 Release gate
 
 No release should rely on the scaffold's placeholder handlers. Verify API contracts, authorization, audit trails, data retention, and disaster-recovery procedures in the target environment.

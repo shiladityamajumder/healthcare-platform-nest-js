@@ -1,12 +1,20 @@
-# Runtime and request flow
+# 📘 Runtime and request flow
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 This guide follows the actual startup and request path in the current repository, separating NestJS wiring from feature behavior.
 
-## Current-state note
+## 🔹 Current-state note
 
 The current AppModule composes platform libraries, BaseModule, HealthModule, and AuthModule. Auth routes are live; most other feature slices under libs/modules are scaffolds and are not automatically live endpoints until their context module is imported into AppModule and their service/handler is implemented.
 
-## Startup path
+## 🔹 Startup path
 
 1. apps/api/src/main.ts creates Nest with FastifyAdapter.
 2. Nest resolves AppModule imports and providers.
@@ -16,17 +24,17 @@ The current AppModule composes platform libraries, BaseModule, HealthModule, and
 
 Main files: main.ts starts the process; bootstrap/configure-application.ts configures global HTTP behavior; app.module.ts is the runtime wiring map.
 
-## Request path
+## 🔹 Request path
 
 Client -> Fastify -> prefix/version routing -> request context -> schema/DTO validation -> controller -> execution boundary -> service/handler -> repository or provider -> database -> response interceptor -> client.
 
-## HTTP kernel
+## 🔹 HTTP kernel
 
 HttpKernelModule registers RequestContextMiddleware, OperationExecutionInterceptor, ApiResponseInterceptor, and ApiExceptionFilter. Do not duplicate ordinary response envelopes, exception serialization, logging, or request IDs in every controller.
 
 ValidationPipe transforms input, allows only DTO-declared fields, and rejects unknown fields. That is why request DTOs are part of the public API contract.
 
-## Execution and data
+## 🔹 Execution and data
 
 For ordinary controller work, OperationExecutionInterceptor calls ExecutionService. It records the operation and normally opens a PostgreSQL transaction. An exception rolls the transaction back and is then handled by the API exception filter. Use @NonTransactional only for endpoints such as health checks that must work while PostgreSQL is unavailable.
 
@@ -46,7 +54,7 @@ Its registration, password, session, OTP, and RBAC writes are rolled back as a
 unit when any step fails. Refresh rotation additionally uses a row lock to
 prevent two concurrent requests from consuming one refresh token.
 
-## Trace a feature
+## 🔹 Trace a feature
 
 1. Find the route in `features/<feature>/<feature>.controller.ts`.
 2. Read its request schema/DTO.

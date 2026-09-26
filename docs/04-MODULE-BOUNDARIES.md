@@ -1,8 +1,16 @@
-# Module boundaries
+# 📘 Module boundaries
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 Boundaries are part of the system design, not a convention to remember during review. `pnpm architecture:check` validates the most important dependency rules locally and in CI.
 
-## Rules
+## 🔹 Rules
 
 1. `apps/api` is the composition root. It contains bootstrap, transport-wide concerns, and health checks—not business workflows.
 2. Platform libraries must not import business modules.
@@ -15,7 +23,7 @@ Boundaries are part of the system design, not a convention to remember during re
 9. HTTP DTOs, domain objects, and persistence entities are different models. Do not reuse one as another.
 10. Repositories, SQL query files, and provider adapters remain private to their owning context.
 
-## Allowed cross-module usage
+## 🔹 Allowed cross-module usage
 
 ```ts
 // * Allowed: the public contract is the only import target.
@@ -30,11 +38,11 @@ import { StockOrmEntity } from '@modules/inventory/src/infrastructure/...';
 
 Public APIs should expose the smallest contract that a real consumer needs. An empty facade is better than exporting internal services speculatively.
 
-## Why this matters
+## 🔹 Why this matters
 
 Process-level modularity is weaker than a network boundary: any file can technically import any other file unless the repository prevents it. Keeping contracts narrow reduces accidental coupling, clarifies ownership, and leaves a credible path to extract a context later.
 
-## Enforcement
+## 🔹 Enforcement
 
 Run the check before committing architecture changes:
 

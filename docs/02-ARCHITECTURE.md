@@ -1,6 +1,14 @@
-# Architecture
+# 📘 Architecture
 
-## Summary
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
+## 🔹 Summary
 
 The backend is a **modular monolith**: one NestJS process, one deployment unit, and multiple business bounded contexts with enforced dependency boundaries. This gives the project simple local transactions and operations while keeping future extraction possible when a context genuinely needs independent scaling, release cadence, or fault isolation.
 
@@ -14,7 +22,7 @@ flowchart LR
   Platform -. optional .-> Mongo[(MongoDB)]
 ```
 
-## Repository layers
+## 🔹 Repository layers
 
 | Layer            | Location             | Responsibility                                                                    | May depend on                                    |
 | ---------------- | -------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------ |
@@ -25,7 +33,7 @@ flowchart LR
 
 The composition root wires modules together; it does not own business workflows. A business module owns its transport boundary, application services/handlers, domain model, persistence adapters, and tests.
 
-## Dependency direction
+## 🔹 Dependency direction
 
 ```mermaid
 flowchart LR
@@ -43,7 +51,7 @@ flowchart LR
 - Infrastructure implements ports and owns SQL repositories, provider SDKs, storage, and other technical details.
 - SQL repositories and query files are private to their owning bounded context.
 
-## Feature slices
+## 🔹 Feature slices
 
 Features live under `libs/modules/<context>/src/features/<feature>`. A slice keeps its controller, request schemas/DTOs, application service or command/handler, module wiring, persistence collaborators, and focused tests together. This limits merge contention and makes the unit of ownership visible in the filesystem.
 
@@ -55,7 +63,7 @@ adapters under `auth/src/infrastructure`.
 
 The current repository contains implemented auth, catalog, and pricing contexts plus scaffolded slices across users, organizations, patients, practitioners, files, inventory, orders, payments, notifications, prescriptions, appointments, and audit. The feature directory and each context README are the source of truth for the current inventory.
 
-## Cross-module communication
+## 🔹 Cross-module communication
 
 Use the least coupled mechanism that satisfies the use case:
 
@@ -66,7 +74,7 @@ Use the least coupled mechanism that satisfies the use case:
 
 Consumers may import only `@modules/<name>`, which resolves to that context's `src/public-api.ts`. They must not import another module's features, domain objects, SQL repositories, or providers.
 
-## Data ownership
+## 🔹 Data ownership
 
 One PostgreSQL database is acceptable for the monolith, but ownership is logical:
 
@@ -77,13 +85,13 @@ One PostgreSQL database is acceptable for the monolith, but ownership is logical
 
 The database connection is platform-owned. The database schema is external to this application, while SQL repositories and query files remain private to their owning context.
 
-## Transactions and consistency
+## 🔹 Transactions and consistency
 
 Application use cases own transaction boundaries. Repositories do not commit independently. In the API, the global operation-execution interceptor supplies this boundary; auth's multi-step flows use it for identity creation, OTP consumption, password changes, RBAC replacement, and session rotation. Use database constraints, explicit locks, idempotency keys, and deterministic lock ordering for workflows such as inventory, orders, and payments.
 
 Do not keep a database transaction open across a network call. Represent external work as durable state transitions and use an outbox or saga-style workflow where necessary.
 
-## Extraction readiness
+## 🔹 Extraction readiness
 
 A context is a candidate for extraction only when it has:
 

@@ -1,8 +1,16 @@
-# Testing strategy
+# 📘 Testing strategy
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 Tests should provide fast feedback at the lowest level that proves the behavior, with a small number of high-value end-to-end journeys.
 
-## Test layers
+## 🔹 Test layers
 
 | Layer        | Purpose                                                     | Typical location          |
 | ------------ | ----------------------------------------------------------- | ------------------------- |
@@ -14,7 +22,7 @@ Tests should provide fast feedback at the lowest level that proves the behavior,
 
 Mock ports and contracts, not NestJS internals. Use disposable real infrastructure when SQL behavior, transaction semantics, serialization, or provider integration is the behavior under test.
 
-## Commands
+## 🔹 Commands
 
 ```bash
 pnpm test
@@ -23,7 +31,7 @@ pnpm test:e2e
 pnpm architecture:check
 ```
 
-## Expectations
+## 🔹 Expectations
 
 - Test success, validation, authorization, conflict, retry, and failure paths.
 - Add regression coverage for every production bug.

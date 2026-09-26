@@ -1,4 +1,12 @@
-# Database conventions
+# 📘 Database conventions
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 `libs/platform/database` is a client-only PostgreSQL access library. It owns the connection pool, parameterized raw query helper, and transaction primitives. The PostgreSQL database, schemas, tables, constraints, and indexes are managed externally and must already exist before this application starts.
 
@@ -16,7 +24,7 @@ live under `src/features/registration`, session persistence under
 `src/features/administration`. Its `src/infrastructure/persistence/auth.repository.ts`
 is only a small DI facade and contains no SQL.
 
-## Raw SQL rules
+## 🔹 Raw SQL rules
 
 - Use `PostgresDatabase.query()` with `$1`, `$2`, ... parameters for all values.
 - Use the fixed `TABLES` constants for schema-qualified table identifiers.
@@ -32,7 +40,7 @@ documented exception for operational RBAC bootstrap. It seeds only the managed
 identity roles, permissions, and role-permission mappings after the external
 identity migrations have created those tables.
 
-## Execution and rollback
+## 🔹 Execution and rollback
 
 HTTP handlers are automatically wrapped by `OperationExecutionInterceptor`. A normal business request therefore has this flow:
 
@@ -54,10 +62,10 @@ non-transactional exceptions. Registration, OTP verification, password reset,
 RBAC replacement, and session rotation remain within one transaction; refresh
 rotation also locks the session row to prevent concurrent double use.
 
-## Consistency
+## 🔹 Consistency
 
 MongoDB and Redis are optional platform integrations. Enable them only when the service is available and the owning module has a clear persistence or caching contract.
 
-## Healthcare data
+## 🔹 Healthcare data
 
 Schema design must account for classification, retention, auditability, encryption, least privilege, access reviews, and jurisdiction-specific requirements. These repository conventions do not replace a compliance or privacy review.

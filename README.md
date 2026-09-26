@@ -5,6 +5,10 @@
 </p>
 
 <p align="center">
+  <img src="assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/NestJS-12-E0234E?logo=nestjs&logoColor=white" alt="NestJS 12" />
   <img src="https://img.shields.io/badge/Runtime-Node.js%2022%2B-339933?logo=nodedotjs&logoColor=white" alt="Node.js 22 or newer" />
   <img src="https://img.shields.io/badge/API-Fastify%205-000000?logo=fastify&logoColor=white" alt="Fastify 5" />
@@ -15,7 +19,7 @@ NestJS 12 modular monolith for a healthcare platform. The repository contains on
 
 > **Current status:** `AuthModule`, `CatalogModule`, and `PricingModule` are composed into the running API. Auth provides identity/session/RBAC workflows; Catalog and Pricing provide the product, reference-master, price-book, product-price, and tax-rule APIs. The remaining bounded contexts are scaffolds and are not production endpoints yet. This repository is not a compliance certification or a production-ready healthcare system by itself.
 
-## At a glance
+## 🧭 At a glance
 
 | Area                | Current implementation                                                        |
 | ------------------- | ----------------------------------------------------------------------------- |
@@ -30,7 +34,7 @@ NestJS 12 modular monolith for a healthcare platform. The repository contains on
 | Deployment shape    | One stateless API process                                                     |
 | Boundary check      | `pnpm architecture:check`                                                     |
 
-## Documentation
+## 📚 Documentation
 
 - [Documentation hub](docs/00-README.md)
 - [Getting oriented](docs/01-GETTING-ORIENTED.md)
@@ -48,16 +52,16 @@ NestJS 12 modular monolith for a healthcare platform. The repository contains on
 
 The README in each bounded context is the local feature inventory. Auth, Catalog, and Pricing document implemented contracts; the remaining context READMEs document scaffold scope and limitations.
 
-## Local development
+## 🛠️ Local development
 
-### Prerequisites
+### ✅ Prerequisites
 
 - Node.js 22 or newer
 - pnpm 11.17 or another compatible pnpm 11 release
 - Docker Desktop or another Docker runtime
 - An externally managed PostgreSQL schema containing the identity/RBAC tables required by auth
 
-### Start the API
+### 🚀 Start the API
 
 ```bash
 pnpm install --frozen-lockfile
@@ -83,7 +87,7 @@ The API listens on `http://localhost:3000` by default. The compose file starts P
 
 Versioned auth routes are served under `/api/v1`. The API wraps successful results and errors in the platform response envelope and includes request, correlation, API-version, timestamp, and optional pagination metadata.
 
-## Common commands
+## ⚡ Common commands
 
 ```bash
 pnpm start:dev          # development server with watch mode
@@ -105,7 +109,7 @@ pnpm check              # format, architecture, lint, test, and build
 
 The seed command reads `tools/seed/identity-rbac-manifest.json`. It inserts or updates identity master data only; it does not create database tables or run migrations. Use `--check-only` to validate the manifest without writing.
 
-## Repository shape
+## 🗂️ Repository shape
 
 ```text
 apps/api/                 API composition root, bootstrap, health, metadata, e2e tests
@@ -119,7 +123,7 @@ docs/                     Engineering handbook and ADRs
 
 Each business context has a root module and `src/public-api.ts`. Cross-context code may import only the public API alias such as `@modules/auth`; implementation paths, SQL, repositories, and feature internals remain private.
 
-## Bounded contexts
+## 🧩 Bounded contexts
 
 The current contexts are `auth`, `user-management`, `organizations`, `patients`, `practitioners`, `file-management`, `catalog`, `pricing`, `inventory`, `orders`, `payments`, `notifications`, `prescriptions`, `appointments`, and `audit`.
 
@@ -127,7 +131,7 @@ Auth, Catalog, and Pricing are composed by `apps/api/src/app.module.ts`. Auth us
 
 The remaining contexts currently use command/handler-oriented vertical slices. Their controllers, DTOs, commands, handlers, modules, tests, and facade contracts describe intended ownership, but the handlers are placeholders and the context modules are not imported by the API composition root.
 
-## Configuration and persistence
+## ⚙️ Configuration and persistence
 
 Copy `.env.example` to `.env`. The default local configuration enables the PostgreSQL client and authentication, disables MongoDB and Redis, enables Swagger, and uses `DATABASE_HOST`/`DATABASE_NAME`/`DATABASE_USER`/`DATABASE_PASSWORD` unless `DATABASE_URL` is supplied.
 
@@ -135,7 +139,7 @@ The database platform uses a shared `pg` pool, parameterized SQL, and `AsyncLoca
 
 MongoDB and Redis are optional adapters. Set their enabled flags and connection settings only when a feature actually needs them. Never commit credentials, JWT secrets, patient data, payment data, or provider secrets.
 
-## Engineering contract
+## 🔒 Engineering contract
 
 Before opening a pull request:
 

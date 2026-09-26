@@ -1,11 +1,19 @@
-# Get oriented: this NestJS codebase for developers from other frameworks
+# 📘 Get oriented: this NestJS codebase for developers from other frameworks
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
 
 This guide explains the NestJS codebase for developers coming from other backend frameworks.
 This is the recommended first document if you already know backend development but do not know NestJS. It maps familiar ideas from Express, FastAPI, Django, Spring, Rails, ASP.NET, or Laravel to the code in this repository.
 
 The project is a modular monolith: one Node.js process and deployment, with separate business areas kept behind explicit source-code boundaries. The architecture is mature enough to guide development, but many feature handlers are deliberately scaffolds rather than completed healthcare workflows. Treat an existing feature folder as a contract and a starting point, not proof that the endpoint is production-ready.
 
-## The shortest useful mental model
+## 🔹 The shortest useful mental model
 
 NestJS is TypeScript server-side application structure built on top of an HTTP adapter. Here the adapter is Fastify. NestJS gives the project modules, dependency injection, decorators, validation hooks, interceptors, exception filters, and testing helpers.
 
@@ -20,7 +28,7 @@ NestJS is TypeScript server-side application structure built on top of an HTTP a
 | Middleware                      | Nest middleware, guards, interceptors, filters, pipes | libs/platform/http                          |
 | ORM model/entity                | Not used here; raw PostgreSQL row interfaces are used | libs/platform/database/src/schema           |
 
-## Core NestJS concepts
+## 🔹 Core NestJS concepts
 
 Start with a module: it is the dependency container and registration boundary. A feature module registers its controller and application service/handler; AppModule assembles the currently live feature and platform modules.
 
@@ -28,7 +36,7 @@ Controllers translate HTTP requests and responses. Schemas/DTOs describe validat
 
 Decorators beginning with @ are framework wiring: @Module declares a container, @Controller owns a route, @Get/@Post declare endpoints, and @Injectable marks a constructible provider.
 
-## Read the repository in this order
+## 🔹 Read the repository in this order
 
 1. Read the root README, then docs/02-ARCHITECTURE.md and docs/04-MODULE-BOUNDARIES.md.
 2. Open apps/api/src/main.ts, then bootstrap/configure-application.ts, then app.module.ts. This is server creation, global setup, and module wiring.
@@ -36,7 +44,7 @@ Decorators beginning with @ are framework wiring: @Module declares a container, 
 4. Choose one context in libs/modules, read its README, and follow one feature from controller to schema/DTO, service or handler, repository/port, and test.
 5. Use docs/05-LIBS-GUIDE.md and docs/06-LIBS-REFERENCE.md before changing a library.
 
-## Where code belongs
+## 🔹 Where code belongs
 
 - apps/api is the HTTP composition root, not a home for business workflows.
 - libs/modules/<context> owns a business capability such as Orders, Inventory, or Patients.
@@ -45,6 +53,6 @@ Decorators beginning with @ are framework wiring: @Module declares a container, 
 
 The aliases in tsconfig.json are boundaries: use @platform/<package> for technical code, @shared/... for stable neutral primitives, and only @modules/<name> to consume another bounded context. Do not import another module internal file.
 
-## Before you implement
+## 🔹 Before you implement
 
 Choose the owning context first. Define request and response schemas/DTOs if the work is HTTP-facing. Keep the controller thin, put workflow decisions in a service/handler or domain code, use the owner module contract for cross-context work, and add focused tests. Read docs/03-RUNTIME-FLOW.md, docs/05-LIBS-GUIDE.md, docs/10-ADDING-A-FEATURE.md, and docs/11-TESTING.md next.
