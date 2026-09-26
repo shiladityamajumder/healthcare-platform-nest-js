@@ -1,10 +1,18 @@
-# Authentication bounded context
+# 🔐 Authentication bounded context
+
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
 
 <p><img src="https://img.shields.io/badge/Status-Implemented-16A34A?logo=auth0&logoColor=white" alt="Authentication context implemented" /></p>
 
+<p align="center">
+  <img src="../../../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
 Identity registration, credentials, verification, sessions, JWTs, current-user access, and RBAC administration. This is the only business bounded context currently imported by `apps/api/src/app.module.ts`.
 
-## Implemented feature areas
+## ✨ Implemented feature areas
 
 - `capabilities` — auth capability flags and `/.well-known/jwks.json` metadata; explicitly non-transactional.
 - `registration` — email registration, phone OTP registration, email-verification request, and email verification.
@@ -17,7 +25,7 @@ Identity registration, credentials, verification, sessions, JWTs, current-user a
 
 The controllers, services, repositories, SQL loader, token service, validation schemas, and focused workflow helpers in this context are implemented. The external PostgreSQL schema and identity/RBAC master data must exist before database-backed routes can succeed.
 
-## HTTP surface
+## 🌐 HTTP surface
 
 The global prefix is `/api` and URI versioning defaults to `v1`, so the normal base is `/api/v1`.
 
@@ -35,7 +43,7 @@ The global prefix is `/api` and URI versioning defaults to `v1`, so the normal b
 
 See the generated Swagger document at `/api/docs` for request schemas, examples, status codes, bearer security, and the exact nested administration routes.
 
-## Internal structure
+## 🧱 Internal structure
 
 ```text
 src/
@@ -59,7 +67,7 @@ src/
 
 The public boundary is `src/public-api.ts`, which exports only `AuthModule` and the intentionally narrow `AuthFacade` contract. Consumers must use `@modules/auth`; they must not import feature services, repositories, token adapters, or SQL.
 
-## Persistence and transaction behavior
+## 🗄️ Persistence and transaction behavior
 
 Auth uses parameterized raw SQL through the shared `PostgresDatabase`; it does not use an ORM, entity metadata, schema synchronization, migrations, or DDL. SQL files are under `src/infrastructure/persistence/sql` and are loaded by the auth persistence adapter. The loader first checks for a compiled SQL asset and then falls back to the source-tree file; verify SQL asset packaging when producing a deployment artifact because the current Nest build reports that this asset pattern is not matched.
 
@@ -67,7 +75,7 @@ The global `OperationExecutionInterceptor` opens one PostgreSQL transaction for 
 
 The capabilities and JWKS routes use `@NonTransactional()` so discovery remains available when PostgreSQL is unavailable. All other auth handlers are transactional by default.
 
-## Authentication and authorization behavior
+## 🛡️ Authentication and authorization behavior
 
 - Passwords are hashed with Argon2; password policy is controlled by `PASSWORD_MIN_LENGTH` and requires three of four character classes.
 - Access and refresh tokens are signed separately and include a server-side session identifier.
@@ -80,7 +88,7 @@ The capabilities and JWKS routes use `@NonTransactional()` so discovery remains 
 
 `AuthNotificationMessageService` builds provider-neutral SMS/email payloads for login, registration, email verification, and password recovery. Provider dispatch is still a TODO: no SMS/email is sent and no notification row is written by the current auth implementation.
 
-## Request and response flow
+## 🔄 Request and response flow
 
 ```text
 RequestContextMiddleware

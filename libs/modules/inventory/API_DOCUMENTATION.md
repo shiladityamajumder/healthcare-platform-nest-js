@@ -1,5 +1,13 @@
 # 📦 Inventory API Documentation
 
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../../../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
 > **Module:** `libs/modules/inventory`  
 > **API style:** REST/JSON  
 > **Audience:** Web, Android, iOS, fulfilment, warehouse, and operations frontend developers  
@@ -10,6 +18,7 @@ This document describes every HTTP endpoint currently mounted by the inventory m
 
 ## 📚 Contents
 
+- [✅ Contract status](#contract-status)
 - [🚀 Quick start](#-quick-start)
 - [📐 API conventions](#-api-conventions)
 - [🔐 Authorization and actor context](#-authorization-and-actor-context)
@@ -24,6 +33,30 @@ This document describes every HTTP endpoint currently mounted by the inventory m
 - [🔢 Cycle counts](#-cycle-counts)
 - [📊 Replenishment rules](#-replenishment-rules)
 - [🧭 Recommended frontend flows](#-recommended-frontend-flows)
+
+---
+
+<a id="contract-status"></a>
+
+## ✅ Contract status
+
+| Contract item | Source-aligned state |
+| --- | --- |
+| Runtime mount | `InventoryModule` is imported by [`AppModule`](../../../apps/api/src/app.module.ts). |
+| API address | URI version `v1`; every route resolves below `/api/v1`. |
+| Route audit | **45 documented / 45 registered controller operations**. |
+| Registered surfaces | `WarehousesController`, `InventoryRoutesController`, and `ReplenishmentRulesController`. |
+| Runtime specification | Swagger is generated at `/api/docs`; controller decorators are the code source of truth. |
+| Scaffold exclusion | `inventory/get-stock`, `inventory/adjust-stock`, `inventory/reserve-stock`, `inventory/release-reservation`, and `inventory/transfer-stock` have source folders, but their feature modules are not imported by `InventoryModule`; they are not mounted endpoints. |
+
+### 🗺️ Route coverage
+
+| Surface | Registered controller | Operations |
+| --- | --- | ---: |
+| Warehouse lifecycle and bins | `WarehousesController` | 7 |
+| Balances, lots, adjustments, reservations, holds, locations, ledger, transfers, counts, and availability | `InventoryRoutesController` | 36 |
+| Replenishment rules | `ReplenishmentRulesController` | 2 |
+| **Total** | **3 controllers** | **45** |
 
 ---
 

@@ -1,5 +1,13 @@
 # 🛍️ Catalog API Documentation
 
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../../../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
 > **Module:** libs/modules/catalog  
 > **API style:** REST/JSON  
 > **Audience:** Web, Android, and iOS frontend developers, catalogue administrators, pharmacy operations, and merchandising teams  
@@ -10,6 +18,7 @@ This document is the frontend-readable companion to the generated Swagger specif
 
 ## 📚 Contents
 
+- [✅ Contract status](#contract-status)
 - [🚀 Quick start](#-quick-start)
 - [📐 API conventions](#-api-conventions)
 - [🔐 Authorization and audit context](#-authorization-and-audit-context)
@@ -21,6 +30,34 @@ This document is the frontend-readable companion to the generated Swagger specif
 - [🏷️ Reference masters](#️-reference-masters)
 - [🧭 Recommended frontend flows](#-recommended-frontend-flows)
 - [🛠️ Implementation notes](#️-implementation-notes)
+
+---
+
+<a id="contract-status"></a>
+
+## ✅ Contract status
+
+| Contract item | Source-aligned state |
+| --- | --- |
+| Runtime mount | `CatalogModule` is imported by [`AppModule`](../../../apps/api/src/app.module.ts). |
+| API address | URI version `v1`; every route resolves below `/api/v1`. |
+| Route audit | **63 documented / 63 registered controller operations**. |
+| Runtime specification | Swagger is generated at `/api/docs`; controller decorators are the code source of truth. |
+| Authorization model | `X-User-ID` is accepted as audit attribution on supported writes; it is not an authorization credential. |
+
+### 🗺️ Route coverage
+
+| Surface | Registered controller | Operations |
+| --- | --- | ---: |
+| Products, details, and relationships | `ProductsController` | 16 |
+| Substitution groups | `SubstitutionGroupsController` | 10 |
+| Brands | `BrandsController` | 6 |
+| Manufacturers | `ManufacturersController` | 6 |
+| Categories and tree | `CategoriesController` | 7 |
+| Salts | `SaltsController` | 6 |
+| Dosage forms | `DosageFormsController` | 6 |
+| Units of measure | `UnitsController` | 6 |
+| **Total** | **8 controllers** | **63** |
 
 ---
 

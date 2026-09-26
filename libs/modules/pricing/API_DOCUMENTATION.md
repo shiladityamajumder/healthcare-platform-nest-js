@@ -1,5 +1,13 @@
 # 💰 Pricing API Documentation
 
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../../../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
 > **Module:** `libs/modules/pricing`  
 > **API style:** REST/JSON  
 > **Audience:** Web, Android, iOS, admin, checkout, and operations frontend developers  
@@ -10,6 +18,7 @@ This document describes every HTTP endpoint currently exposed by the pricing mod
 
 ## 📚 Contents
 
+- [✅ Contract status](#contract-status)
 - [🚀 Quick start](#-quick-start)
 - [📐 API conventions](#-api-conventions)
 - [🔐 Authorization and audit context](#-authorization-and-audit-context)
@@ -25,6 +34,33 @@ This document describes every HTTP endpoint currently exposed by the pricing mod
 - [🔍 Pricing evaluations](#-pricing-evaluations)
 - [🧭 Recommended frontend flows](#-recommended-frontend-flows)
 - [🛡️ Frontend safety checklist](#️-frontend-safety-checklist)
+
+---
+
+<a id="contract-status"></a>
+
+## ✅ Contract status
+
+| Contract item | Source-aligned state |
+| --- | --- |
+| Runtime mount | `PricingModule` is imported by [`AppModule`](../../../apps/api/src/app.module.ts). |
+| API address | URI version `v1`; every route resolves below `/api/v1`. |
+| Route audit | **37 documented / 37 registered controller operations**. |
+| Runtime specification | Swagger is generated at `/api/docs`; controller decorators are the code source of truth. |
+| Authorization model | Pricing controllers do not apply a bearer guard; surrounding application authorization remains required for operational routes. |
+
+### 🗺️ Route coverage
+
+| Surface | Registered controller | Operations |
+| --- | --- | ---: |
+| Price books | `PriceBooksController` | 6 |
+| Product prices | `ProductPricesController` | 3 |
+| Tax rules | `TaxRulesController` | 6 |
+| Promotions and versions | `PromotionsController` | 10 |
+| Coupon codes | `CouponCodesController` | 6 |
+| Promotion redemptions | `PromotionRedemptionsController` | 3 |
+| Pricing evaluations | `PricingEvaluationsController` | 3 |
+| **Total** | **7 controllers** | **37** |
 
 ---
 

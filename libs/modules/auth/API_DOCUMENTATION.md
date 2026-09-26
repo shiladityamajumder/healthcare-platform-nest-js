@@ -1,5 +1,13 @@
 # 🔐 Authentication API Documentation
 
+<p align="center">
+  <img src="https://nestjs.com/img/logo-small.svg" width="72" alt="NestJS logo" />
+</p>
+
+<p align="center">
+  <img src="../../../assets/readme/healthcare-platform-banner.png" alt="Abstract healthcare platform backend architecture banner" width="100%" />
+</p>
+
 > **Module:** libs/modules/auth  
 > **API style:** REST/JSON  
 > **Audience:** Web, Android, and iOS frontend developers  
@@ -9,6 +17,7 @@ This document describes every HTTP endpoint exposed by the authentication module
 
 ## 📚 Contents
 
+- [✅ Contract status](#contract-status)
 - [🚀 Quick start](#-quick-start)
 - [📐 API conventions](#-api-conventions)
 - [🔑 Authentication and token lifecycle](#-authentication-and-token-lifecycle)
@@ -22,6 +31,35 @@ This document describes every HTTP endpoint exposed by the authentication module
 - [🔒 Password management](#-password-management)
 - [🛡️ Administration and RBAC](#️-administration-and-rbac)
 - [🧭 Recommended frontend flows](#-recommended-frontend-flows)
+
+---
+
+<a id="contract-status"></a>
+
+## ✅ Contract status
+
+| Contract item | Source-aligned state |
+| --- | --- |
+| Runtime mount | `AuthModule` is imported by [`AppModule`](../../../apps/api/src/app.module.ts). |
+| API address | URI version `v1`; every route resolves below `/api/v1`. |
+| Route audit | **44 documented / 44 registered controller operations**. |
+| Runtime specification | Swagger is generated at `/api/docs`; controller decorators are the code source of truth. |
+| Security model | Discovery and authentication flows are public where documented; user, session, and administration flows enforce endpoint-level authorization. |
+
+### 🗺️ Route coverage
+
+| Surface | Registered controller | Operations |
+| --- | --- | ---: |
+| Discovery | `CapabilitiesController` | 2 |
+| Registration and verification | `RegistrationController` | 5 |
+| Login | `LoginController` | 3 |
+| Sessions | `SessionManagementController` | 6 |
+| Password management | `PasswordManagementController` | 5 |
+| Current user | `CurrentUserController` | 3 |
+| User administration | `AdminUsersController` | 8 |
+| Role administration | `AdminRolesController` | 7 |
+| Permission administration | `AdminPermissionsController` | 5 |
+| **Total** | **9 controllers** | **44** |
 
 ---
 
